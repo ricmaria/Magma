@@ -13,4 +13,6 @@ find_package(Vulkan REQUIRED)
 
 find_package(SDL2 REQUIRED)
 
+target_link_libraries(Engine PRIVATE vkbootstrap vma glm tinyobjloader imgui stb_image)
+
 target_link_libraries(Engine PRIVATE Vulkan::Vulkan SDL2::SDL2main SDL2::SDL2)
