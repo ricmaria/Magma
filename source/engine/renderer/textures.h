@@ -4,10 +4,10 @@
 #pragma once
 
 #include <types.h>
-#include <engine.h>
+#include <renderer.h>
 
 namespace vkutil {
 
-	bool load_image_from_file(VulkanEngine& engine, const char* file, AllocatedImage& outImage);
+	bool load_image_from_file(VulkanRenderer& renderer, const char* file, AllocatedImage& outImage);
 
 }

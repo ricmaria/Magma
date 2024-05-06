@@ -8,7 +8,7 @@
 
 
 
-bool vkutil::load_image_from_file(VulkanEngine& engine, const char* file, AllocatedImage & outImage)
+bool vkutil::load_image_from_file(VulkanRenderer& renderer, const char* file, AllocatedImage & outImage)
 {
 	int texWidth, texHeight, texChannels;
 
@@ -24,14 +24,14 @@ bool vkutil::load_image_from_file(VulkanEngine& engine, const char* file, Alloca
 
 	VkFormat image_format = VK_FORMAT_R8G8B8A8_SRGB;
 
-	AllocatedBuffer stagingBuffer = engine.create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY);
+	AllocatedBuffer stagingBuffer = renderer.create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY);
 
 	void* data;
-	vmaMapMemory(engine._allocator, stagingBuffer._allocation, &data);
+	vmaMapMemory(renderer._allocator, stagingBuffer._allocation, &data);
 
 	memcpy(data, pixel_ptr, static_cast<size_t>(imageSize));
 
-	vmaUnmapMemory(engine._allocator, stagingBuffer._allocation);
+	vmaUnmapMemory(renderer._allocator, stagingBuffer._allocation);
 
 	stbi_image_free(pixels);
 
@@ -48,10 +48,10 @@ bool vkutil::load_image_from_file(VulkanEngine& engine, const char* file, Alloca
 	dimg_allocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
 	//allocate and create the image
-	vmaCreateImage(engine._allocator, &dimg_info, &dimg_allocinfo, &newImage._image, &newImage._allocation, nullptr);
+	vmaCreateImage(renderer._allocator, &dimg_info, &dimg_allocinfo, &newImage._image, &newImage._allocation, nullptr);
 	
 	//transition image to transfer-receiver	
-	engine.immediate_submit([&](VkCommandBuffer cmd) {
+	renderer.immediate_submit([&](VkCommandBuffer cmd) {
 		VkImageSubresourceRange range;
 		range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		range.baseMipLevel = 0;
@@ -100,12 +100,12 @@ bool vkutil::load_image_from_file(VulkanEngine& engine, const char* file, Alloca
 	});
 
 
-	engine._mainDeletionQueue.push_function([=]() {
+	renderer._mainDeletionQueue.push_function([=]() {
 	
-		vmaDestroyImage(engine._allocator, newImage._image, newImage._allocation);
+		vmaDestroyImage(renderer._allocator, newImage._image, newImage._allocation);
 	});
 
-	vmaDestroyBuffer(engine._allocator, stagingBuffer._buffer, stagingBuffer._allocation);
+	vmaDestroyBuffer(renderer._allocator, stagingBuffer._buffer, stagingBuffer._allocation);
 
 	std::cout << "Texture loaded succesfully " << file << std::endl;
 

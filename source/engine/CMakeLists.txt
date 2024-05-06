@@ -1,16 +1,26 @@
+
+file(GLOB SRC_ENGINE
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+)
+
+file(GLOB_RECURSE SRC_RENDERER
+    "${CMAKE_CURRENT_SOURCE_DIR}/renderer/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/renderer/*.h"
+)
+
+message(STATUS ${SRC_ENGINE})
+message(STATUS ${SRC_RENDERER})
+
 add_library(Engine
- engine.cpp
- engine.h
- initializers.cpp
- initializers.h
- mesh.cpp
- mesh.h
- textures.h
- textures.cpp
- types.h
+ ${SRC_ENGINE}
+ ${SRC_RENDERER}
  )
 
-target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${Vulkan_INCLUDE_DIR})
+source_group("Source Files" FILES ${SRC_ENGINE})
+source_group("Source Files/renderer" FILES ${SRC_RENDERER})
+
+target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/renderer/" ${Vulkan_INCLUDE_DIR})
 
 target_link_libraries(Engine compiler_flags)
 
