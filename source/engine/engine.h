@@ -1,4 +1,5 @@
 #include "renderer/renderer.h"
+#include "magma_sdl_manager.h"
 
 #pragma once
 
@@ -10,5 +11,6 @@ public:
 	void cleanup();
 
 private:
+	SDLManager _sdl_manager;
 	VulkanRenderer _renderer;
 };

@@ -34,23 +34,11 @@ using namespace std;
 	} while (0)
 
 
-void VulkanRenderer::init()
+void VulkanRenderer::init(uint32_t width, uint32_t height, SDL_Window * window)
 {
-	// We initialize SDL and create a window with it. 
-	SDL_Init(SDL_INIT_VIDEO);
+	_windowExtent = { width, height };
 
-	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN);
-	
-	_window = SDL_CreateWindow(
-		"Vulkan Engine",
-		SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED,
-		_windowExtent.width,
-		_windowExtent.height,
-		window_flags
-	);
-
-	init_vulkan();
+	init_vulkan(window);
 
 	init_swapchain();
 
@@ -88,17 +76,11 @@ void VulkanRenderer::cleanup()
 		vkDestroyDevice(_device, nullptr);
 		vkb::destroy_debug_utils_messenger(_instance, _debug_messenger);
 		vkDestroyInstance(_instance, nullptr);
-
-		SDL_DestroyWindow(_window);
 	}
 }
 
 void VulkanRenderer::draw()
 {
-	//check if window is minimized and skip drawing
-	if (SDL_GetWindowFlags(_window) & SDL_WINDOW_MINIMIZED)
-		return;
-	
 	//wait until the gpu has finished rendering the last frame. Timeout of 1 second
 	VK_CHECK(vkWaitForFences(_device, 1, &get_current_frame()._renderFence, true, 1000000000));
 	VK_CHECK(vkResetFences(_device, 1, &get_current_frame()._renderFence));
@@ -186,51 +168,17 @@ void VulkanRenderer::draw()
 	_frameNumber++;
 }
 
-void VulkanRenderer::run()
-{
-	SDL_Event e;
-	bool bQuit = false;
-
-	//main loop
-	while (!bQuit)
-	{
-		//Handle events on queue
-		while (SDL_PollEvent(&e) != 0)
-		{
-			//close the window when user alt-f4s or clicks the X button			
-			if (e.type == SDL_QUIT)
-			{
-				bQuit = true;
-			}
-			else if (e.type == SDL_KEYDOWN)
-			{
-				if (e.key.keysym.sym == SDLK_SPACE)
-				{
-					_selectedShader += 1;
-					if (_selectedShader > 1)
-					{
-						_selectedShader = 0;
-					}
-				}
-			}
-		}
-
-		draw();
-	}
-}
-
 FrameData& VulkanRenderer::get_current_frame()
 {
 	return _frames[_frameNumber % FRAME_OVERLAP];
 }
-
 
 FrameData& VulkanRenderer::get_last_frame()
 {
 	return _frames[(_frameNumber -1) % 2];
 }
 
-void VulkanRenderer::init_vulkan()
+void VulkanRenderer::init_vulkan(SDL_Window* window)
 {
 	vkb::InstanceBuilder builder;
 
@@ -247,7 +195,7 @@ void VulkanRenderer::init_vulkan()
 	_instance = vkb_inst.instance;
 	_debug_messenger = vkb_inst.debug_messenger;
 
-	SDL_Vulkan_CreateSurface(_window, _instance, &_surface);
+	SDL_Vulkan_CreateSurface(window, _instance, &_surface);
 
 	//use vkbootstrap to select a gpu. 
 	//We want a gpu that can write to the SDL surface and supports vulkan 1.2

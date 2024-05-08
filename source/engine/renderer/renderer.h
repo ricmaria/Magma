@@ -127,9 +127,7 @@ public:
 	int _frameNumber {0};
 	int _selectedShader{ 0 };
 
-	VkExtent2D _windowExtent{ 1700 , 900 };
-
-	struct SDL_Window* _window{ nullptr };
+	VkExtent2D _windowExtent{ 800, 600 };
 
 	VkInstance _instance;
 	VkDebugUtilsMessengerEXT _debug_messenger;
@@ -175,16 +173,13 @@ public:
 
 	UploadContext _uploadContext;
 	//initializes everything in the engine
-	void init();
+	void init(uint32_t width, uint32_t height, struct SDL_Window* window);
 
 	//shuts down the engine
 	void cleanup();
 
 	//draw loop
 	void draw();
-
-	//run main loop
-	void run();
 	
 	FrameData& get_current_frame();
 	FrameData& get_last_frame();
@@ -216,7 +211,7 @@ public:
 	void immediate_submit(std::function<void(VkCommandBuffer cmd)>&& function);
 private:
 
-	void init_vulkan();
+	void init_vulkan(SDL_Window* window);
 
 	void init_swapchain();
 
