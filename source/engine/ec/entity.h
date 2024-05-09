@@ -3,7 +3,7 @@
 #include "component.h"
 
 #include <memory>
-#include <unordered_map>
+#include <vector>
 #include <type_traits>
 
 namespace EC
@@ -12,48 +12,74 @@ namespace EC
 	{
 	public:
 
-		using ComponentType = char*;
-
-		template<typename TComponent>
-		static ComponentType get_component_type() { return typeid(TComponent).name(); }
-
+	
 		template<typename TComponent,
 			typename = std::enable_if_t<std::is_base_of_v<Component, TComponent>> >
-		bool add_component(std::unique_ptr<TComponent>&& component)
+		TComponent* add_component(std::unique_ptr<TComponent>&& component)
 		{
-			const ComponentType type = get_component_type<TComponent>();
+			components.push_back(component);
 
-			auto[it, inserted] = type_to_component.insert({ type , std::move(component) });
+			// TODO: implement notifications to components
 
-			return inserted;
+			return components.back().get();
 		}
 
 		template<typename TComponent,
 			typename = std::enable_if_t<std::is_base_of_v<Component, TComponent>> >
-		bool remove_component()
+		std::unique_ptr<Component> remove_component()
 		{
-			const ComponentType type = get_component_type<TComponent>();
+			auto it = std::find(components.begin(), components.end(),
+				[](std::unique_ptr<Component>& component)
+				{
+					return component->is_of_type<TComponent>();
+				});
 
-			const size_t num_erased = type_to_component.erase(type);
-
-			return num_erased;
+			return remove_component(it);
 		}
+
+		std::unique_ptr<Component> remove_component(Component* component_arg);
 
 		template<typename TComponent,
 			typename = std::enable_if_t<std::is_base_of_v<Component, TComponent>> >
 		Component* get_component() const
 		{
-			const ComponentType type = get_component_type<TComponent>();
+			auto it = std::find_if(components.begin(), components.end(),
+				[](std::unique_ptr<Component>& component)
+				{
+					return component->is_of_type<TComponent>();
+				});
 
-			auto component = type_to_component.find(type);
+			if (it != components.end())
+			{
+				return it->get();
+			}
 
-			return (component != type_to_component.end() ? component->second.get() : nullptr);
+			return nullptr;
+		}
+
+		template<typename TComponent,
+			typename = std::enable_if_t<std::is_base_of_v<Component, TComponent>> >
+		std::vector<Component*> get_components() const
+		{
+			std::vector<Component*> result;
+
+			for (auto& component : components)
+			{
+				if (component->is_of_type<TComponent>())
+				{
+					result.push_back(component.get());
+				}
+			}
+
+			return result;
 		}
 
 		void update(float delta_time);
 
 	private:
-		std::unordered_map<ComponentType, std::unique_ptr<Component>> type_to_component;
+		std::vector<std::unique_ptr<Component>> components;
+
+		std::unique_ptr<Component> remove_component(const std::vector<std::unique_ptr<Component>>::iterator& it);
 
 	};
 };
