@@ -4,7 +4,7 @@ using namespace EC;
 
 void Entity::update(float delta_time)
 {
-	for (auto& component : components)
+	for (auto& component : _components)
 	{
 		component->update(delta_time);
 	}
@@ -12,7 +12,7 @@ void Entity::update(float delta_time)
 
 std::unique_ptr<Component> Entity::remove_component(Component* component_arg)
 {
-	auto it = std::find_if(components.begin(), components.end(),
+	auto it = std::find_if(_components.begin(), _components.end(),
 		[&component_arg](std::unique_ptr<Component>& component_lambda)
 		{
 			return component_lambda.get() == component_arg;
@@ -23,16 +23,22 @@ std::unique_ptr<Component> Entity::remove_component(Component* component_arg)
 
 std::unique_ptr<Component> Entity::remove_component(const std::vector<std::unique_ptr<Component>>::iterator& it)
 {
-	if (it != components.end())
+	if (it == _components.end())
 	{
-		std::unique_ptr<Component> component_unique = std::move(*it);
-
-		components.erase(it);
-
-		// TODO: implement notifications to components
-
-		return component_unique;
+		return nullptr;
 	}
 
-	return nullptr;
+	(*it)->on_being_removed();
+
+	for (auto& component : _components)
+	{
+		component->on_sibling_component_removed(**it);
+	}
+
+	std::unique_ptr<Component> component_unique = std::move(*it);
+
+	_components.erase(it);
+
+	return component_unique;
+	
 }

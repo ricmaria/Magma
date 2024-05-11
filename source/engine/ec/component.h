@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <cassert>
+#include <memory>
 
 namespace EC
 {
@@ -9,26 +10,12 @@ namespace EC
 	{
 	public:
 		virtual ~Component() {};
-		virtual void init() {};
 		virtual void update(float delta_time) {};
-		virtual void exit() {};
-	
-	protected:
-		Component() { register_my_type<decltype(*this)>(); }
 
-		using TypeId = const char*;
-
-		template<typename TypeArg>
-		static TypeId extract_type()
-		{
-			return typeid(TypeArg).name();
-		}
-
-		template<typename TypeArg>
-		void register_my_type()
-		{
-			my_type_ids.push_back(extract_type<TypeArg>());
-		}
+		virtual void on_being_added(const std::vector<std::unique_ptr<Component>>& siblings) {};
+		virtual void on_being_removed() {};
+		virtual void on_sibling_component_added(const Component& sibling) {};
+		virtual void on_sibling_component_removed(const Component& sibling) {};
 
 		template<typename TypeArg>
 		bool is_of_type() const
@@ -46,6 +33,23 @@ namespace EC
 			}
 
 			return false;
+		}
+	
+	protected:
+		Component() { register_my_type<decltype(*this)>(); }
+
+		using TypeId = const char*;
+
+		template<typename TypeArg>
+		static TypeId extract_type()
+		{
+			return typeid(TypeArg).name();
+		}
+
+		template<typename TypeArg>
+		void register_my_type()
+		{
+			my_type_ids.push_back(extract_type<TypeArg>());
 		}
 
 	private:
