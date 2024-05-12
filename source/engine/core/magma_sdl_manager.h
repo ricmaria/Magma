@@ -17,6 +17,8 @@ public:
 
 	bool is_window_visible() const;
 
+	void log(const char* text);
+
 private:
 	struct SDL_Window* _window{ nullptr };
 	uint32_t _width = 0;

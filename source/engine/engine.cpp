@@ -25,3 +25,8 @@ void MagmaEngine::cleanup()
 
 	_sdl_manager.cleanup();
 }
+
+void MagmaEngine::log(const char* text)
+{
+	_sdl_manager.log(text);
+}

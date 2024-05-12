@@ -10,6 +10,8 @@ public:
 	void run();
 	void cleanup();
 
+	void log(const char* text);
+
 private:
 	SDLManager _sdl_manager;
 	VulkanRenderer _renderer;

@@ -61,3 +61,8 @@ bool SDLManager::is_window_visible() const
 {
 	return ! ((SDL_GetWindowFlags(_window) & SDL_WINDOW_MINIMIZED));
 }
+
+void SDLManager::log(const char* text)
+{
+	SDL_Log(text);
+}
