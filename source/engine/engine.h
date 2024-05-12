@@ -1,5 +1,5 @@
 #include "renderer/renderer.h"
-#include "magma_sdl_manager.h"
+#include "core/magma_sdl_manager.h"
 
 #pragma once
 

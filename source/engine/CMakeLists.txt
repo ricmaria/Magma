@@ -4,27 +4,37 @@ file(GLOB SRC_ENGINE
     "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
 )
 
-file(GLOB_RECURSE SRC_RENDERER
-    "${CMAKE_CURRENT_SOURCE_DIR}/renderer/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/renderer/*.h"
+set(CORE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/core/")
+file(GLOB_RECURSE SRC_CORE
+    "${CORE_SOURCE_DIR}/*.cpp"
+    "${CORE_SOURCE_DIR}/*.h"
 )
 
+set(RENDERER_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/renderer/")
+file(GLOB_RECURSE SRC_RENDERER
+    "${RENDERER_SOURCE_DIR}/*.cpp"
+    "${RENDERER_SOURCE_DIR}/*.h"
+)
+
+set(EC_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ec/")
 file(GLOB_RECURSE SRC_EC
-    "${CMAKE_CURRENT_SOURCE_DIR}/ec/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/ec/*.h"
+    "${EC_SOURCE_DIR}/*.cpp"
+    "${EC_SOURCE_DIR}/*.h"
 )
 
 add_library(MagmaEngine
  ${SRC_ENGINE}
+ ${SRC_CORE}
  ${SRC_RENDERER}
  ${SRC_EC}
  )
 
 source_group("Source Files" FILES ${SRC_ENGINE})
+source_group("Source Files/core" FILES ${SRC_CORE})
 source_group("Source Files/renderer" FILES ${SRC_RENDERER})
 source_group("Source Files/ec" FILES ${SRC_EC})
 
-target_include_directories(MagmaEngine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/renderer/" ${Vulkan_INCLUDE_DIR})
+target_include_directories(MagmaEngine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${Vulkan_INCLUDE_DIR})
 
 target_link_libraries(MagmaEngine compiler_flags)
 

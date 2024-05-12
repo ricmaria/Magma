@@ -14,8 +14,10 @@ namespace EC
 	public:
 		template<typename TComponent,
 			typename = std::enable_if_t<std::is_base_of_v<Component, TComponent>> >
-		TComponent* add_component(std::unique_ptr<TComponent>&& component)
+		TComponent* add_component()
 		{
+			auto component = std::make_unique<TComponent>();
+
 			component->on_being_added(_components);
 
 			for (auto& component : _components)

@@ -18,13 +18,9 @@ int main(int argc, char* argv[])
 
 	EC::Entity* entity = entity_manager.create_entity();
 
-	auto keyboard_input_component = entity_manager.create_component<EC::KeyboardInputComponent>();
-
-	entity->add_component(std::move(keyboard_input_component));
+	auto keyboard_input_component = entity->add_component<EC::KeyboardInputComponent>();
 	
-	auto camera_component = entity_manager.create_component<EC::CameraComponent>();
-
-	entity->add_component(std::move(camera_component));
+	auto camera_component = entity->add_component<EC::CameraComponent>();
 
 	entity->remove_component<EC::KeyboardInputComponent>();
 

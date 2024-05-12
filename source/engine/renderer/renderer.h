@@ -3,16 +3,19 @@
 
 #pragma once
 
-#include <types.h>
 #include <vector>
 #include <functional>
 #include <deque>
 #include <string>
-#include <mesh.h>
 #include <unordered_map>
+
+#define NOMINMAX // GLM includes windows.h, which defines min and max. This stops it.
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
+
+#include "types.h"
+#include "mesh.h"
 
 class PipelineBuilder {
 public:

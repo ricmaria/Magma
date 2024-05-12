@@ -1,7 +1,8 @@
-﻿#include <textures.h>
+﻿
 #include <iostream>
 
-#include <initializers.h>
+#include "textures.h"
+#include "initializers.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>

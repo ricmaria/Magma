@@ -11,12 +11,6 @@ namespace EC
 	public:
 		Entity* create_entity();
 
-		template<typename TComponent>
-		std::unique_ptr<TComponent> create_component()
-		{
-			return std::make_unique<TComponent>();
-		}
-
 	private:
 		std::vector<std::unique_ptr<Entity>> _entities;
 	};

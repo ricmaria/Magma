@@ -1,4 +1,6 @@
-﻿#include <mesh.h>
+﻿
+#include "mesh.h"
+
 #include <tiny_obj_loader.h>
 #include <iostream>
 
