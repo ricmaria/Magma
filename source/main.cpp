@@ -10,7 +10,7 @@
 
 #include <SDL.h>
 
-void test()
+void test_void()
 {
 	SDL_Log("test void");
 }
@@ -18,6 +18,18 @@ void test()
 int test_int()
 {
 	SDL_Log("test int");
+
+	return 0;
+}
+
+void test_void_int(int value)
+{
+	SDL_Log("test void int");
+}
+
+int test_int_int(int value)
+{
+	SDL_Log("test int int");
 
 	return 0;
 }
@@ -42,11 +54,17 @@ int main(int argc, char* argv[])
 
 	entity->remove_component<EC::KeyboardInputComponent>();
 
-	auto* delegate_test = new DelegateFunctionNoParams(test);
-	(*delegate_test)();
+	auto* delegate_test_void = new DelegateFunctionNoParams(test_void);
+	(*delegate_test_void)();
 
 	auto* delegate_test_int = new DelegateFunctionNoParams(test_int);
 	(*delegate_test_int)();
+
+	auto* delegate_test_void_int = new DelegateFunctionOneParam(test_void_int);
+	(*delegate_test_void_int)(0);
+
+	auto* delegate_test_int_int = new DelegateFunctionOneParam(test_int_int);
+	(*delegate_test_int_int)(0);
 
 	return 0;
 }
