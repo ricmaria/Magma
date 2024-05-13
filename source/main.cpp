@@ -34,6 +34,60 @@ int test_int_int(int value)
 	return 0;
 }
 
+void test_delegates()
+{
+	auto* delegate_test_void = new DelegateFunction(test_void);
+	(*delegate_test_void)();
+
+	auto* delegate_test_int = new DelegateFunction(test_int);
+	(*delegate_test_int)();
+
+	auto* delegate_test_void_int = new DelegateFunction(test_void_int);
+	(*delegate_test_void_int)(0);
+
+	auto* delegate_test_int_int = new DelegateFunction(test_int_int);
+	(*delegate_test_int_int)(0);
+
+	struct TestObject
+	{
+		void method_void()
+		{
+			SDL_Log("test method void");
+		}
+
+		void method_void_int(int param1)
+		{
+			SDL_Log("test method void int");
+		}
+
+		int method_int()
+		{
+			SDL_Log("test method int");
+			return 0;
+		}
+
+		int method_int_int(int param1)
+		{
+			SDL_Log("test method int int");
+			return 0;
+		}
+	};
+
+	TestObject test_object;
+
+	auto* delegate_method_void = new DelegateMethod(&test_object, &TestObject::method_void);
+	(*delegate_method_void)();
+
+	auto* delegate_method_void_int = new DelegateMethod(&test_object, &TestObject::method_void_int);
+	(*delegate_method_void_int)(0);
+
+	auto* delegate_method_int = new DelegateMethod(&test_object, &TestObject::method_int);
+	(*delegate_method_int)();
+
+	auto* delegate_method_int_int = new DelegateMethod(&test_object, &TestObject::method_int_int);
+	(*delegate_method_int_int)(0);
+}
+
 int main(int argc, char* argv[])
 {
 	//MagmaEngine engine;
@@ -54,17 +108,7 @@ int main(int argc, char* argv[])
 
 	entity->remove_component<EC::KeyboardInputComponent>();
 
-	auto* delegate_test_void = new DelegateFunctionNoParams(test_void);
-	(*delegate_test_void)();
-
-	auto* delegate_test_int = new DelegateFunctionNoParams(test_int);
-	(*delegate_test_int)();
-
-	auto* delegate_test_void_int = new DelegateFunctionOneParam(test_void_int);
-	(*delegate_test_void_int)(0);
-
-	auto* delegate_test_int_int = new DelegateFunctionOneParam(test_int_int);
-	(*delegate_test_int_int)(0);
+	test_delegates();
 
 	return 0;
 }

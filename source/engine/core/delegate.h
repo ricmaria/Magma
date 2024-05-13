@@ -1,85 +1,45 @@
 #pragma once
 
-template<typename TReturn = void>
+template<typename TReturn, typename... TParams>
 class Delegate
 {
 public:
 	virtual ~Delegate() = default;
-	virtual TReturn operator()() = 0;
+	virtual TReturn operator()(TParams...) = 0;
 };
 
-template<typename TReturn, typename = void>
-class DelegateFunctionNoParams : public Delegate<TReturn>
+template<typename TReturn, typename... TParams>
+class DelegateFunction : public Delegate<TReturn, TParams...>
 {
 public:
-	using FunctionType = TReturn(*)();
+	using FunctionType = TReturn(*)(TParams...);
 
-	DelegateFunctionNoParams(FunctionType function) : _function(function) {}
+	DelegateFunction(FunctionType function) : _function(function) {}
 
-	TReturn operator()() override
+	TReturn operator()(TParams... params) override
 	{
-		return _function();
+		return _function(params...);
 	}
 
 private:
 	FunctionType _function;
 };
 
-template<typename TReturn>
-class DelegateFunctionNoParams<TReturn, typename std::enable_if<std::is_same<TReturn, void>::value>::type> : public Delegate<TReturn>
+template<typename TReturn, typename TObject, typename... TParams>
+class DelegateMethod : public Delegate<TReturn, TParams...>
 {
 public:
-	using FunctionType = void (*)();
+	using MethodType = TReturn(TObject::*)(TParams...);
 
-	DelegateFunctionNoParams(FunctionType function) : _function(function) {}
+	DelegateMethod(TObject* object, MethodType method) :
+		_object(object), _method(method) {}
 
-	void operator()() override
+	TReturn operator()(TParams... params) override
 	{
-		_function();
+		return (_object->*_method)(params...);
 	}
 
 private:
-	FunctionType _function;
-};
-
-template<typename TReturn = void, typename TParam1 = int>
-class DelegateOneParam
-{
-public:
-	virtual ~DelegateOneParam() = default;
-	virtual TReturn operator()(TParam1) = 0;
-};
-
-template<typename TReturn, typename TParam1, typename = void>
-class DelegateFunctionOneParam : public DelegateOneParam<TReturn, TParam1>
-{
-public:
-	using FunctionType = TReturn(*)(TParam1);
-
-	DelegateFunctionOneParam(FunctionType function) : _function(function) {}
-
-	TReturn operator()(TParam1 param1) override
-	{
-		return _function(param1);
-	}
-
-private:
-	FunctionType _function;
-};
-
-template<typename TReturn, typename TParam1>
-class DelegateFunctionOneParam<TReturn, TParam1, typename std::enable_if<std::is_same<TReturn, void>::value>::type> : public DelegateOneParam<TReturn, TParam1>
-{
-public:
-	using FunctionType = void (*)(TParam1);
-
-	DelegateFunctionOneParam(FunctionType function) : _function(function) {}
-
-	void operator()(TParam1 param1) override
-	{
-		_function(param1);
-	}
-
-private:
-	FunctionType _function;
+	TObject* _object;
+	MethodType _method;
 };
