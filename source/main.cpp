@@ -36,56 +36,57 @@ int test_int_int(int value)
 
 void test_delegates()
 {
-	auto* delegate_test_void = new DelegateFunction(test_void);
-	(*delegate_test_void)();
-
-	auto* delegate_test_int = new DelegateFunction(test_int);
-	(*delegate_test_int)();
-
-	auto* delegate_test_void_int = new DelegateFunction(test_void_int);
-	(*delegate_test_void_int)(0);
-
-	auto* delegate_test_int_int = new DelegateFunction(test_int_int);
-	(*delegate_test_int_int)(0);
-
 	struct TestObject
 	{
 		void method_void()
 		{
-			SDL_Log("test method void");
+			SDL_Log("test class member void");
 		}
 
 		void method_void_int(int param1)
 		{
-			SDL_Log("test method void int");
+			SDL_Log("test class member void int");
 		}
 
 		int method_int()
 		{
-			SDL_Log("test method int");
+			SDL_Log("test class member int");
 			return 0;
 		}
 
 		int method_int_int(int param1)
 		{
-			SDL_Log("test method int int");
+			SDL_Log("test class member int int");
 			return 0;
 		}
 	};
 
+	int a = 0;
 	TestObject test_object;
 
-	auto* delegate_method_void = new DelegateMethod(&test_object, &TestObject::method_void);
-	(*delegate_method_void)();
+	Delegate<void> alt_void(test_void);
+	alt_void();
 
-	auto* delegate_method_void_int = new DelegateMethod(&test_object, &TestObject::method_void_int);
-	(*delegate_method_void_int)(0);
+	Delegate<int> alt_int(test_int);
+	a = alt_int();
 
-	auto* delegate_method_int = new DelegateMethod(&test_object, &TestObject::method_int);
-	(*delegate_method_int)();
+	Delegate<void, int> alt_void_int(test_void_int);
+	alt_void_int(0);
 
-	auto* delegate_method_int_int = new DelegateMethod(&test_object, &TestObject::method_int_int);
-	(*delegate_method_int_int)(0);
+	Delegate<int, int> alt_int_int(test_int_int);
+	a = alt_int_int(0);
+
+	Delegate<void> alt_obj_void(&test_object, &TestObject::method_void);
+	alt_obj_void();
+
+	Delegate<int> alt_obj_int(&test_object, &TestObject::method_int);
+	a = alt_obj_int();
+
+	Delegate<void, int> alt_obj_void_int(&test_object, &TestObject::method_void_int);
+	alt_obj_void_int(0);
+
+	Delegate<int, int> alt_obj_int_int(&test_object, &TestObject::method_int_int);
+	a = alt_obj_int_int(0);
 }
 
 int main(int argc, char* argv[])
