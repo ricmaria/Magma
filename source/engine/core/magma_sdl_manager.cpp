@@ -24,7 +24,7 @@ void SDLManager::init(uint32_t width, uint32_t height)
 	);
 }
 
-void SDLManager::run(std::function<void()> on_loop)
+void SDLManager::run(Delegate<bool> on_loop)
 {
 	SDL_Event e;
 	bool bQuit = false;
@@ -48,7 +48,7 @@ void SDLManager::run(std::function<void()> on_loop)
 			}
 		}
 
-		on_loop();
+		bQuit |= ! on_loop();
 	}
 }
 

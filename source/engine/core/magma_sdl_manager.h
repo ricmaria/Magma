@@ -1,13 +1,13 @@
 
 #pragma once
 
-#include <functional>
+#include "Delegate.h"
 
 class SDLManager
 {
 public:
 	void init(uint32_t width, uint32_t height);
-	void run(std::function<void()> on_loop);
+	void run(Delegate<bool> on_loop);
 	void cleanup();
 
 	uint32_t get_width() const { return _width; }

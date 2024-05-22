@@ -91,13 +91,13 @@ void test_delegates()
 
 int main(int argc, char* argv[])
 {
-	//MagmaEngine engine;
+	MagmaEngine engine;
 
-	//engine.init();	
-	//
-	//engine.run();	
+	engine.init();	
+	
+	engine.run();
 
-	//engine.cleanup();
+	engine.cleanup();
 
 	EC::EntityManager entity_manager;
 
@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
 
 	entity->remove_component<EC::KeyboardInputComponent>();
 
-	test_delegates();
+	// test_delegates();
 
 	return 0;
 }

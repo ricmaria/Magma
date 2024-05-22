@@ -15,6 +15,8 @@ void MagmaEngine::run()
 			{
 				_renderer.draw();
 			}
+
+			return true;
 		}
 	);
 }
