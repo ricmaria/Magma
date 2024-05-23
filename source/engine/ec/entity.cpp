@@ -32,7 +32,7 @@ std::unique_ptr<Component> Entity::remove_component(const std::vector<std::uniqu
 
 	for (auto& component : _components)
 	{
-		component->on_sibling_component_removed(**it);
+		component->on_sibling_component_removed((*it).get());
 	}
 
 	std::unique_ptr<Component> component_unique = std::move(*it);

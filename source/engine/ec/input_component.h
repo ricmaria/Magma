@@ -13,6 +13,11 @@ namespace EC
 			register_my_type<decltype(*this)>();
 		}
 
+		virtual bool is_up_pressed() const = 0;
+		virtual bool is_down_pressed() const = 0;
+		virtual bool is_left_pressed() const = 0;
+		virtual bool is_right_pressed() const = 0;
+
 		virtual ~InputComponent() override {};
 	};
 }

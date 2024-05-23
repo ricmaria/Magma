@@ -1,6 +1,7 @@
 #include <engine.h>
 
 #include <ec/keyboard_input_component.h>
+#include <ec/transform_component.h>
 #include <ec/camera_component.h>
 
 #include <core/delegate.h>
@@ -99,10 +100,8 @@ int main(int argc, char* argv[])
 	EC::Entity* entity = entity_manager->create_entity();
 
 	auto keyboard_input_component = entity->add_component<EC::KeyboardInputComponent>();
-
 	auto camera_component = entity->add_component<EC::CameraComponent>();
-
-	entity->remove_component<EC::KeyboardInputComponent>();
+	auto transform_component = entity->add_component<EC::TransformComponent>();
 
 	engine.run();
 

@@ -16,16 +16,16 @@ namespace EC
 			typename = std::enable_if_t<std::is_base_of_v<Component, TComponent>> >
 		TComponent* add_component()
 		{
-			auto component = std::make_unique<TComponent>();
+			auto new_component = std::make_unique<TComponent>();
 
-			component->on_being_added(_components);
+			new_component->on_being_added(_components);
 
-			for (auto& component : _components)
+			for (auto& old_component : _components)
 			{
-				component->on_sibling_component_added(*component);
+				old_component->on_sibling_component_added(new_component.get());
 			}
 
-			_components.push_back(std::move(component));
+			_components.push_back(std::move(new_component));
 
 			return static_cast<TComponent*>(_components.back().get());
 		}

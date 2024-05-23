@@ -15,15 +15,15 @@ void MagmaEngine::init(Features features)
 		return;
 	}
 
-	std::bitset<4> bit_set(static_cast<size_t>(features));
+	std::bitset<4> bit_set(static_cast<size_t>(features) << 1);	// Shift left as the bitset starts at position 0, which is the value for None
 
-	if (bit_set.test(static_cast<size_t>(Features::EC) - 1))
+	if (bit_set.test(static_cast<size_t>(Features::EC)))
 	{
 		_entity_manager = std::make_unique<EC::EntityManager>();
 		log("Entity Manager initialized");
 	}
 
-	if (bit_set.test(static_cast<size_t>(Features::Test) - 1))
+	if (bit_set.test(static_cast<size_t>(Features::Test)))
 	{
 		log("Test initialized");
 	}
