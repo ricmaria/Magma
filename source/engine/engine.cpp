@@ -6,6 +6,10 @@ void MagmaEngine::init(Features features)
 
 	_renderer.init(_sdl_manager.get_width(), _sdl_manager.get_height(), _sdl_manager.get_sdl_window());
 
+	_time_manager.init();
+
+	_last_time_update = _time_manager.get_elapsed_time();
+
 	if (features == Features::None)
 	{
 		return;
@@ -27,16 +31,26 @@ void MagmaEngine::init(Features features)
 
 void MagmaEngine::run()
 {
-	_sdl_manager.run([&]
-		{
-			if (_sdl_manager.is_window_visible())
-			{
-				_renderer.draw();
-			}
+	_sdl_manager.run(Delegate<bool>(this, &MagmaEngine::update));
+}
 
-			return true;
-		}
-	);
+bool MagmaEngine::update()
+{
+	float elapsed_time = _time_manager.get_elapsed_time();
+	float delta_time = elapsed_time - _last_time_update;
+	_last_time_update = elapsed_time;
+
+	if (_entity_manager)
+	{
+		_entity_manager->update(delta_time);
+	}
+
+	if (_sdl_manager.is_window_visible())
+	{
+		_renderer.draw();
+	}
+
+	return true;
 }
 
 void MagmaEngine::cleanup()

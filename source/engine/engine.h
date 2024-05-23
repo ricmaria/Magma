@@ -1,5 +1,6 @@
 #include "renderer/renderer.h"
 #include "core/magma_sdl_manager.h"
+#include "core/time_manager.h"
 #include "ec/entity_manager.h"
 #include <bitset>
 
@@ -33,9 +34,14 @@ public:
 	}
 
 private:
+
+	bool update();
+
 	SDLManager _sdl_manager;
 	VulkanRenderer _renderer;
+	TimeManager _time_manager;
 	std::unique_ptr<EC::EntityManager> _entity_manager;
+	float _last_time_update;
 };
 
 inline MagmaEngine::Features operator|(MagmaEngine::Features a, MagmaEngine::Features b)

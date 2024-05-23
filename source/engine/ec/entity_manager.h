@@ -11,6 +11,8 @@ namespace EC
 	public:
 		Entity* create_entity();
 
+		void update(float delta_time);
+
 	private:
 		std::vector<std::unique_ptr<Entity>> _entities;
 	};

@@ -11,3 +11,11 @@ Entity* EntityManager::create_entity()
 	return _entities.back().get();
 }
 
+void EntityManager::update(float delta_time)
+{
+	for (auto& entity : _entities)
+	{
+		entity->update(delta_time);
+	}
+}
+
