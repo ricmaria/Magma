@@ -12,20 +12,7 @@ namespace EC
 		virtual ~Component() {};
 		virtual void update(float delta_time) {};
 
-		virtual void on_being_added(const std::vector<std::unique_ptr<Component>>& siblings)
-		{
-			for (auto& sibling_request : _sibling_requests)
-			{
-				for (auto& sibling : siblings)
-				{
-					if (sibling->is_of_type(sibling_request.type_id))
-					{
-						(*sibling_request.destination) = sibling.get();
-						break;
-					}
-				}
-			}			
-		};
+		virtual void on_being_added() {};
 
 		virtual void on_being_removed() {};
 

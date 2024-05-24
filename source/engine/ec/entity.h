@@ -18,10 +18,12 @@ namespace EC
 		{
 			auto new_component = std::make_unique<TComponent>();
 
-			new_component->on_being_added(_components);
+			new_component->on_being_added();
 
 			for (auto& old_component : _components)
 			{
+				new_component->on_sibling_component_added(old_component.get());
+
 				old_component->on_sibling_component_added(new_component.get());
 			}
 

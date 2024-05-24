@@ -4,7 +4,7 @@
 
 using namespace EC;
 
-void KeyboardInputComponent::on_being_added(const std::vector<std::unique_ptr<Component>>& siblings)
+void KeyboardInputComponent::on_being_added()
 {
 	_sdl_keyboard_state_array = SDL_GetKeyboardState(nullptr);
 }

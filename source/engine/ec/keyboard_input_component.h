@@ -13,7 +13,7 @@ namespace EC
 			register_my_type<decltype(*this)>();
 		}
 
-		void on_being_added(const std::vector<std::unique_ptr<Component>>& siblings) override;
+		void on_being_added() override;
 
 		bool is_up_pressed() const override;
 		bool is_down_pressed() const override;
