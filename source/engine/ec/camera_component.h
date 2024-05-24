@@ -15,15 +15,15 @@ namespace EC
 		{
 			register_my_type<decltype(*this)>();
 
-			request_sibling<InputComponent>((void**) &_input_component);
-			request_sibling<TransformComponent>((void**) &_transform_component);
+			request_siblings<InputComponent>(_input_components);
+			request_sibling<TransformComponent>(&_transform_component);
 		}
 
 		void update(float delta_time) override;
 
 		virtual ~CameraComponent() override {};
 	private:
-		InputComponent* _input_component = nullptr;
+		std::vector<InputComponent*> _input_components;
 		TransformComponent* _transform_component = nullptr;
 	};
 }

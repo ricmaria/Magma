@@ -3,6 +3,7 @@
 #include <vector>
 #include <cassert>
 #include <memory>
+#include <functional>
 
 namespace EC
 {
@@ -22,7 +23,7 @@ namespace EC
 			{
 				if (sibling->is_of_type(sibling_request.type_id))
 				{
-					(*sibling_request.destination) = sibling;
+					sibling_request.assign_sibling(sibling);
 					break;
 				}
 			}
@@ -34,16 +35,16 @@ namespace EC
 			{
 				if (sibling->is_of_type(sibling_request.type_id))
 				{
-					(*sibling_request.destination) = nullptr;
+					sibling_request.assign_sibling(nullptr);
 					break;
 				}
 			}
 		};
 
-		template<typename TypeArg>
+		template<typename TType>
 		bool is_of_type() const
 		{
-			TypeId type_id = extract_type<TypeArg>();
+			TypeId type_id = extract_type<TType>();
 
 			return is_of_type(type_id);
 		}
@@ -53,16 +54,16 @@ namespace EC
 
 		using TypeId = const char*;
 
-		template<typename TypeArg>
+		template<typename TType>
 		static TypeId extract_type()
 		{
-			return typeid(TypeArg).name();
+			return typeid(TType).name();
 		}
 
-		template<typename TypeArg>
+		template<typename TType>
 		void register_my_type()
 		{
-			my_type_ids.push_back(extract_type<TypeArg>());
+			my_type_ids.push_back(extract_type<TType>());
 		}
 
 		bool is_of_type(const TypeId& type_id) const
@@ -80,11 +81,28 @@ namespace EC
 			return false;
 		}
 
-		template<typename TypeArg>
-		void request_sibling(void** destination)
+		template<typename TType>
+		void request_sibling(TType** destination)
 		{
-			TypeId type_id = extract_type<TypeArg>();
-			_sibling_requests.push_back({ type_id , destination });
+			TypeId type_id = extract_type<TType>();
+			auto assign_sibling = [destination](Component* sibling)
+				{
+					*destination = static_cast<TType*>(sibling);
+				};
+
+			_sibling_requests.push_back({ type_id , assign_sibling });
+		}
+
+		template<typename TType>
+		void request_siblings(std::vector<TType*>& destination)
+		{
+			TypeId type_id = extract_type<TType>();
+			auto assign_sibling = [&destination](Component* sibling)
+				{
+					destination.push_back(static_cast<TType*>(sibling));
+				};
+
+			_sibling_requests.push_back({ type_id , assign_sibling });
 		}
 
 	private:
@@ -93,7 +111,7 @@ namespace EC
 		struct SiblingRequest
 		{
 			TypeId type_id;
-			void** destination;
+			std::function<void(Component*)> assign_sibling;
 		};
 
 		std::vector<SiblingRequest> _sibling_requests;

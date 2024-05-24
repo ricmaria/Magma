@@ -7,7 +7,7 @@ using namespace EC;
 
 void CameraComponent::update(float delta_time)
 {
-	assert(_input_component);
+	assert(_input_components.size() > 0);
 	assert(_transform_component);
 
 	const float speed = 1.0f;
