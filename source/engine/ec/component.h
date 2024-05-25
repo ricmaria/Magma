@@ -35,11 +35,11 @@ namespace EC
 			{
 				if (sibling->is_of_type(sibling_request.type_id))
 				{
-					sibling_request.assign_sibling(nullptr);
+					sibling_request.dismiss_sibling(sibling);
 					break;
 				}
 			}
-		};
+		}
 
 		template<typename TType>
 		bool is_of_type() const
@@ -82,27 +82,38 @@ namespace EC
 		}
 
 		template<typename TType>
-		void request_sibling(TType** destination)
+		void register_sibling_request(TType** destination)
 		{
 			TypeId type_id = extract_type<TType>();
 			auto assign_sibling = [destination](Component* sibling)
 				{
 					*destination = static_cast<TType*>(sibling);
 				};
+			auto dismiss_sibling = [destination](Component* sibling)
+				{
+					assert(*destination == static_cast<TType*>(sibling));
+					*destination = nullptr;
+				};
 
-			_sibling_requests.push_back({ type_id , assign_sibling });
+			_sibling_requests.push_back({ type_id , assign_sibling, dismiss_sibling });
 		}
 
 		template<typename TType>
-		void request_siblings(std::vector<TType*>& destination)
+		void register_siblings_request(std::vector<TType*>& destination)
 		{
 			TypeId type_id = extract_type<TType>();
 			auto assign_sibling = [&destination](Component* sibling)
 				{
 					destination.push_back(static_cast<TType*>(sibling));
 				};
+			auto dismiss_sibling = [&destination](Component* sibling)
+				{
+					auto it = std::find(destination.begin(), destination.end(), sibling);
+					assert(it != destination.end());
+					destination.erase(it);
+				};
 
-			_sibling_requests.push_back({ type_id , assign_sibling });
+			_sibling_requests.push_back({ type_id , assign_sibling, dismiss_sibling });
 		}
 
 	private:
@@ -112,6 +123,7 @@ namespace EC
 		{
 			TypeId type_id;
 			std::function<void(Component*)> assign_sibling;
+			std::function<void(Component*)> dismiss_sibling;
 		};
 
 		std::vector<SiblingRequest> _sibling_requests;

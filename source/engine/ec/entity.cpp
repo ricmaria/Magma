@@ -28,12 +28,16 @@ std::unique_ptr<Component> Entity::remove_component(const std::vector<std::uniqu
 		return nullptr;
 	}
 
-	(*it)->on_being_removed();
+	Component* removed_component = (*it).get();
 
 	for (auto& component : _components)
 	{
-		component->on_sibling_component_removed((*it).get());
+		removed_component->on_sibling_component_removed(component.get());
+
+		component->on_sibling_component_removed(removed_component);
 	}
+
+	removed_component->on_being_removed();
 
 	std::unique_ptr<Component> component_unique = std::move(*it);
 
