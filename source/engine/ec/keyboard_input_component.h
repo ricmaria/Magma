@@ -15,10 +15,10 @@ namespace EC
 
 		void on_being_added() override;
 
-		bool is_up_pressed() const override;
-		bool is_down_pressed() const override;
-		bool is_left_pressed() const override;
-		bool is_right_pressed() const override;
+		float get_up() const override;
+		float get_down() const override;
+		float get_left() const override;
+		float get_right() const override;
 
 		virtual ~KeyboardInputComponent() override {};
 

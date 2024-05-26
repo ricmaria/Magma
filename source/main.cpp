@@ -101,9 +101,9 @@ int main(int argc, char* argv[])
 	EC::Entity* entity = entity_manager->create_entity();
 
 	entity->add_component<EC::KeyboardInputComponent>();
-	entity->add_component<EC::CameraComponent>();
 	entity->add_component<EC::TransformComponent>();
 	entity->add_component<EC::FirstPersonControllerComponent>();
+	entity->add_component<EC::CameraComponent>();
 
 	engine.run();
 

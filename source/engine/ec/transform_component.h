@@ -13,24 +13,14 @@ namespace EC
 			register_my_type<decltype(*this)>();
 		}
 
-		inline glm::vec3 get_position() const
+		inline const glm::vec3& get_position() const
 		{
 			return _position;
 		}
 
-		inline float get_position_x() const
+		inline glm::vec3& get_position()
 		{
-			return _position.x;
-		}
-
-		inline float get_position_y() const
-		{
-			return _position.y;
-		}
-
-		inline float get_position_z() const
-		{
-			return _position.z;
+			return _position;
 		}
 
 		inline void set_position(const glm::vec3& position)
@@ -38,22 +28,27 @@ namespace EC
 			_position = position;
 		}
 
-		inline void set_position_x(float x)
+		inline const glm::vec3& get_forward() const
 		{
-			_position.x = x;
+			return _forward;
 		}
 
-		inline void set_position_y(float y)
+		inline const glm::vec3& get_right() const
 		{
-			_position.y = y;
+			return _right;
 		}
 
-		inline void set_position_z(float z)
+
+		inline const glm::vec3& get_up() const
 		{
-			_position.z = z;
+			return _up;
 		}
 
 	private:
 		glm::vec3 _position = { 0, 0, 0 };
+
+		glm::vec3 _forward = { 0, 0, -1 };
+		glm::vec3 _right = { 1, 0, 0 };
+		glm::vec3 _up = { 0, -1, 0 };
 	};
 }

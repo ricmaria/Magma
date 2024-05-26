@@ -9,22 +9,22 @@ void KeyboardInputComponent::on_being_added()
 	_sdl_keyboard_state_array = SDL_GetKeyboardState(nullptr);
 }
 
-bool KeyboardInputComponent::KeyboardInputComponent::is_up_pressed() const
+float KeyboardInputComponent::KeyboardInputComponent::get_up() const
 {
-	return _sdl_keyboard_state_array[SDLK_w] | _sdl_keyboard_state_array[SDLK_UP];
+	return std::max(_sdl_keyboard_state_array[SDL_SCANCODE_W],_sdl_keyboard_state_array[SDL_SCANCODE_UP]);
 }
 
-bool KeyboardInputComponent::is_down_pressed() const
+float KeyboardInputComponent::get_down() const
 {
-	return _sdl_keyboard_state_array[SDLK_s] | _sdl_keyboard_state_array[SDLK_DOWN];
+	return std::max(_sdl_keyboard_state_array[SDL_SCANCODE_S], _sdl_keyboard_state_array[SDL_SCANCODE_DOWN]);
 }
 
-bool KeyboardInputComponent::is_left_pressed() const
+float KeyboardInputComponent::get_left() const
 {
-	return _sdl_keyboard_state_array[SDLK_a] | _sdl_keyboard_state_array[SDLK_LEFT];
+	return std::max(_sdl_keyboard_state_array[SDL_SCANCODE_A], _sdl_keyboard_state_array[SDL_SCANCODE_LEFT]);
 }
 
-bool KeyboardInputComponent::is_right_pressed() const
+float KeyboardInputComponent::get_right() const
 {
-	return _sdl_keyboard_state_array[SDLK_d] | _sdl_keyboard_state_array[SDLK_RIGHT];
+	return std::max(_sdl_keyboard_state_array[SDL_SCANCODE_D], _sdl_keyboard_state_array[SDL_SCANCODE_RIGHT]);
 }

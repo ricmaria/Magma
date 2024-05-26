@@ -1,6 +1,7 @@
 #pragma once
 
 #include "component.h"
+#include <glm/vec3.hpp>
 
 namespace EC
 {
