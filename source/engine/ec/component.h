@@ -1,13 +1,13 @@
 #pragma once
 
-#include <vector>
-#include <cassert>
 #include <memory>
 #include <functional>
 
+#include "core/reflectable.h"
+
 namespace EC
 {
-	class Component
+	class Component: protected Reflectable
 	{
 	public:
 		virtual ~Component() {};
@@ -40,46 +40,9 @@ namespace EC
 				}
 			}
 		}
-
-		template<typename TType>
-		bool is_of_type() const
-		{
-			TypeId type_id = extract_type<TType>();
-
-			return is_of_type(type_id);
-		}
 	
 	protected:
 		Component() { register_my_type<decltype(*this)>(); }
-
-		using TypeId = const char*;
-
-		template<typename TType>
-		static TypeId extract_type()
-		{
-			return typeid(TType).name();
-		}
-
-		template<typename TType>
-		void register_my_type()
-		{
-			my_type_ids.push_back(extract_type<TType>());
-		}
-
-		bool is_of_type(const TypeId& type_id) const
-		{
-			assert(my_type_ids.size() > 0);
-
-			for (int32_t i = my_type_ids.size() - 1; i >= 0; i--)
-			{
-				if (my_type_ids[i] == type_id)
-				{
-					return true;
-				}
-			}
-
-			return false;
-		}
 
 		template<typename TType>
 		void register_sibling_request(TType** destination)
@@ -117,11 +80,10 @@ namespace EC
 		}
 
 	private:
-		std::vector<TypeId> my_type_ids;
 
 		struct SiblingRequest
 		{
-			TypeId type_id;
+			Reflectable::TypeId type_id;
 			std::function<void(Component*)> assign_sibling;
 			std::function<void(Component*)> dismiss_sibling;
 		};
