@@ -19,5 +19,5 @@ void Renderer::cleanup()
 
 void Renderer::set_camera_position(const glm::vec3& position)
 {
-
+	_vulkan_renderer.set_camera_position(position);
 }

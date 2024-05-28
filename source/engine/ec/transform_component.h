@@ -47,8 +47,8 @@ namespace EC
 	private:
 		glm::vec3 _position = { 0, 0, 0 };
 
-		glm::vec3 _forward = { 0, 0, -1 };
-		glm::vec3 _right = { 1, 0, 0 };
+		glm::vec3 _forward = { 0, 0, 1 };
+		glm::vec3 _right = { -1, 0, 0 };
 		glm::vec3 _up = { 0, -1, 0 };
 	};
 }

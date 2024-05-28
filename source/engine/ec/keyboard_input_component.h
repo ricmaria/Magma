@@ -19,6 +19,9 @@ namespace EC
 		float get_down() const override;
 		float get_left() const override;
 		float get_right() const override;
+		float get_high() const override;
+		float get_low() const override;
+		float get_run() const override;
 
 		virtual ~KeyboardInputComponent() override {};
 

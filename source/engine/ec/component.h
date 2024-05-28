@@ -5,12 +5,17 @@
 
 #include "core/reflectable.h"
 
+class ServiceLocator;
+
 namespace EC
 {
 	class Component: protected Reflectable
 	{
+		friend class Entity;
+
 	public:
 		virtual ~Component() {};
+
 		virtual void update(float delta_time) {};
 
 		virtual void on_being_added() {};
@@ -43,6 +48,8 @@ namespace EC
 	
 	protected:
 		Component() { register_my_type<decltype(*this)>(); }
+
+		ServiceLocator* _service_locator = nullptr;
 
 		template<typename TType>
 		void register_sibling_request(TType** destination)

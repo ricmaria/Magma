@@ -14,12 +14,6 @@ public:
 		return typeid(TType).name();
 	}
 
-	template<typename TType>
-	void register_my_type()
-	{
-		_my_type_ids.push_back(extract_type<TType>());
-	}
-
 	bool is_of_type(const TypeId& type_id) const
 	{
 		assert(_my_type_ids.size() > 0);
@@ -41,6 +35,13 @@ public:
 		TypeId type_id = extract_type<TType>();
 
 		return is_of_type(type_id);
+	}
+
+protected:
+	template<typename TType>
+	void register_my_type()
+	{
+		_my_type_ids.push_back(extract_type<TType>());
 	}
 
 private:

@@ -6,17 +6,23 @@
 #include <vector>
 #include <type_traits>
 
+class ServiceLocator;
+
 namespace EC
 {
 	class Entity
 	{
 		friend class EntityManager;
+	
 	public:
+		
 		template<typename TComponent,
 			typename = std::enable_if_t<std::is_base_of_v<Component, TComponent>> >
 		TComponent* add_component()
 		{
 			auto new_component = std::make_unique<TComponent>();
+
+			new_component->_service_locator = _service_locator;
 
 			new_component->on_being_added();
 
@@ -109,6 +115,8 @@ namespace EC
 	private:
 
 		Entity() {};
+
+		ServiceLocator* _service_locator = nullptr;
 
 		std::vector<std::unique_ptr<Component>> _components;
 

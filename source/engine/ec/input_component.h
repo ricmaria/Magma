@@ -17,6 +17,9 @@ namespace EC
 		virtual float get_down() const = 0;
 		virtual float get_left() const = 0;
 		virtual float get_right() const = 0;
+		virtual float get_high() const = 0;
+		virtual float get_low() const = 0;
+		virtual float get_run() const = 0;
 
 		virtual ~InputComponent() override {};
 	};

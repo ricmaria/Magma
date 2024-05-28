@@ -2,6 +2,7 @@
 #include "core/magma_sdl_manager.h"
 #include "core/time_manager.h"
 #include "ec/entity_manager.h"
+#include "core/service_locator.h"
 #include <bitset>
 
 #pragma once
@@ -22,25 +23,18 @@ public:
 
 	void log(const char* text);
 
-	template<typename TService>
-	TService* GetService() { return nullptr; }
-
-	template<>
-	EC::EntityManager* GetService<EC::EntityManager>()
-	{
-		auto* res = _entity_manager.get();
-		assert(res != nullptr);
-		return res;
-	}
+	inline const ServiceLocator& get_service_locator() const { return _service_locator; }
 
 private:
 
 	bool update();
 
 	SDLManager _sdl_manager;
-	VulkanRenderer _renderer;
+	Renderer _renderer;
 	TimeManager _time_manager;
 	std::unique_ptr<EC::EntityManager> _entity_manager;
+	ServiceRegister _service_locator;
+
 	float _last_time_update;
 };
 

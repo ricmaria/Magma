@@ -96,14 +96,16 @@ int main(int argc, char* argv[])
 
 	engine.init(MagmaEngine::Features::EC);
 	
-	EC::EntityManager* entity_manager = engine.GetService<EC::EntityManager>();
+	EC::EntityManager* entity_manager = engine.get_service_locator().get_service<EC::EntityManager>();
 
 	EC::Entity* entity = entity_manager->create_entity();
 
 	entity->add_component<EC::KeyboardInputComponent>();
-	entity->add_component<EC::TransformComponent>();
+	auto transform_component = entity->add_component<EC::TransformComponent>();
 	entity->add_component<EC::FirstPersonControllerComponent>();
 	entity->add_component<EC::CameraComponent>();
+
+	transform_component->set_position({ 0.f,-6.f,-10.f });
 
 	engine.run();
 

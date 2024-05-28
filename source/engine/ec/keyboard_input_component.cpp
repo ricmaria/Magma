@@ -28,3 +28,18 @@ float KeyboardInputComponent::get_right() const
 {
 	return std::max(_sdl_keyboard_state_array[SDL_SCANCODE_D], _sdl_keyboard_state_array[SDL_SCANCODE_RIGHT]);
 }
+
+float KeyboardInputComponent::KeyboardInputComponent::get_high() const
+{
+	return std::max(_sdl_keyboard_state_array[SDL_SCANCODE_E], _sdl_keyboard_state_array[SDL_SCANCODE_PAGEUP]);
+}
+
+float KeyboardInputComponent::get_low() const
+{
+	return std::max(_sdl_keyboard_state_array[SDL_SCANCODE_Q], _sdl_keyboard_state_array[SDL_SCANCODE_PAGEDOWN]);
+}
+
+float KeyboardInputComponent::get_run() const
+{
+	return std::max(_sdl_keyboard_state_array[SDL_SCANCODE_LSHIFT], _sdl_keyboard_state_array[SDL_SCANCODE_RSHIFT]);
+}
