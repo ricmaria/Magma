@@ -17,7 +17,7 @@ public:
 
             res._type_id = Reflectable::extract_type<TInjected>();
 
-            res._inject = [&injectee_member](void* injectee, void* injected)
+            res._inject = [injectee_member](void* injectee, void* injected)
                 {
                     TInjectee* injectee_typed = static_cast<TInjectee*>(injectee);
                     TInjected* injected_typed = static_cast<TInjected*>(injected);

@@ -11,6 +11,8 @@
 
 #include <SDL.h>
 
+#include "core/injectee.h"
+
 void test_void()
 {
 	SDL_Log("test void");
@@ -107,13 +109,47 @@ int main(int argc, char* argv[])
 
 	transform_component->set_position({ 0.f,-6.f,-10.f });
 
-	engine.run();
-
-	engine.cleanup();
+	// engine.run();
 
 	
 
+	Renderer* renderer = engine.get_service_locator().get_service<Renderer>();
+
+	class A : public Injectee
+	{
+	private:
+		EC::EntityManager* _entity_manager;
+		Renderer* _renderer;
+	public:
+		const std::vector<Dependency>& get_dependencies() const override
+		{
+			static Dependency dependency1 = Dependency::make(&A::_entity_manager);
+			static Dependency dependency2 = Dependency::make(&A::_renderer);
+			static auto dependencies = register_dependencies<Injectee>(dependency1, dependency2);
+			return dependencies;
+		}
+	};	
+
+	A a;
+
+	for (auto& dependency : a.get_dependencies())
+	{
+		SDL_Log("dependency %s", dependency.get_type_id());
+
+		if (dependency.get_type_id() == Reflectable::extract_type<EC::EntityManager>())
+		{
+			dependency.inject(&a, entity_manager);
+		}
+
+		if (dependency.get_type_id() == Reflectable::extract_type<Renderer>())
+		{
+			dependency.inject(&a, renderer);
+		}
+	}
+
 	// test_delegates();
+
+	engine.cleanup();
 
 	return 0;
 }
