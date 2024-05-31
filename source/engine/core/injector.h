@@ -38,10 +38,14 @@ class InjectorRegister : public Injector
 public:
 	void register_injected(Reflectable* injected)
 	{
-		Reflectable::TypeId type_id = injected->get_actual_type();
-
-		assert(!_type_id_to_injected.contains(type_id));
-
-		_type_id_to_injected[type_id] = injected;
+		static Reflectable::TypeId reflectable_type_id = Reflectable::extract_type<Reflectable>();
+		
+		for (auto& type_id : injected->get_types())
+		{
+			if (type_id != reflectable_type_id && !_type_id_to_injected.contains(type_id))
+			{
+				_type_id_to_injected[type_id] = injected;
+			}
+		}
 	}
 };
