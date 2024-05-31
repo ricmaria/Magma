@@ -6,9 +6,12 @@
 class TimeManager : public Reflectable
 {
 public:
-	TimeManager()
+	using ParentType = Reflectable;
+
+	std::vector<TypeId> get_types() const override
 	{
-		register_my_type<decltype(*this)>();
+		static std::vector<TypeId> type_ids = register_type_and_get_types<TimeManager, ParentType>();
+		return type_ids;
 	}
 
 	void init()

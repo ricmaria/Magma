@@ -8,9 +8,12 @@ namespace EC
 	{
 	public:
 
-		KeyboardInputComponent()
+		using ParentType = InputComponent;
+
+		std::vector<TypeId> get_types() const override
 		{
-			register_my_type<decltype(*this)>();
+			static std::vector<TypeId> type_ids = register_type_and_get_types<KeyboardInputComponent, ParentType>();
+			return type_ids;
 		}
 
 		void on_being_added() override;

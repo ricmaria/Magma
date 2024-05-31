@@ -6,56 +6,70 @@
 class Reflectable
 {
 public:
-	using TypeId = const char*;
 
-	template<typename TType>
-	static TypeId extract_type()
-	{
-		return typeid(TType).name();
-	}
+    using TypeId = const char*;
 
-	inline TypeId get_actual_type() const
-	{
-		assert(_my_type_ids.size() > 0);
-		return _my_type_ids[_my_type_ids.size() - 1];
-	}
+    // This must be overridden by every subclass
+    virtual std::vector<TypeId> get_types() const
+    {
+        static std::vector<TypeId> type_ids = register_top_type();
+        return type_ids;
+    }
 
-	bool is_of_type(const TypeId& type_id) const
-	{
-		assert(_my_type_ids.size() > 0);
+    TypeId get_actual_type() const
+    {
+        std::vector<TypeId> type_ids = get_types();
+        assert(type_ids.size() > 0);
+        return type_ids[type_ids.size() - 1];
+    }
 
-		for (int32_t i = _my_type_ids.size() - 1; i >= 0; i--)
-		{
-			if (_my_type_ids[i] == type_id)
-			{
-				return true;
-			}
-		}
+    bool is_of_type(TypeId type_id) const
+    {
+        std::vector<TypeId> type_ids = get_types();
 
-		return false;
-	}
+        for (const auto& stored_type : type_ids)
+        {
+            if (type_id == stored_type)
+            {
+                return true;
+            }
+        }
 
-	template<typename TType>
-	bool is_of_type() const
-	{
-		TypeId type_id = extract_type<TType>();
+        return false;
+    }
 
-		return is_of_type(type_id);
-	}
+    template<typename TType>
+    bool is_of_type()
+    {
+        TypeId type_id = extract_type<TType>();
+        return is_of_type(type_id);
+    }
 
-protected:
+    template<typename TType>
+    static TypeId extract_type()
+    {
+        return typeid(TType).name();
+    }
 
-	Reflectable()
-	{
-		register_my_type<Reflectable>();
-	}
+protected:    
 
-	template<typename TType>
-	void register_my_type()
-	{
-		_my_type_ids.push_back(extract_type<TType>());
-	}
+    template<typename TSelf, typename TParent>
+    std::vector<TypeId> register_type_and_get_types() const
+    {
+        TypeId type_id = extract_type<TSelf>();
+        const TParent* this_as_parent = static_cast<const TParent*>(this);
+        std::vector<TypeId> type_ids = this_as_parent->TParent::get_types();
+        type_ids.push_back(type_id);
+        return type_ids;
+    }
 
 private:
-	std::vector<TypeId> _my_type_ids;
+
+    static std::vector<TypeId> register_top_type()
+    {
+        TypeId type_id = extract_type<Reflectable>();
+        std::vector<TypeId> type_ids;
+        type_ids.push_back(type_id);
+        return type_ids;
+    }
 };

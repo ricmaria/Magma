@@ -11,10 +11,17 @@ namespace EC
 	class FirstPersonControllerComponent : public Component
 	{
 	public:
+
+		using ParentType = Component;
+
+		std::vector<TypeId> get_types() const override
+		{
+			static std::vector<TypeId> type_ids = register_type_and_get_types<FirstPersonControllerComponent, ParentType>();
+			return type_ids;
+		}
+
 		FirstPersonControllerComponent()
 		{
-			register_my_type<decltype(*this)>();
-
 			register_siblings_request<InputComponent>(_input_components);
 			register_sibling_request<TransformComponent>(&_transform_component);
 		}

@@ -8,9 +8,12 @@
 class Renderer : public Reflectable
 {
 public:
-	Renderer()
+	using ParentType = Reflectable;
+
+	std::vector<TypeId> get_types() const override
 	{
-		register_my_type<decltype(*this)>();
+		static std::vector<TypeId> type_ids = register_type_and_get_types<Renderer, ParentType>();
+		return type_ids;
 	}
 
 	void init(uint32_t width, uint32_t height, struct SDL_Window* window);

@@ -8,11 +8,20 @@
 
 namespace EC
 {
-	class Component: protected Reflectable, public Injectee
+	class Component: public Injectee, public Reflectable // Injectee must be the first to allow downcast
 	{
 		friend class Entity;
 
 	public:
+
+		using ParentType = Reflectable;
+
+		std::vector<TypeId> get_types() const override
+		{
+			static std::vector<TypeId> type_ids = register_type_and_get_types<Component, ParentType>();
+			return type_ids;
+		}
+
 		virtual ~Component() {};
 
 		virtual void update(float delta_time) {};
@@ -46,8 +55,7 @@ namespace EC
 		}
 	
 	protected:
-		Component() { register_my_type<decltype(*this)>(); }
-
+		
 		template<typename TType>
 		void register_sibling_request(TType** destination)
 		{

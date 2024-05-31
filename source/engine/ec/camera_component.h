@@ -12,17 +12,23 @@ namespace EC
 	{
 	public:
 
+		using ParentType = Component;
+
+		std::vector<TypeId> get_types() const override
+		{
+			static std::vector<TypeId> type_ids = register_type_and_get_types<CameraComponent, ParentType>();
+			return type_ids;
+		}
+
 		CameraComponent()
 		{
-			register_my_type<decltype(*this)>();
-
 			register_sibling_request<TransformComponent>(&_transform_component);
 		}
 
 		const std::vector<Dependency>& get_dependencies() const override
 		{
 			static Dependency dependency = Dependency::make(&CameraComponent::_renderer);
-			static auto dependencies = register_dependencies<Component>(dependency);
+			static auto dependencies = register_dependencies<ParentType>(dependency);
 			return dependencies;
 		}
 

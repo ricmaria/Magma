@@ -8,9 +8,12 @@ namespace EC
 	class TransformComponent : public Component
 	{
 	public:
-		TransformComponent()
+		using ParentType = Component;
+
+		std::vector<TypeId> get_types() const override
 		{
-			register_my_type<decltype(*this)>();
+			static std::vector<TypeId> type_ids = register_type_and_get_types<TransformComponent, ParentType>();
+			return type_ids;
 		}
 
 		inline const glm::vec3& get_position() const
