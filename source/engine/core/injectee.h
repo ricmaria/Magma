@@ -6,7 +6,11 @@
 
 class Injectee
 {
-public:
+    friend class Injector;
+
+protected:
+    Injectee() {}
+
     class Dependency
     {
     public:
@@ -46,7 +50,6 @@ public:
         return dependencies;
     }
 
-protected:
     template<typename TParent>
     inline std::vector<Dependency> register_dependencies(const Dependency& dependency) const
     {
@@ -100,6 +103,7 @@ protected:
     }
 
 private:
+    
     template<typename TParent>
     inline std::vector<Dependency> register_dependencies(const std::vector<Dependency>& dependencies) const
     {
