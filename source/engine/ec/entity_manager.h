@@ -4,16 +4,16 @@
 #include "component.h"
 #include <vector>
 
-class ServiceLocator;
+class Injector;
 
 namespace EC
 {
 	class EntityManager
 	{
 	public:
-		inline void init(ServiceLocator* service_locator)
+		inline void init(Injector* injector)
 		{
-			_service_locator = service_locator;
+			_injector = injector;
 		}
 
 		Entity* create_entity();
@@ -23,6 +23,6 @@ namespace EC
 	private:
 		std::vector<std::unique_ptr<Entity>> _entities;
 
-		ServiceLocator* _service_locator;
+		Injector* _injector;
 	};
 }

@@ -19,7 +19,12 @@ namespace EC
 			register_sibling_request<TransformComponent>(&_transform_component);
 		}
 
-		void on_being_added() override;
+		const std::vector<Dependency>& get_dependencies() const override
+		{
+			static Dependency dependency = Dependency::make(&CameraComponent::_renderer);
+			static auto dependencies = register_dependencies<Component>(dependency);
+			return dependencies;
+		}
 
 		void update(float delta_time) override;
 	

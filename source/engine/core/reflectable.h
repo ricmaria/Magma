@@ -14,6 +14,12 @@ public:
 		return typeid(TType).name();
 	}
 
+	inline TypeId get_actual_type() const
+	{
+		assert(_my_type_ids.size() > 0);
+		return _my_type_ids[_my_type_ids.size() - 1];
+	}
+
 	bool is_of_type(const TypeId& type_id) const
 	{
 		assert(_my_type_ids.size() > 0);
@@ -38,6 +44,12 @@ public:
 	}
 
 protected:
+
+	Reflectable()
+	{
+		register_my_type<Reflectable>();
+	}
+
 	template<typename TType>
 	void register_my_type()
 	{

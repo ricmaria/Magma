@@ -103,7 +103,8 @@ private:
     template<typename TParent>
     inline std::vector<Dependency> register_dependencies(const std::vector<Dependency>& dependencies) const
     {
-        const auto& parent_dependencies = TParent::get_dependencies();
+        const TParent* this_as_parent = static_cast<const TParent*>(this);
+        const auto& parent_dependencies = this_as_parent->TParent::get_dependencies();
         std::vector<Dependency> all_dependencies;
         all_dependencies.reserve(dependencies.size() + parent_dependencies.size());
         all_dependencies.insert(all_dependencies.end(), dependencies.begin(), dependencies.end());

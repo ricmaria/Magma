@@ -1,12 +1,11 @@
 #pragma once
 
 #include "component.h"
+#include "core/injector.h"
 
 #include <memory>
 #include <vector>
 #include <type_traits>
-
-class ServiceLocator;
 
 namespace EC
 {
@@ -22,7 +21,7 @@ namespace EC
 		{
 			auto new_component = std::make_unique<TComponent>();
 
-			new_component->_service_locator = _service_locator;
+			_injector->inject(*new_component);
 
 			new_component->on_being_added();
 
@@ -114,9 +113,9 @@ namespace EC
 
 	private:
 
-		Entity() {};
+		Entity(Injector* injector) : _injector(injector) {};
 
-		ServiceLocator* _service_locator = nullptr;
+		Injector* _injector = nullptr;
 
 		std::vector<std::unique_ptr<Component>> _components;
 

@@ -2,7 +2,7 @@
 #include "core/magma_sdl_manager.h"
 #include "core/time_manager.h"
 #include "ec/entity_manager.h"
-#include "core/service_locator.h"
+#include "core/injector.h"
 #include <bitset>
 
 #pragma once
@@ -23,17 +23,19 @@ public:
 
 	void log(const char* text);
 
-	inline const ServiceLocator& get_service_locator() const { return _service_locator; }
+	inline Renderer * get_renderer() { return &_renderer; }
+	inline TimeManager * get_time_manager() { return &_time_manager; }
+	inline EC::EntityManager* get_ec_entity_manager() { return _entity_manager.get(); }
 
 private:
 
 	bool update();
 
+	InjectorRegister _injector;
 	SDLManager _sdl_manager;
 	Renderer _renderer;
 	TimeManager _time_manager;
 	std::unique_ptr<EC::EntityManager> _entity_manager;
-	ServiceRegister _service_locator;
 
 	float _last_time_update;
 };

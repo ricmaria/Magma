@@ -4,12 +4,11 @@
 #include <functional>
 
 #include "core/reflectable.h"
-
-class ServiceLocator;
+#include "core/injectee.h"
 
 namespace EC
 {
-	class Component: protected Reflectable
+	class Component: protected Reflectable, public Injectee
 	{
 		friend class Entity;
 
@@ -48,8 +47,6 @@ namespace EC
 	
 	protected:
 		Component() { register_my_type<decltype(*this)>(); }
-
-		ServiceLocator* _service_locator = nullptr;
 
 		template<typename TType>
 		void register_sibling_request(TType** destination)

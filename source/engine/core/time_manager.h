@@ -1,10 +1,16 @@
 #pragma once
 
 #include <chrono>
+#include "core/reflectable.h"
 
-class TimeManager
+class TimeManager : public Reflectable
 {
 public:
+	TimeManager()
+	{
+		register_my_type<decltype(*this)>();
+	}
+
 	void init()
 	{
 		_start_time_point = std::chrono::system_clock::now();

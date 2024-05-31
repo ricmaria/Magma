@@ -92,28 +92,10 @@ void test_delegates()
 	a = alt_obj_int_int(0);
 }
 
-int main(int argc, char* argv[])
+void test_injection(MagmaEngine& engine)
 {
-	MagmaEngine engine;
-
-	engine.init(MagmaEngine::Features::EC);
-	
-	EC::EntityManager* entity_manager = engine.get_service_locator().get_service<EC::EntityManager>();
-
-	EC::Entity* entity = entity_manager->create_entity();
-
-	entity->add_component<EC::KeyboardInputComponent>();
-	auto transform_component = entity->add_component<EC::TransformComponent>();
-	entity->add_component<EC::FirstPersonControllerComponent>();
-	entity->add_component<EC::CameraComponent>();
-
-	transform_component->set_position({ 0.f,-6.f,-10.f });
-
-	// engine.run();
-
-	
-
-	Renderer* renderer = engine.get_service_locator().get_service<Renderer>();
+	Renderer* renderer = engine.get_renderer();
+	EC::EntityManager* entity_manager = engine.get_ec_entity_manager();
 
 	class A : public Injectee
 	{
@@ -128,7 +110,7 @@ int main(int argc, char* argv[])
 			static auto dependencies = register_dependencies<Injectee>(dependency1, dependency2);
 			return dependencies;
 		}
-	};	
+	};
 
 	A a;
 
@@ -146,8 +128,29 @@ int main(int argc, char* argv[])
 			dependency.inject(&a, renderer);
 		}
 	}
+}
+
+int main(int argc, char* argv[])
+{
+	MagmaEngine engine;
+
+	engine.init(MagmaEngine::Features::EC);
+	
+	EC::EntityManager* entity_manager = engine.get_ec_entity_manager();
+
+	EC::Entity* entity = entity_manager->create_entity();
+
+	entity->add_component<EC::KeyboardInputComponent>();
+	auto transform_component = entity->add_component<EC::TransformComponent>();
+	entity->add_component<EC::FirstPersonControllerComponent>();
+	entity->add_component<EC::CameraComponent>();
+
+	transform_component->set_position({ 0.f,-6.f,-10.f });
+
+	engine.run();
 
 	// test_delegates();
+	// test_injection()
 
 	engine.cleanup();
 
