@@ -92,44 +92,6 @@ void test_delegates()
 	a = alt_obj_int_int(0);
 }
 
-void test_injection(MagmaEngine& engine)
-{
-	Renderer* renderer = engine.get_renderer();
-	EC::EntityManager* entity_manager = engine.get_ec_entity_manager();
-
-	class A : public Injectee
-	{
-	private:
-		EC::EntityManager* _entity_manager;
-		Renderer* _renderer;
-	public:
-		const std::vector<Dependency>& get_dependencies() const override
-		{
-			static Dependency dependency1 = Dependency::make(&A::_entity_manager);
-			static Dependency dependency2 = Dependency::make(&A::_renderer);
-			static auto dependencies = register_dependencies<Injectee>(dependency1, dependency2);
-			return dependencies;
-		}
-	};
-
-	A a;
-
-	for (auto& dependency : a.get_dependencies())
-	{
-		SDL_Log("dependency %s", dependency.get_type_id());
-
-		if (dependency.get_type_id() == Reflectable::extract_type<EC::EntityManager>())
-		{
-			dependency.inject(&a, entity_manager);
-		}
-
-		if (dependency.get_type_id() == Reflectable::extract_type<Renderer>())
-		{
-			dependency.inject(&a, renderer);
-		}
-	}
-}
-
 int main(int argc, char* argv[])
 {
 	MagmaEngine engine;
@@ -150,7 +112,6 @@ int main(int argc, char* argv[])
 	engine.run();
 
 	// test_delegates();
-	// test_injection()
 
 	engine.cleanup();
 

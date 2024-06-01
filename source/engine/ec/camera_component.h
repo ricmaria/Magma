@@ -32,7 +32,7 @@ namespace EC
 		const std::vector<Dependency>& get_dependencies() const override
 		{
 			static Dependency dependency = Dependency::make(&CameraComponent::_renderer);
-			static auto dependencies = register_dependencies<ParentType>(dependency);
+			static auto dependencies = register_and_get_dependencies<ParentType>({ dependency });
 			return dependencies;
 		}
 

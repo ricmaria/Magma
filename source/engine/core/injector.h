@@ -13,7 +13,7 @@ public:
 
 		for (auto& dependency : dependencies)
 		{
-			Reflectable::TypeId type_id = dependency.get_type_id();
+			Reflectable::TypeId type_id = dependency.type_id;
 
 			assert(_type_id_to_injected.contains(type_id) && "Missing injected object.");
 
