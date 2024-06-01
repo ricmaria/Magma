@@ -3,8 +3,6 @@
 #include "input_component.h"
 #include "transform_component.h"
 
-#include <SDL.h>
-
 using namespace EC;
 
 void FirstPersonControllerComponent::update(float delta_time)
