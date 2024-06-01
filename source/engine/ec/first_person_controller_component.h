@@ -20,10 +20,13 @@ namespace EC
 			return type_ids;
 		}
 
-		FirstPersonControllerComponent()
+	protected:
+		std::vector<SiblingRequest> get_sibling_requests() const override
 		{
-			register_siblings_request<InputComponent>(_input_components);
-			register_sibling_request<TransformComponent>(&_transform_component);
+			static SiblingRequest transform = SiblingRequest::make(&FirstPersonControllerComponent::_transform_component);
+			static SiblingRequest input = SiblingRequest::make(&FirstPersonControllerComponent::_input_components);
+			static std::vector<SiblingRequest> requests = add_and_get_siblings_requests<ParentType>({ transform, input });
+			return requests;
 		}
 
 		void update(float delta_time) override;

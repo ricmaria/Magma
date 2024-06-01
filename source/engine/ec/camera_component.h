@@ -20,11 +20,15 @@ namespace EC
 			return type_ids;
 		}
 
-		CameraComponent()
+	protected:
+		std::vector<SiblingRequest> get_sibling_requests() const override
 		{
-			register_sibling_request<TransformComponent>(&_transform_component);
+			static SiblingRequest transform = SiblingRequest::make(&CameraComponent::_transform_component);
+			static std::vector<SiblingRequest> requests = add_and_get_siblings_requests<ParentType>({ transform });
+			return requests;
 		}
 
+	public:
 		const std::vector<Dependency>& get_dependencies() const override
 		{
 			static Dependency dependency = Dependency::make(&CameraComponent::_renderer);
