@@ -30,11 +30,18 @@ std::unique_ptr<Component> Entity::remove_component(const std::vector<std::uniqu
 
 	Component* removed_component = (*it).get();
 
-	for (auto& component : _components)
+	for (auto& other_component : _components)
 	{
-		removed_component->on_sibling_component_removed(component.get());
+		Injector::eject_all(*removed_component);
 
-		component->on_sibling_component_removed(removed_component);
+		// We must specify the template argument for eject_one as the component is both Injectee (first) and Reflectable
+		// If we pass it as a Reflectable, downcasting the pointer value will return the wrong value
+		
+		Injector::eject_one<Component>(*other_component, removed_component);
+
+		removed_component->on_sibling_component_removed(other_component.get());
+
+		other_component->on_sibling_component_removed(removed_component);
 	}
 
 	removed_component->on_being_removed();

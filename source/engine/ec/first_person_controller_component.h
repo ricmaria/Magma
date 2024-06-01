@@ -20,16 +20,17 @@ namespace EC
 			return type_ids;
 		}
 
-	protected:
-		std::vector<SiblingRequest> get_sibling_requests() const override
-		{
-			static SiblingRequest transform = SiblingRequest::make(&FirstPersonControllerComponent::_transform_component);
-			static SiblingRequest input = SiblingRequest::make(&FirstPersonControllerComponent::_input_components);
-			static std::vector<SiblingRequest> requests = add_and_get_siblings_requests<ParentType>({ transform, input });
-			return requests;
-		}
-
 		void update(float delta_time) override;
+
+	protected:
+		const std::vector<Dependency>& get_dependencies() const override
+		{
+			static Dependency transform = Dependency::make(&FirstPersonControllerComponent::_transform_component);
+			static Dependency input = Dependency::make(&FirstPersonControllerComponent::_input_components);
+			static auto dependencies = register_and_get_dependencies<ParentType>({ transform, input });
+			
+			return dependencies;
+		}
 
 	private:
 		std::vector<InputComponent*> _input_components;

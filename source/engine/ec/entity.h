@@ -19,20 +19,30 @@ namespace EC
 			typename = std::enable_if_t<std::is_base_of_v<Component, TComponent>> >
 		TComponent* add_component()
 		{
-			auto new_component = std::make_unique<TComponent>();
+			auto new_component_unique = std::make_unique<TComponent>();
+			auto new_component = new_component_unique.get();
 
-			_injector->inject(*new_component);
+			_external_injector->inject(*new_component);
 
 			new_component->on_being_added();
 
-			for (auto& old_component : _components)
+			for (auto& other_component_unique : _components)
 			{
-				new_component->on_sibling_component_added(old_component.get());
+				auto other_component = other_component_unique.get();
 
-				old_component->on_sibling_component_added(new_component.get());
+				// We must specify the template argument for inject_one as the component is both Injectee (first) and Reflectable
+				// If we pass it as a Reflectable, downcasting the pointer value will return the wrong value
+
+				Injector::inject_one<Component>(*other_component, new_component);
+
+				Injector::inject_one<Component>(*new_component, other_component);
+
+				new_component->on_sibling_component_added(other_component);
+
+				other_component->on_sibling_component_added(new_component);
 			}
 
-			_components.push_back(std::move(new_component));
+			_components.push_back(std::move(new_component_unique));
 
 			return static_cast<TComponent*>(_components.back().get());
 		}
@@ -113,9 +123,9 @@ namespace EC
 
 	private:
 
-		Entity(Injector* injector) : _injector(injector) {};
+		Entity(Injector* injector) : _external_injector(injector) {};
 
-		Injector* _injector = nullptr;
+		Injector* _external_injector = nullptr;
 
 		std::vector<std::unique_ptr<Component>> _components;
 
