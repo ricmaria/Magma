@@ -3,16 +3,9 @@
 #include <chrono>
 #include "core/reflectable.h"
 
-class TimeManager : public Reflectable
+class TimeManager
 {
 public:
-	using ParentType = Reflectable;
-
-	std::vector<TypeId> get_types() const override
-	{
-		static std::vector<TypeId> type_ids = register_type_and_get_types<TimeManager, ParentType>();
-		return type_ids;
-	}
 
 	void init()
 	{

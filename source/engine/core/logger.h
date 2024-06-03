@@ -1,9 +1,8 @@
 #pragma once
 
-#include "reflectable.h"
 #include <SDL.h>
 
-class Logger: public Reflectable
+class Logger
 {
 public:
 	template<typename... Args>

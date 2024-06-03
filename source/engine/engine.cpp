@@ -18,13 +18,13 @@ void MagmaEngine::init(Features features)
 
 	_sdl_manager.init(1700, 900);
 
-	_injector.register_injected(&_logger);
+	_injector.register_one_type(&_logger);
 
 	_renderer.init(_sdl_manager.get_width(), _sdl_manager.get_height(), _sdl_manager.get_sdl_window());
-	_injector.register_injected(&_renderer);
+	_injector.register_one_type(&_renderer);
 
 	_time_manager.init();
-	_injector.register_injected(&_time_manager);
+	_injector.register_one_type(&_time_manager);
 
 	if (_entity_manager)
 	{

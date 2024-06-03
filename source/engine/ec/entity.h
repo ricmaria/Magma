@@ -33,9 +33,9 @@ namespace EC
 				// We must specify the template argument for inject_one as the component is both Injectee (first) and Reflectable
 				// If we pass it as a Reflectable, downcasting the pointer value will return the wrong value
 
-				Injector::inject_one<Component>(*other_component, new_component);
+				Injector::inject_all_types_of_injected<Component>(*other_component, new_component);
 
-				Injector::inject_one<Component>(*new_component, other_component);
+				Injector::inject_all_types_of_injected<Component>(*new_component, other_component);
 
 				new_component->on_sibling_component_added(other_component);
 
