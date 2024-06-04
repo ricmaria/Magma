@@ -36,15 +36,29 @@ namespace EC
 			return _forward;
 		}
 
+		inline void set_forward(const glm::vec3& forward)
+		{
+			_forward = forward;
+		}
+
 		inline const glm::vec3& get_right() const
 		{
 			return _right;
 		}
 
+		inline void set_right(const glm::vec3& right)
+		{
+			_right = right;
+		}
 
 		inline const glm::vec3& get_up() const
 		{
 			return _up;
+		}
+
+		inline void set_up(const glm::vec3& up)
+		{
+			_up = up;
 		}
 
 	private:

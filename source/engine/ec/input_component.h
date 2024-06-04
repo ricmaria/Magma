@@ -16,13 +16,15 @@ namespace EC
 			return type_ids;
 		}
 
-		virtual float get_up() const = 0;
-		virtual float get_down() const = 0;
-		virtual float get_left() const = 0;
-		virtual float get_right() const = 0;
-		virtual float get_high() const = 0;
-		virtual float get_low() const = 0;
+		virtual float get_forward() const = 0;
+		virtual float get_lateral() const = 0;
+		virtual float get_vertical() const = 0;
 		virtual float get_run() const = 0;
+		virtual float get_action_1() const = 0;
+		virtual float get_action_2() const = 0;
+
+		virtual float get_pitch() const = 0;
+		virtual float get_yaw() const = 0;
 
 		virtual ~InputComponent() override {};
 	};

@@ -1,6 +1,6 @@
 #include <engine.h>
 
-#include <ec/keyboard_input_component.h>
+#include <ec/mouse_keyboard_input_component.h>
 #include <ec/transform_component.h>
 #include <ec/camera_component.h>
 #include <ec/first_person_controller_component.h>
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 
 	EC::Entity* entity = entity_manager->create_entity();
 
-	entity->add_component<EC::KeyboardInputComponent>();
+	entity->add_component<EC::MouseKeyboardInputComponent>();
 	auto transform_component = entity->add_component<EC::TransformComponent>();
 	entity->add_component<EC::FirstPersonControllerComponent>();
 	entity->add_component<EC::CameraComponent>();
