@@ -27,7 +27,7 @@ namespace EC
 		{
 			static Dependency transform = Dependency::make(&FirstPersonControllerComponent::_transform_component);
 			static Dependency input = Dependency::make(&FirstPersonControllerComponent::_input_components);
-			static auto dependencies = register_and_get_dependencies<ParentType>({ transform, input });
+			static auto dependencies = append_dependencies(ParentType::get_dependencies(), { transform, input });
 			
 			return dependencies;
 		}

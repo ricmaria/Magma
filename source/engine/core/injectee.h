@@ -93,16 +93,13 @@ protected:
         static std::vector<Dependency> dependencies;
         return dependencies;
     }
-    
-    template<typename TParent>
-    inline std::vector<Dependency> register_and_get_dependencies(const std::vector<Dependency>& dependencies) const
+
+    static std::vector<Dependency> append_dependencies(const std::vector<Dependency>& parent_dependencies, const std::vector<Dependency>& child_dependencies)
     {
-        const TParent* this_as_parent = static_cast<const TParent*>(this);
-        const auto& parent_dependencies = this_as_parent->TParent::get_dependencies();
         std::vector<Dependency> all_dependencies;
-        all_dependencies.reserve(dependencies.size() + parent_dependencies.size());
-        all_dependencies.insert(all_dependencies.end(), dependencies.begin(), dependencies.end());
+        all_dependencies.reserve(parent_dependencies.size() + child_dependencies.size());
         all_dependencies.insert(all_dependencies.end(), parent_dependencies.begin(), parent_dependencies.end());
+        all_dependencies.insert(all_dependencies.end(), child_dependencies.begin(), child_dependencies.end());
         return all_dependencies;
     }
 };

@@ -27,7 +27,7 @@ namespace EC
 		{
 			static Dependency renderer = Dependency::make(&CameraComponent::_renderer);
 			static Dependency transform = Dependency::make(&CameraComponent::_transform_component);
-			static auto dependencies = register_and_get_dependencies<ParentType>({ renderer, transform });
+			static auto dependencies = append_dependencies(ParentType::get_dependencies(), { renderer, transform });
 			
 			return dependencies;
 		}

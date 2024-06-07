@@ -3,8 +3,10 @@
 #include <memory>
 #include <functional>
 
-#include "core/reflectable.h"
 #include "core/injectee.h"
+#include "core/logger.h"
+#include "core/reflectable.h"
+
 
 namespace EC
 {
@@ -15,15 +17,21 @@ namespace EC
 	public:
 		virtual ~Component() {};
 
-		using ParentType = Reflectable;
-
 		std::vector<TypeId> get_types() const override
 		{
-			static std::vector<TypeId> type_ids = register_type_and_get_types<Component, ParentType>();
+			static std::vector<TypeId> type_ids = register_type_and_get_types<Component, Reflectable>();
 			return type_ids;
 		}
 
 	protected:
+		const std::vector<Dependency>& get_dependencies() const override
+		{
+			static Dependency logger = Dependency::make(&Component::_logger);
+			static auto dependencies = append_dependencies(Injectee::get_dependencies(), { logger });
+
+			return dependencies;
+		}
+
 		virtual void update(float delta_time) {};
 
 		virtual void on_being_added() {};
@@ -33,5 +41,7 @@ namespace EC
 		virtual void on_sibling_component_added(Component* sibling) {};
 
 		virtual void on_sibling_component_removed(Component* sibling) {};
+
+		Logger* _logger;
 	};
 };
