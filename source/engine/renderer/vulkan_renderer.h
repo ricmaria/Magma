@@ -191,6 +191,7 @@ public:
 
 	inline glm::vec3 get_camera_position() { return _camera_position; }
 	inline void set_camera_position(glm::vec3 position) { _camera_position = position; }
+	void set_camera_view(const glm::vec3& forward, const glm::vec3& left, const glm::vec3& up);
 
 	//default array of renderable objects
 	std::vector<RenderObject> _renderables;
@@ -247,4 +248,6 @@ private:
 	void upload_mesh(Mesh& mesh);
 
 	glm::vec3 _camera_position = { 0.f,-6.f,-10.f };
+
+	glm::mat4 _camera_view{ glm::vec4{1,0,0,0}, glm::vec4{0,1,0,0}, glm::vec4{0,0,-1,0}, glm::vec4{0,0,0,1} };
 };

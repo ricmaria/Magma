@@ -13,6 +13,7 @@ public:
 	void cleanup();
 
 	void set_camera_position(const glm::vec3& position);
+	void set_camera_view(const glm::vec3& forward, const glm::vec3& left, const glm::vec3& up);
 
 private:
 	VulkanRenderer _vulkan_renderer;

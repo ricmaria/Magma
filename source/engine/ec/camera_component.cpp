@@ -7,7 +7,13 @@ using namespace EC;
 
 void CameraComponent::update(float delta_time)
 {
-	glm::vec3 position = _transform_component->get_position();
-
+	const auto& position = _transform_component->get_position();
+	
 	_renderer->set_camera_position(position);
+
+	const auto& forward = _transform_component->get_forward();
+	const auto& left = _transform_component->get_left();
+	const auto& up = _transform_component->get_up();
+
+	_renderer->set_camera_view(forward, left, up);
 }

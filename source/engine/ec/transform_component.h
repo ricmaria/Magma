@@ -21,11 +21,6 @@ namespace EC
 			return _position;
 		}
 
-		inline glm::vec3& get_position()
-		{
-			return _position;
-		}
-
 		inline void set_position(const glm::vec3& position)
 		{
 			_position = position;
@@ -41,14 +36,14 @@ namespace EC
 			_forward = forward;
 		}
 
-		inline const glm::vec3& get_right() const
+		inline const glm::vec3& get_left() const
 		{
-			return _right;
+			return _left;
 		}
 
-		inline void set_right(const glm::vec3& right)
+		inline void set_left(const glm::vec3& left)
 		{
-			_right = right;
+			_left = left;
 		}
 
 		inline const glm::vec3& get_up() const
@@ -64,8 +59,10 @@ namespace EC
 	private:
 		glm::vec3 _position = { 0, 0, 0 };
 
-		glm::vec3 _forward = { 0, 0, 1 };
-		glm::vec3 _right = { -1, 0, 0 };
-		glm::vec3 _up = { 0, -1, 0 };
+		glm::vec3 _left = { -1, 0, 0 };
+		glm::vec3 _up = { 0, 1, 0 };
+		glm::vec3 _forward = { 0, 0, -1 };
+		
+		
 	};
 }

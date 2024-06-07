@@ -25,7 +25,7 @@ void FirstPersonControllerComponent::update(float delta_time)
 			val = std::abs(new_val) > std::abs(val) ? new_val : val;
 		};
 
-	for (auto* input_component: _input_components)
+	for (auto* input_component : _input_components)
 	{
 		update_input_val(forward_input, input_component->get_forward());
 		update_input_val(lateral_input, input_component->get_lateral());
@@ -35,34 +35,67 @@ void FirstPersonControllerComponent::update(float delta_time)
 		update_input_val(yaw_input, input_component->get_yaw());
 	}
 
-	glm::vec3 forward_vec = _transform_component->get_forward();
-	glm::vec3 right_vec = _transform_component->get_right();
+	_logger->log("forward_input %f", forward_input);
 
 	const glm::vec3 global_up_vec{ 0.0f, 1.0f, 0.0f };
 
-	right_vec = glm::rotate(right_vec, yaw_input, global_up_vec);
-	forward_vec = glm::rotate(forward_vec, yaw_input, global_up_vec);
-	
-	glm::vec3 up_vec = glm::cross(right_vec, forward_vec);
-	right_vec = glm::cross(forward_vec, up_vec);
+	//glm::vec3 forward_vec = _transform_component->get_forward();
+	//glm::vec3 left_vec = _transform_component->get_left();
 
-	forward_vec = glm::rotate(forward_vec, pitch_input, right_vec);
+	//left_vec = glm::rotate(left_vec, -yaw_input, global_up_vec);
+	//forward_vec = glm::rotate(forward_vec, -yaw_input, global_up_vec);
 
-	up_vec = glm::cross(right_vec, forward_vec);
+	//glm::vec3 up_vec = glm::cross(forward_vec, left_vec);
+	//left_vec = glm::cross(up_vec, forward_vec);
+	//left_vec = glm::normalize(left_vec);
 
-	forward_vec = glm::normalize(forward_vec);
-	if (forward_vec.y > 0.99f)
-	{
-		forward_vec.y = 0.99f;
-		forward_vec = glm::normalize(forward_vec);
-	}
+	//forward_vec = glm::rotate(forward_vec, -pitch_input, left_vec);
+	//forward_vec = glm::normalize(forward_vec);
+	//if (forward_vec.y > 0.99f)
+	//{
+	//	forward_vec.y = 0.99f;
+	//	forward_vec = glm::normalize(forward_vec);
+	//}
 
-	right_vec = glm::normalize(right_vec);
-	up_vec = glm::normalize(up_vec);
-	
+	//up_vec = glm::cross(forward_vec, left_vec);
+	//up_vec = glm::normalize(up_vec);
+
 	//_transform_component->set_forward(forward_vec);
-	//_transform_component->set_right(right_vec);
-	//_transform_component->set_up(up_vec);	
+	//_transform_component->set_left(forward_vec);
+	//_transform_component->set_up(up_vec);
+
+	{
+		static bool once = false;
+
+		if (!once)
+		{
+			once = true;
+
+			glm::vec3 forward_db = _transform_component->get_forward();
+			glm::vec3 left_db = _transform_component->get_left();
+
+			const float rotation_speed = 1.0f;
+			float rotation_angle = rotation_speed * delta_time;
+
+			rotation_angle = 45;
+
+			forward_db = glm::rotate(forward_db, rotation_angle, global_up_vec);
+			forward_db = glm::normalize(forward_db);
+
+			left_db = glm::rotate(left_db, rotation_angle, global_up_vec);
+			left_db = glm::normalize(left_db);
+
+			glm::vec3 up_db = glm::cross(forward_db, left_db);
+			up_db = glm::normalize(up_db);
+
+			left_db = glm::cross(up_db, forward_db);
+			left_db = glm::normalize(left_db);
+
+			//_transform_component->set_forward(forward_db);
+			//_transform_component->set_left(left_db);
+			//_transform_component->set_up(up_db);
+		}		
+	}
 
 	const float default_speed = 1.0f;
 	const float run_speed = 5.0f;
@@ -71,9 +104,8 @@ void FirstPersonControllerComponent::update(float delta_time)
 
 	glm::vec3 position = _transform_component->get_position();
 
-	
 	position += _transform_component->get_forward() * forward_input * speed * delta_time;
-	position += _transform_component->get_right() * lateral_input * speed * delta_time;
+	position -= _transform_component->get_left() * lateral_input * speed * delta_time;
 	position += _transform_component->get_up() * vertical_input * speed * delta_time;
 
 	_transform_component->set_position(position);

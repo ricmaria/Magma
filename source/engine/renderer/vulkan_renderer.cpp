@@ -885,10 +885,11 @@ void VulkanRenderer::draw_objects(VkCommandBuffer cmd,RenderObject* first, int c
 {
 	//make a model view matrix for rendering the object
 	
-	glm::mat4 view = glm::translate(glm::mat4(1.f), _camera_position);
+	//glm::mat4 view = glm::translate(_camera_view, _camera_position);
+	glm::mat4 view = glm::translate(glm::mat4{ 1.0f }, _camera_position);
 	//camera projection
-	glm::mat4 projection = glm::perspective(glm::radians(70.f), 1700.f / 900.f, 0.1f, 200.0f);
-	projection[1][1] *= -1;	
+	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(70.f), 1700.f / 900.f, 0.1f, 200.0f);
+	projection[1][1] *= -1;
 
 	GPUCameraData camData;
 	camData.proj = projection;
@@ -1238,4 +1239,9 @@ void VulkanRenderer::init_descriptors()
 			vmaDestroyBuffer(_allocator, _frames[i].objectBuffer._buffer, _frames[i].objectBuffer._allocation);
 		}
 	});
+}
+
+void VulkanRenderer::set_camera_view(const glm::vec3& forward, const glm::vec3& left, const glm::vec3& up)
+{
+	_camera_view = glm::mat4(glm::vec4(left, 0.0f), glm::vec4(up, 0.0f), glm::vec4(forward, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 }

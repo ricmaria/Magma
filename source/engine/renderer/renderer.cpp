@@ -21,3 +21,8 @@ void Renderer::set_camera_position(const glm::vec3& position)
 {
 	_vulkan_renderer.set_camera_position(position);
 }
+
+void Renderer::set_camera_view(const glm::vec3& forward, const glm::vec3& left, const glm::vec3& up)
+{
+	_vulkan_renderer.set_camera_view(forward, left, up);
+}
