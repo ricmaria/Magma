@@ -885,8 +885,8 @@ void VulkanRenderer::draw_objects(VkCommandBuffer cmd,RenderObject* first, int c
 {
 	//make a model view matrix for rendering the object
 	
-	//glm::mat4 view = glm::translate(_camera_view, _camera_position);
-	glm::mat4 view = glm::translate(glm::mat4{ 1.0f }, _camera_position);
+	glm::mat4 view = glm::translate(_camera_view, _camera_position);
+
 	//camera projection
 	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(70.f), 1700.f / 900.f, 0.1f, 200.0f);
 	projection[1][1] *= -1;
@@ -1241,7 +1241,8 @@ void VulkanRenderer::init_descriptors()
 	});
 }
 
-void VulkanRenderer::set_camera_view(const glm::vec3& forward, const glm::vec3& left, const glm::vec3& up)
+void VulkanRenderer::set_camera_view(const glm::vec3& forward, const glm::vec3& right, const glm::vec3& up)
 {
-	_camera_view = glm::mat4(glm::vec4(left, 0.0f), glm::vec4(up, 0.0f), glm::vec4(forward, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	// Why right must be negated???
+	_camera_view = glm::transpose(glm::mat4(-glm::vec4(right, 0.0f), -glm::vec4(up, 0.0f), glm::vec4(forward, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)));
 }

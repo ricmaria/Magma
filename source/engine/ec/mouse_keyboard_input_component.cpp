@@ -26,13 +26,13 @@ float MouseKeyboardInputComponent::MouseKeyboardInputComponent::get_forward() co
 			- std::max(_sdl_keyboard_state_array[SDL_SCANCODE_S], _sdl_keyboard_state_array[SDL_SCANCODE_DOWN]);
 }
 
-float MouseKeyboardInputComponent::get_lateral() const
+float MouseKeyboardInputComponent::get_strafe() const
 {
 	return std::max(_sdl_keyboard_state_array[SDL_SCANCODE_D], _sdl_keyboard_state_array[SDL_SCANCODE_RIGHT])
 			- std::max(_sdl_keyboard_state_array[SDL_SCANCODE_A], _sdl_keyboard_state_array[SDL_SCANCODE_LEFT]);
 }
 
-float MouseKeyboardInputComponent::MouseKeyboardInputComponent::get_vertical() const
+float MouseKeyboardInputComponent::MouseKeyboardInputComponent::get_fly() const
 {
 	return std::max(_sdl_keyboard_state_array[SDL_SCANCODE_E], _sdl_keyboard_state_array[SDL_SCANCODE_PAGEUP])
 			- std::max(_sdl_keyboard_state_array[SDL_SCANCODE_Q], _sdl_keyboard_state_array[SDL_SCANCODE_PAGEDOWN]);
@@ -53,12 +53,12 @@ float MouseKeyboardInputComponent::get_action_2() const
 	return _action_2;
 }
 
-float MouseKeyboardInputComponent::get_pitch() const
+float MouseKeyboardInputComponent::get_yaw() const
 {
 	return _mouse_delta.x;
 }
 
-float MouseKeyboardInputComponent::get_yaw() const
+float MouseKeyboardInputComponent::get_pitch() const
 {
 	return _mouse_delta.y;
 }

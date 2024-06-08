@@ -22,6 +22,9 @@ namespace EC
 
 		void update(float delta_time) override;
 
+		bool get_invert_mouse_y() { return _invert_mouse_y; }
+		bool set_invert_mouse_y(bool value) { _invert_mouse_y = value; }
+
 	protected:
 		const std::vector<Dependency>& get_dependencies() const override
 		{
@@ -35,5 +38,6 @@ namespace EC
 	private:
 		std::vector<InputComponent*> _input_components;
 		TransformComponent* _transform_component = nullptr;
+		bool _invert_mouse_y = false;
 	};
 }

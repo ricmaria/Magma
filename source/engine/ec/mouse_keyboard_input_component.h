@@ -22,8 +22,8 @@ namespace EC
 		void update(float delta_time) override;
 
 		float get_forward() const override;
-		float get_lateral() const override;
-		float get_vertical() const override;
+		float get_strafe() const override;
+		float get_fly() const override;
 		float get_run() const override;
 		float get_action_1() const override;
 		float get_action_2() const override;

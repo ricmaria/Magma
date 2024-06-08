@@ -17,8 +17,8 @@ namespace EC
 		}
 
 		virtual float get_forward() const = 0;
-		virtual float get_lateral() const = 0;
-		virtual float get_vertical() const = 0;
+		virtual float get_strafe() const = 0;
+		virtual float get_fly() const = 0;
 		virtual float get_run() const = 0;
 		virtual float get_action_1() const = 0;
 		virtual float get_action_2() const = 0;
