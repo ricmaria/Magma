@@ -14,12 +14,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
+#include "core/id_pool.h"
 #include "types.h"
 #include "mesh.h"
 
-class PipelineBuilder {
+class PipelineBuilder
+{
 public:
-
 	std::vector<VkPipelineShaderStageCreateInfo> _shaderStages;
 	VkPipelineVertexInputStateCreateInfo _vertexInputInfo;
 	VkPipelineInputAssemblyStateCreateInfo _inputAssembly;
@@ -30,20 +31,21 @@ public:
 	VkPipelineMultisampleStateCreateInfo _multisampling;
 	VkPipelineLayout _pipelineLayout;
 	VkPipelineDepthStencilStateCreateInfo _depthStencil;
+
 	VkPipeline build_pipeline(VkDevice device, VkRenderPass pass);
 };
 
-
-
 struct DeletionQueue
 {
-    std::deque<std::function<void()>> deletors;
+	std::deque<std::function<void()>> deletors;
 
-    void push_function(std::function<void()>&& function) {
-        deletors.push_back(function);
-    }
+	void push_function(std::function<void()>&& function)
+	{
+		deletors.push_back(function);
+	}
 
-    void flush() {
+	void flush()
+	{
         // reverse iterate the deletion queue to execute all the functions
         for (auto it = deletors.rbegin(); it != deletors.rend(); it++) {
             (*it)(); //call functors
@@ -53,35 +55,39 @@ struct DeletionQueue
     }
 };
 
-struct MeshPushConstants {
+struct MeshPushConstants
+{
 	glm::vec4 data;
 	glm::mat4 render_matrix;
 };
 
 
-struct Material {
+struct Material
+{
 	VkDescriptorSet textureSet{VK_NULL_HANDLE};
 	VkPipeline pipeline;
 	VkPipelineLayout pipelineLayout;
 };
 
-struct Texture {
+struct Texture
+{
 	AllocatedImage image;
 	VkImageView imageView;
 };
 
-struct RenderObject {
+using RenderObjectId = IdPool::Id;
+
+struct RenderObject
+{
+	RenderObjectId id;
 	Mesh* mesh;
-
 	Material* material;
-
-	glm::mat4 transformMatrix;
-
-	
+	glm::mat4 transformMatrix;	
 };
 
 
-struct FrameData {
+struct FrameData
+{
 	VkSemaphore _presentSemaphore, _renderSemaphore;
 	VkFence _renderFence;
 
@@ -97,19 +103,22 @@ struct FrameData {
 	VkDescriptorSet objectDescriptor;
 };
 
-struct UploadContext {
+struct UploadContext
+{
 	VkFence _uploadFence;
 	VkCommandPool _commandPool;	
 	VkCommandBuffer _commandBuffer;
 };
-struct GPUCameraData{
+struct GPUCameraData
+{
 	glm::mat4 view;
 	glm::mat4 proj;
 	glm::mat4 viewproj;
 };
 
 
-struct GPUSceneData {
+struct GPUSceneData
+{
 	glm::vec4 fogColor; // w is for exponent
 	glm::vec4 fogDistances; //x for min, y for max, zw unused.
 	glm::vec4 ambientColor;
@@ -193,6 +202,9 @@ public:
 	inline void set_camera_position(glm::vec3 position) { _camera_position = position; }
 	void set_camera_view(const glm::vec3& forward, const glm::vec3& left, const glm::vec3& up);
 
+	RenderObjectId add_render_object(const std::string& mesh_name, const std::string& material_name, glm::mat4 transform);
+	void remove_render_object(RenderObjectId id);
+
 	//default array of renderable objects
 	std::vector<RenderObject> _renderables;
 
@@ -250,4 +262,6 @@ private:
 	glm::vec3 _camera_position = { 0.f,-6.f,-10.f };
 
 	glm::mat4 _camera_view{ glm::vec4{1,0,0,0}, glm::vec4{0,1,0,0}, glm::vec4{0,0,-1,0}, glm::vec4{0,0,0,1} };
+
+	IdPool id_pool;
 };

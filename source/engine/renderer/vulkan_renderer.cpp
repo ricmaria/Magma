@@ -872,10 +872,12 @@ Material* VulkanRenderer::get_material(const std::string& name)
 Mesh* VulkanRenderer::get_mesh(const std::string& name)
 {
 	auto it = _meshes.find(name);
-	if (it == _meshes.end()) {
+	if (it == _meshes.end())
+	{
 		return nullptr;
 	}
-	else {
+	else
+	{
 		return &(*it).second;
 	}
 }
@@ -1245,4 +1247,33 @@ void VulkanRenderer::set_camera_view(const glm::vec3& forward, const glm::vec3& 
 {
 	// Why right must be negated???
 	_camera_view = glm::transpose(glm::mat4(-glm::vec4(right, 0.0f), -glm::vec4(up, 0.0f), glm::vec4(forward, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+}
+
+RenderObjectId VulkanRenderer::add_render_object(const std::string& mesh_name, const std::string& material_name, glm::mat4 transform)
+{
+	RenderObject object;
+	object.id = id_pool.acquire_id();
+	object.mesh = get_mesh(mesh_name);
+	object.material = get_material(mesh_name);
+	object.transformMatrix = transform;
+
+	assert(object.mesh);
+	assert(object.material);
+
+	_renderables.push_back(object);
+
+	return object.id;
+}
+
+void VulkanRenderer::remove_render_object(RenderObjectId id)
+{
+	auto it = std::find_if(_renderables.begin(), _renderables.end(),
+		[id](const RenderObject& render_object)
+		{
+			return render_object.id == id;
+		});
+	if (it != _renderables.end())
+	{
+		_renderables.erase(it);
+	}
 }

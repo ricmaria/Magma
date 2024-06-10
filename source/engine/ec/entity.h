@@ -17,10 +17,21 @@ namespace EC
 		
 		template<typename TComponent,
 			typename = std::enable_if_t<std::is_base_of_v<Component, TComponent>> >
+		static std::unique_ptr<TComponent> create_component()
+		{
+			return std::make_unique<TComponent>();
+		}
+
+		template<typename TComponent,
+			typename = std::enable_if_t<std::is_base_of_v<Component, TComponent>> >
 		TComponent* add_component()
 		{
-			auto new_component_unique = std::make_unique<TComponent>();
-			auto new_component = new_component_unique.get();
+			return static_cast<TComponent*>(add_component(create_component<TComponent>()));
+		}
+
+		Component* add_component(std::unique_ptr<Component>&& component)
+		{
+			Component* new_component = component.get();
 
 			_external_injector->inject(*new_component);
 
@@ -42,9 +53,9 @@ namespace EC
 				other_component->on_sibling_component_added(new_component);
 			}
 
-			_components.push_back(std::move(new_component_unique));
+			_components.push_back(std::move(component));
 
-			return static_cast<TComponent*>(_components.back().get());
+			return _components.back().get();
 		}
 
 		template<typename TComponent,
