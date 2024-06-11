@@ -19,6 +19,7 @@ void FirstPersonControllerComponent::update(float delta_time)
 	float run_input = 0.0f;
 	float pitch_input = 0.0f;
 	float yaw_input = 0.0f;
+	float action_1 = 0.0f;
 
 	auto update_input_val = [](float& val, float new_val)
 		{
@@ -33,13 +34,14 @@ void FirstPersonControllerComponent::update(float delta_time)
 		update_input_val(run_input, input_component->get_run());
 		update_input_val(yaw_input, input_component->get_yaw());
 		update_input_val(pitch_input, input_component->get_pitch());
+		update_input_val(action_1, input_component->get_action_1());
 	}
 
 	const float yaw_speed = 0.5f;
 	const float pitch_speed = 0.5f;
 
-	const float yaw_angle = -yaw_input * yaw_speed * delta_time;
-	const float pitch_angle = -pitch_input * pitch_speed * delta_time * (_invert_mouse_y ? -1.0f : 1.0f);
+	const float yaw_angle = -yaw_input * yaw_speed * delta_time * action_1;
+	const float pitch_angle = -pitch_input * pitch_speed * delta_time * action_1 * (_invert_mouse_y ? -1.0f : 1.0f);
 
 	const glm::vec3 global_up_vec{ 0.0f, -1.0f, 0.0f };
 
