@@ -75,11 +75,9 @@ struct Texture
 	VkImageView imageView;
 };
 
-using RenderObjectId = IdPool::Id;
-
 struct RenderObject
 {
-	RenderObjectId id;
+	IdPool::Id id;
 	Mesh* mesh;
 	Material* material;
 	glm::mat4 transformMatrix;	
@@ -136,6 +134,10 @@ constexpr unsigned int FRAME_OVERLAP = 2;
 class VulkanRenderer
 {
 public:
+
+	using RenderObjectId = IdPool::Id;
+
+	static const RenderObjectId invalid_render_object_id = IdPool::Invalid;
 
 	bool _isInitialized{ false };
 	int _frameNumber {0};
@@ -246,7 +248,7 @@ private:
 
 	void init_pipelines();
 
-	void init_scene();
+	void init_textures();
 
 	void init_descriptors();
 
@@ -263,5 +265,5 @@ private:
 
 	glm::mat4 _camera_view{ glm::vec4{1,0,0,0}, glm::vec4{0,1,0,0}, glm::vec4{0,0,-1,0}, glm::vec4{0,0,0,1} };
 
-	IdPool id_pool;
+	IdPool _id_pool;
 };

@@ -7,6 +7,8 @@ class IdPool
 public:
 	using Id = uint32_t;
 
+	static const Id Invalid = 0;
+
 	IdPool(uint32_t batch_size = 32) : _batch_size(batch_size)
 	{
 		assert(batch_size > 0);
@@ -37,7 +39,7 @@ private:
 	{
 		_ids.reserve(_ids.size() + _batch_size);
 
-		const uint32_t first = _ids.size();
+		const uint32_t first = _ids.size() + 1;
 
 		for (int32_t i = _batch_size - 1; i >= 0; --i)
 		{

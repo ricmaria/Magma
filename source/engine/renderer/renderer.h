@@ -8,6 +8,10 @@ class Renderer
 {
 public:
 
+	using RenderObjectId = VulkanRenderer::RenderObjectId;
+
+	static const RenderObjectId invalid_render_object_id = VulkanRenderer::invalid_render_object_id;
+
 	void init(uint32_t width, uint32_t height, struct SDL_Window* window);
 	void draw();
 	void cleanup();

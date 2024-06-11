@@ -59,7 +59,7 @@ void VulkanRenderer::init(uint32_t width, uint32_t height, SDL_Window * window)
 
 	load_meshes();
 
-	init_scene();
+	init_textures();
 	//everything went fine
 	_isInitialized = true;
 }
@@ -102,9 +102,8 @@ void VulkanRenderer::draw()
 	VK_CHECK(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
 
 	//make a clear-color from frame number. This will flash with a 120 frame period.
-	VkClearValue clearValue;
-	float flash = abs(sin(_frameNumber / 120.f));
-	clearValue.color = { { 0.0f, 0.0f, flash, 1.0f } };
+	VkClearValue clearValue;;
+	clearValue.color = { { 0.0f, 0.0f, 0.0f, 1.0f } };
 
 	//clear depth at 1
 	VkClearValue depthClear;
@@ -984,37 +983,8 @@ void VulkanRenderer::draw_objects(VkCommandBuffer cmd,RenderObject* first, int c
 
 
 
-void VulkanRenderer::init_scene()
+void VulkanRenderer::init_textures()
 {
-	RenderObject monkey;
-	monkey.mesh = get_mesh("monkey");
-	monkey.material = get_material("defaultmesh");
-	monkey.transformMatrix = glm::mat4{ 1.0f };
-
-	_renderables.push_back(monkey);
-
-	RenderObject map;
-	map.mesh = get_mesh("empire");
-	map.material = get_material("texturedmesh");
-	map.transformMatrix = glm::translate(glm::vec3{ 5,-10,0 }); //glm::mat4{ 1.0f };
-
-	_renderables.push_back(map);
-
-	for (int x = -20; x <= 20; x++) {
-		for (int y = -20; y <= 20; y++) {
-
-			RenderObject tri;
-			tri.mesh = get_mesh("triangle");
-			tri.material = get_material("defaultmesh");
-			glm::mat4 translation = glm::translate(glm::mat4{ 1.0 }, glm::vec3(x, 0, y));
-			glm::mat4 scale = glm::scale(glm::mat4{ 1.0 }, glm::vec3(0.2, 0.2, 0.2));
-			tri.transformMatrix = translation * scale;
-
-			_renderables.push_back(tri);
-		}
-	}
-
-
 	Material* texturedMat=	get_material("texturedmesh");
 
 	VkDescriptorSetAllocateInfo allocInfo = {};
@@ -1249,12 +1219,12 @@ void VulkanRenderer::set_camera_view(const glm::vec3& forward, const glm::vec3& 
 	_camera_view = glm::transpose(glm::mat4(-glm::vec4(right, 0.0f), -glm::vec4(up, 0.0f), glm::vec4(forward, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)));
 }
 
-RenderObjectId VulkanRenderer::add_render_object(const std::string& mesh_name, const std::string& material_name, glm::mat4 transform)
+VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object(const std::string& mesh_name, const std::string& material_name, glm::mat4 transform)
 {
 	RenderObject object;
-	object.id = id_pool.acquire_id();
+	object.id = _id_pool.acquire_id();
 	object.mesh = get_mesh(mesh_name);
-	object.material = get_material(mesh_name);
+	object.material = get_material(material_name);
 	object.transformMatrix = transform;
 
 	assert(object.mesh);
