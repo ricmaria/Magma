@@ -7,8 +7,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-
-
 bool vkutil::load_image_from_file(VulkanRenderer& renderer, const char* file, AllocatedImage & outImage)
 {
 	int texWidth, texHeight, texChannels;
@@ -28,11 +26,11 @@ bool vkutil::load_image_from_file(VulkanRenderer& renderer, const char* file, Al
 	AllocatedBuffer stagingBuffer = renderer.create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY);
 
 	void* data;
-	vmaMapMemory(renderer._allocator, stagingBuffer._allocation, &data);
+	vmaMapMemory(renderer._allocator, stagingBuffer.allocation, &data);
 
 	memcpy(data, pixel_ptr, static_cast<size_t>(imageSize));
 
-	vmaUnmapMemory(renderer._allocator, stagingBuffer._allocation);
+	vmaUnmapMemory(renderer._allocator, stagingBuffer.allocation);
 
 	stbi_image_free(pixels);
 
@@ -49,7 +47,7 @@ bool vkutil::load_image_from_file(VulkanRenderer& renderer, const char* file, Al
 	dimg_allocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
 	//allocate and create the image
-	vmaCreateImage(renderer._allocator, &dimg_info, &dimg_allocinfo, &newImage._image, &newImage._allocation, nullptr);
+	vmaCreateImage(renderer._allocator, &dimg_info, &dimg_allocinfo, &newImage.image, &newImage.allocation, nullptr);
 	
 	//transition image to transfer-receiver	
 	renderer.immediate_submit([&](VkCommandBuffer cmd) {
@@ -65,7 +63,7 @@ bool vkutil::load_image_from_file(VulkanRenderer& renderer, const char* file, Al
 
 		imageBarrier_toTransfer.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		imageBarrier_toTransfer.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-		imageBarrier_toTransfer.image = newImage._image;
+		imageBarrier_toTransfer.image = newImage.image;
 		imageBarrier_toTransfer.subresourceRange = range;
 
 		imageBarrier_toTransfer.srcAccessMask = 0;
@@ -86,7 +84,7 @@ bool vkutil::load_image_from_file(VulkanRenderer& renderer, const char* file, Al
 		copyRegion.imageExtent = imageExtent;
 
 		//copy the buffer into the image
-		vkCmdCopyBufferToImage(cmd, stagingBuffer._buffer, newImage._image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+		vkCmdCopyBufferToImage(cmd, stagingBuffer.buffer, newImage.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
 		VkImageMemoryBarrier imageBarrier_toReadable = imageBarrier_toTransfer;
 
@@ -103,10 +101,10 @@ bool vkutil::load_image_from_file(VulkanRenderer& renderer, const char* file, Al
 
 	renderer._mainDeletionQueue.push_function([=]() {
 	
-		vmaDestroyImage(renderer._allocator, newImage._image, newImage._allocation);
+		vmaDestroyImage(renderer._allocator, newImage.image, newImage.allocation);
 	});
 
-	vmaDestroyBuffer(renderer._allocator, stagingBuffer._buffer, stagingBuffer._allocation);
+	vmaDestroyBuffer(renderer._allocator, stagingBuffer.buffer, stagingBuffer.allocation);
 
 	std::cout << "Texture loaded succesfully " << file << std::endl;
 

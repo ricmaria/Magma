@@ -280,17 +280,17 @@ void VulkanRenderer::init_swapchain()
 	dimg_allocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
 	//allocate and create the image
-	vmaCreateImage(_allocator, &dimg_info, &dimg_allocinfo, &_depthImage._image, &_depthImage._allocation, nullptr);
+	vmaCreateImage(_allocator, &dimg_info, &dimg_allocinfo, &_depthImage.image, &_depthImage.allocation, nullptr);
 
 	//build a image-view for the depth image to use for rendering
-	VkImageViewCreateInfo dview_info = vkinit::imageview_create_info(_depthFormat, _depthImage._image, VK_IMAGE_ASPECT_DEPTH_BIT);;
+	VkImageViewCreateInfo dview_info = vkinit::imageview_create_info(_depthFormat, _depthImage.image, VK_IMAGE_ASPECT_DEPTH_BIT);;
 
 	VK_CHECK(vkCreateImageView(_device, &dview_info, nullptr, &_depthImageView));
 
 	//add to deletion queues
 	_mainDeletionQueue.push_function([=]() {
 		vkDestroyImageView(_device, _depthImageView, nullptr);
-		vmaDestroyImage(_allocator, _depthImage._image, _depthImage._allocation);
+		vmaDestroyImage(_allocator, _depthImage.image, _depthImage.allocation);
 	});
 }
 
@@ -731,17 +731,17 @@ void VulkanRenderer::load_meshes()
 {
 	Mesh triMesh{};
 	//make the array 3 vertices long
-	triMesh._vertices.resize(3);
+	triMesh.vertices.resize(3);
 
 	//vertex positions
-	triMesh._vertices[0].position = { 1.f,1.f, 0.0f };
-	triMesh._vertices[1].position = { -1.f,1.f, 0.0f };
-	triMesh._vertices[2].position = { 0.f,-1.f, 0.0f };
+	triMesh.vertices[0].position = { 1.f,1.f, 0.0f };
+	triMesh.vertices[1].position = { -1.f,1.f, 0.0f };
+	triMesh.vertices[2].position = { 0.f,-1.f, 0.0f };
 
 	//vertex colors, all green
-	triMesh._vertices[0].color = { 0.f,1.f, 0.0f }; //pure green
-	triMesh._vertices[1].color = { 0.f,1.f, 0.0f }; //pure green
-	triMesh._vertices[2].color = { 0.f,1.f, 0.0f }; //pure green
+	triMesh.vertices[0].color = { 0.f,1.f, 0.0f }; //pure green
+	triMesh.vertices[1].color = { 0.f,1.f, 0.0f }; //pure green
+	triMesh.vertices[2].color = { 0.f,1.f, 0.0f }; //pure green
 	//we dont care about the vertex normals
 
 	//load the monkey
@@ -767,7 +767,7 @@ void VulkanRenderer::load_images()
 	
 	vkutil::load_image_from_file(*this, "../assets/lost_empire-RGBA.png", lostEmpire.image);
 	
-	VkImageViewCreateInfo imageinfo = vkinit::imageview_create_info(VK_FORMAT_R8G8B8A8_SRGB, lostEmpire.image._image, VK_IMAGE_ASPECT_COLOR_BIT);
+	VkImageViewCreateInfo imageinfo = vkinit::imageview_create_info(VK_FORMAT_R8G8B8A8_SRGB, lostEmpire.image.image, VK_IMAGE_ASPECT_COLOR_BIT);
 	vkCreateImageView(_device, &imageinfo, nullptr, &lostEmpire.imageView);
 
 	_mainDeletionQueue.push_function([=]() {
@@ -779,7 +779,7 @@ void VulkanRenderer::load_images()
 
 void VulkanRenderer::upload_mesh(Mesh& mesh)
 {
-	const size_t bufferSize= mesh._vertices.size() * sizeof(Vertex);
+	const size_t bufferSize= mesh.vertices.size() * sizeof(Vertex);
 	//allocate vertex buffer
 	VkBufferCreateInfo stagingBufferInfo = {};
 	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -798,17 +798,17 @@ void VulkanRenderer::upload_mesh(Mesh& mesh)
 
 	//allocate the buffer
 	VK_CHECK(vmaCreateBuffer(_allocator, &stagingBufferInfo, &vmaallocInfo,
-		&stagingBuffer._buffer,
-		&stagingBuffer._allocation,
+		&stagingBuffer.buffer,
+		&stagingBuffer.allocation,
 		nullptr));	
 
 	//copy vertex data
 	void* data;
-	vmaMapMemory(_allocator, stagingBuffer._allocation, &data);
+	vmaMapMemory(_allocator, stagingBuffer.allocation, &data);
 
-	memcpy(data, mesh._vertices.data(), mesh._vertices.size() * sizeof(Vertex));
+	memcpy(data, mesh.vertices.data(), mesh.vertices.size() * sizeof(Vertex));
 
-	vmaUnmapMemory(_allocator, stagingBuffer._allocation);
+	vmaUnmapMemory(_allocator, stagingBuffer.allocation);
 
 
 	//allocate vertex buffer
@@ -825,13 +825,13 @@ void VulkanRenderer::upload_mesh(Mesh& mesh)
 
 	//allocate the buffer
 	VK_CHECK(vmaCreateBuffer(_allocator, &vertexBufferInfo, &vmaallocInfo,
-		&mesh._vertexBuffer._buffer,
-		&mesh._vertexBuffer._allocation,
+		&mesh.vertexBuffer.buffer,
+		&mesh.vertexBuffer.allocation,
 		nullptr));
 	//add the destruction of triangle mesh buffer to the deletion queue
 	_mainDeletionQueue.push_function([=]() {
 
-		vmaDestroyBuffer(_allocator, mesh._vertexBuffer._buffer, mesh._vertexBuffer._allocation);
+		vmaDestroyBuffer(_allocator, mesh.vertexBuffer.buffer, mesh.vertexBuffer.allocation);
 	});
 
 	immediate_submit([=](VkCommandBuffer cmd) {
@@ -839,10 +839,10 @@ void VulkanRenderer::upload_mesh(Mesh& mesh)
 		copy.dstOffset = 0;
 		copy.srcOffset = 0;
 		copy.size = bufferSize;
-		vkCmdCopyBuffer(cmd, stagingBuffer._buffer, mesh._vertexBuffer._buffer, 1, & copy);
+		vkCmdCopyBuffer(cmd, stagingBuffer.buffer, mesh.vertexBuffer.buffer, 1, & copy);
 	});
 
-	vmaDestroyBuffer(_allocator, stagingBuffer._buffer, stagingBuffer._allocation);
+	vmaDestroyBuffer(_allocator, stagingBuffer.buffer, stagingBuffer.allocation);
 }
 
 
@@ -898,18 +898,18 @@ void VulkanRenderer::draw_objects(VkCommandBuffer cmd,RenderObject* first, int c
 	camData.viewproj = projection * view;
 
 	void* data;
-	vmaMapMemory(_allocator, get_current_frame().cameraBuffer._allocation, &data);
+	vmaMapMemory(_allocator, get_current_frame().cameraBuffer.allocation, &data);
 
 	memcpy(data, &camData, sizeof(GPUCameraData));
 
-	vmaUnmapMemory(_allocator, get_current_frame().cameraBuffer._allocation);
+	vmaUnmapMemory(_allocator, get_current_frame().cameraBuffer.allocation);
 
 	float framed = (_frameNumber / 120.f);
 
 	_sceneParameters.ambientColor = { sin(framed),0,cos(framed),1 };
 
 	char* sceneData;
-	vmaMapMemory(_allocator, _sceneParameterBuffer._allocation , (void**)&sceneData);
+	vmaMapMemory(_allocator, _sceneParameterBuffer.allocation , (void**)&sceneData);
 
 	int frameIndex = _frameNumber % FRAME_OVERLAP;
 
@@ -917,11 +917,11 @@ void VulkanRenderer::draw_objects(VkCommandBuffer cmd,RenderObject* first, int c
 
 	memcpy(sceneData, &_sceneParameters, sizeof(GPUSceneData));
 
-	vmaUnmapMemory(_allocator, _sceneParameterBuffer._allocation);
+	vmaUnmapMemory(_allocator, _sceneParameterBuffer.allocation);
 
 
 	void* objectData;
-	vmaMapMemory(_allocator, get_current_frame().objectBuffer._allocation, &objectData);
+	vmaMapMemory(_allocator, get_current_frame().objectBuffer.allocation, &objectData);
 	
 	GPUObjectData* objectSSBO = (GPUObjectData*)objectData;
 	
@@ -931,7 +931,7 @@ void VulkanRenderer::draw_objects(VkCommandBuffer cmd,RenderObject* first, int c
 		objectSSBO[i].modelMatrix = object.transformMatrix;
 	}
 	
-	vmaUnmapMemory(_allocator, get_current_frame().objectBuffer._allocation);
+	vmaUnmapMemory(_allocator, get_current_frame().objectBuffer.allocation);
 
 	Mesh* lastMesh = nullptr;
 	Material* lastMaterial = nullptr;
@@ -973,11 +973,11 @@ void VulkanRenderer::draw_objects(VkCommandBuffer cmd,RenderObject* first, int c
 		if (object.mesh != lastMesh) {
 			//bind the mesh vertex buffer with offset 0
 			VkDeviceSize offset = 0;
-			vkCmdBindVertexBuffers(cmd, 0, 1, &object.mesh->_vertexBuffer._buffer, &offset);
+			vkCmdBindVertexBuffers(cmd, 0, 1, &object.mesh->vertexBuffer.buffer, &offset);
 			lastMesh = object.mesh;
 		}
 		//we can now draw
-		vkCmdDraw(cmd, object.mesh->_vertices.size(), 1,0 , i);
+		vkCmdDraw(cmd, object.mesh->vertices.size(), 1,0 , i);
 	}
 }
 
@@ -1034,8 +1034,8 @@ AllocatedBuffer VulkanRenderer::create_buffer(size_t allocSize, VkBufferUsageFla
 
 	//allocate the buffer
 	VK_CHECK(vmaCreateBuffer(_allocator, &bufferInfo, &vmaallocInfo,
-		&newBuffer._buffer,
-		&newBuffer._allocation,
+		&newBuffer.buffer,
+		&newBuffer.allocation,
 		nullptr));
 
 	return newBuffer;
@@ -1167,17 +1167,17 @@ void VulkanRenderer::init_descriptors()
 		vkAllocateDescriptorSets(_device, &objectSetAlloc, &_frames[i].objectDescriptor);
 
 		VkDescriptorBufferInfo cameraInfo;
-		cameraInfo.buffer = _frames[i].cameraBuffer._buffer;
+		cameraInfo.buffer = _frames[i].cameraBuffer.buffer;
 		cameraInfo.offset = 0;
 		cameraInfo.range = sizeof(GPUCameraData);
 
 		VkDescriptorBufferInfo sceneInfo;
-		sceneInfo.buffer = _sceneParameterBuffer._buffer;
+		sceneInfo.buffer = _sceneParameterBuffer.buffer;
 		sceneInfo.offset = 0;
 		sceneInfo.range = sizeof(GPUSceneData);
 
 		VkDescriptorBufferInfo objectBufferInfo;
-		objectBufferInfo.buffer = _frames[i].objectBuffer._buffer;
+		objectBufferInfo.buffer = _frames[i].objectBuffer.buffer;
 		objectBufferInfo.offset = 0;
 		objectBufferInfo.range = sizeof(GPUObjectData) * MAX_OBJECTS;
 
@@ -1196,7 +1196,7 @@ void VulkanRenderer::init_descriptors()
 
 	_mainDeletionQueue.push_function([&]() {
 
-		vmaDestroyBuffer(_allocator, _sceneParameterBuffer._buffer, _sceneParameterBuffer._allocation);
+		vmaDestroyBuffer(_allocator, _sceneParameterBuffer.buffer, _sceneParameterBuffer.allocation);
 
 		vkDestroyDescriptorSetLayout(_device, _objectSetLayout, nullptr);
 		vkDestroyDescriptorSetLayout(_device, _globalSetLayout, nullptr);
@@ -1206,9 +1206,9 @@ void VulkanRenderer::init_descriptors()
 
 		for (int i = 0; i < FRAME_OVERLAP; i++)
 		{
-			vmaDestroyBuffer(_allocator, _frames[i].cameraBuffer._buffer, _frames[i].cameraBuffer._allocation);
+			vmaDestroyBuffer(_allocator, _frames[i].cameraBuffer.buffer, _frames[i].cameraBuffer.allocation);
 
-			vmaDestroyBuffer(_allocator, _frames[i].objectBuffer._buffer, _frames[i].objectBuffer._allocation);
+			vmaDestroyBuffer(_allocator, _frames[i].objectBuffer.buffer, _frames[i].objectBuffer.allocation);
 		}
 	});
 }

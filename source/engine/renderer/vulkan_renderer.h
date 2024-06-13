@@ -1,7 +1,4 @@
-﻿// vulkan_guide.h : Include file for standard system include files,
-// or project specific include files.
-
-#pragma once
+﻿#pragma once
 
 #include <vector>
 #include <functional>
@@ -232,33 +229,22 @@ public:
 	size_t pad_uniform_buffer_size(size_t originalSize);
 
 	void immediate_submit(std::function<void(VkCommandBuffer cmd)>&& function);
+
 private:
-
 	void init_vulkan(SDL_Window* window);
-
 	void init_swapchain();
-
 	void init_default_renderpass();
-
 	void init_framebuffers();
-
 	void init_commands();
-
 	void init_sync_structures();
-
 	void init_pipelines();
-
 	void init_textures();
-
 	void init_descriptors();
 
 	//loads a shader module from a spir-v file. Returns false if it errors
 	bool load_shader_module(const char* filePath, VkShaderModule* outShaderModule);
-
 	void load_meshes();
-
 	void load_images();
-
 	void upload_mesh(Mesh& mesh);
 
 	glm::vec3 _camera_position = { 0.f,-6.f,-10.f };
