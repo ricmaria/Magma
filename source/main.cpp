@@ -38,31 +38,40 @@ int main(int argc, char* argv[])
 
 	monkey_entity->add_component(std::move(monkey_mesh_component));
 
-	EC::Entity* empire_entity = entity_manager->create_entity();
+	EC::Entity* sphere_entity = entity_manager->create_entity();
 
-	auto empire_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
-	empire_mesh_component->set_mesh_name("empire");
-	empire_mesh_component->set_material_name("texturedmesh");
-	empire_mesh_component->_temp_transform = glm::translate(glm::vec3{ 5,-10,0 });
+	auto sphere_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
+	sphere_mesh_component->set_mesh_name("sphere");
+	sphere_mesh_component->set_material_name("defaultmesh");
+	sphere_mesh_component->_temp_transform = glm::mat4{ 1.0f };
 
-	empire_entity->add_component(std::move(empire_mesh_component));
+	sphere_entity->add_component(std::move(sphere_mesh_component));
 
-	EC::Entity* triangles_entity = entity_manager->create_entity();
+	//EC::Entity* empire_entity = entity_manager->create_entity();
 
-	for (int x = -20; x <= 20; x++)
-	{
-		for (int y = -20; y <= 20; y++)
-		{
-			auto triangle_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
-			triangle_mesh_component->set_mesh_name("triangle");
-			triangle_mesh_component->set_material_name("defaultmesh");
-			glm::mat4 translation = glm::translate(glm::mat4{ 1.0 }, glm::vec3(x, 0, y));
-			glm::mat4 scale = glm::scale(glm::mat4{ 1.0 }, glm::vec3(0.2, 0.2, 0.2));
-			triangle_mesh_component->_temp_transform = translation * scale;
+	//auto empire_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
+	//empire_mesh_component->set_mesh_name("empire");
+	//empire_mesh_component->set_material_name("texturedmesh");
+	//empire_mesh_component->_temp_transform = glm::translate(glm::vec3{ 5,-10,0 });
 
-			triangles_entity->add_component(std::move(triangle_mesh_component));
-		}
-	}
+	//empire_entity->add_component(std::move(empire_mesh_component));
+
+	//EC::Entity* triangles_entity = entity_manager->create_entity();
+
+	//for (int x = -20; x <= 20; x++)
+	//{
+	//	for (int y = -20; y <= 20; y++)
+	//	{
+	//		auto triangle_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
+	//		triangle_mesh_component->set_mesh_name("triangle");
+	//		triangle_mesh_component->set_material_name("defaultmesh");
+	//		glm::mat4 translation = glm::translate(glm::mat4{ 1.0 }, glm::vec3(x, 0, y));
+	//		glm::mat4 scale = glm::scale(glm::mat4{ 1.0 }, glm::vec3(0.2, 0.2, 0.2));
+	//		triangle_mesh_component->_temp_transform = translation * scale;
+
+	//		triangles_entity->add_component(std::move(triangle_mesh_component));
+	//	}
+	//}
 
 	engine.run();
 

@@ -15,6 +15,8 @@
 
 #include "textures.h"
 
+#include "geometry.h"
+
 #define VMA_IMPLEMENTATION
 #include "vk_mem_alloc.h"
 
@@ -751,13 +753,18 @@ void VulkanRenderer::load_meshes()
 	Mesh lostEmpire{};
 	lostEmpire.load_from_obj("../assets/lost_empire.obj");
 
+	Mesh sphere{};
+	Geometry::create_sphere(sphere.vertices, 5, { 0.0f, 0.0f, 0.0f }, 10, { 1.0f, 1.0f, 1.0f });
+
 	upload_mesh(triMesh);
 	upload_mesh(monkeyMesh);
 	upload_mesh(lostEmpire);
+	upload_mesh(sphere);
 
 	_meshes["monkey"] = monkeyMesh;
 	_meshes["triangle"] = triMesh;
 	_meshes["empire"] = lostEmpire;
+	_meshes["sphere"] = sphere;
 }
 
 
