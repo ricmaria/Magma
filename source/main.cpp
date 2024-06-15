@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 
 	auto sphere_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
 	sphere_mesh_component->set_mesh_name("sphere");
-	sphere_mesh_component->set_material_name("defaultmesh");
+	sphere_mesh_component->set_material_name("coloredmesh");
 	sphere_mesh_component->_temp_transform = glm::mat4{ 1.0f };
 
 	sphere_entity->add_component(std::move(sphere_mesh_component));

@@ -488,22 +488,28 @@ void VulkanRenderer::init_sync_structures()
 
 void VulkanRenderer::init_pipelines()
 {
-	VkShaderModule colorMeshShader;
-	if (!load_shader_module("../shaders/default_lit.frag.spv", &colorMeshShader))
+	VkShaderModule default_lit_frag_shader;
+	if (!load_shader_module("../shaders/default_lit.frag.spv", &default_lit_frag_shader))
 	{
-		std::cout << "Error when building the colored mesh shader" << std::endl;
+		std::cout << "Error when building default_lit.frag.spv" << std::endl;
 	}
 
-	VkShaderModule texturedMeshShader;
-	if (!load_shader_module("../shaders/textured_lit.frag.spv", &texturedMeshShader))
+	VkShaderModule colored_triangle_frag_shader;
+	if (!load_shader_module("../shaders/colored_triangle.frag.spv", &colored_triangle_frag_shader))
 	{
-		std::cout << "Error when building the colored mesh shader" << std::endl;
+		std::cout << "Error when building colored_triangle.frag.spv" << std::endl;
 	}
 
-	VkShaderModule meshVertShader;
-	if (!load_shader_module("../shaders/tri_mesh_ssbo.vert.spv", &meshVertShader))
+	VkShaderModule textured_lit_frag_shader;
+	if (!load_shader_module("../shaders/textured_lit.frag.spv", &textured_lit_frag_shader))
 	{
-		std::cout << "Error when building the mesh vertex shader module" << std::endl;
+		std::cout << "Error when building textured_lit.frag.spv" << std::endl;
+	}
+
+	VkShaderModule tri_mesh_ssbo_vert_shader;
+	if (!load_shader_module("../shaders/tri_mesh_ssbo.vert.spv", &tri_mesh_ssbo_vert_shader))
+	{
+		std::cout << "Error when building tri_mesh_ssbo.vert.spv" << std::endl;
 	}
 
 	
@@ -511,10 +517,10 @@ void VulkanRenderer::init_pipelines()
 	PipelineBuilder pipelineBuilder;
 
 	pipelineBuilder._shaderStages.push_back(
-		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_VERTEX_BIT, meshVertShader));
+		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_VERTEX_BIT, tri_mesh_ssbo_vert_shader));
 
 	pipelineBuilder._shaderStages.push_back(
-		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, colorMeshShader));
+		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, default_lit_frag_shader));
 
 
 	//we start from just the default empty pipeline layout info
@@ -603,25 +609,37 @@ void VulkanRenderer::init_pipelines()
 
 	create_material(meshPipeline, meshPipLayout, "defaultmesh");
 
-	pipelineBuilder._shaderStages.clear();
+		pipelineBuilder._shaderStages.clear();
 	pipelineBuilder._shaderStages.push_back(
-		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_VERTEX_BIT, meshVertShader));
+		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_VERTEX_BIT, tri_mesh_ssbo_vert_shader));
 
 	pipelineBuilder._shaderStages.push_back(
-		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, texturedMeshShader));
+		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, colored_triangle_frag_shader));
+
+	VkPipeline colorPipeline = pipelineBuilder.build_pipeline(_device, _renderPass);
+	create_material(colorPipeline, texturedPipeLayout, "coloredmesh");
+
+	pipelineBuilder._shaderStages.clear();
+	pipelineBuilder._shaderStages.push_back(
+		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_VERTEX_BIT, tri_mesh_ssbo_vert_shader));
+
+	pipelineBuilder._shaderStages.push_back(
+		vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, textured_lit_frag_shader));
 
 	pipelineBuilder._pipelineLayout = texturedPipeLayout;
 	VkPipeline texPipeline = pipelineBuilder.build_pipeline(_device, _renderPass);
 	create_material(texPipeline, texturedPipeLayout, "texturedmesh");
 
 
-	vkDestroyShaderModule(_device, meshVertShader, nullptr);
-	vkDestroyShaderModule(_device, colorMeshShader, nullptr);
-	vkDestroyShaderModule(_device, texturedMeshShader, nullptr);
+	vkDestroyShaderModule(_device, tri_mesh_ssbo_vert_shader, nullptr);
+	vkDestroyShaderModule(_device, default_lit_frag_shader, nullptr);
+	vkDestroyShaderModule(_device, colored_triangle_frag_shader, nullptr);
+	vkDestroyShaderModule(_device, textured_lit_frag_shader, nullptr);
 	
 
 	_mainDeletionQueue.push_function([=]() {
 		vkDestroyPipeline(_device, meshPipeline, nullptr);
+		vkDestroyPipeline(_device, colorPipeline, nullptr);
 		vkDestroyPipeline(_device, texPipeline, nullptr);
 
 		vkDestroyPipelineLayout(_device, meshPipLayout, nullptr);
@@ -754,7 +772,7 @@ void VulkanRenderer::load_meshes()
 	lostEmpire.load_from_obj("../assets/lost_empire.obj");
 
 	Mesh sphere{};
-	Geometry::create_sphere(sphere.vertices, 5, { 0.0f, 0.0f, 0.0f }, 10, { 1.0f, 1.0f, 1.0f });
+	Geometry::create_sphere(sphere.vertices, 5, { 0.0f, 0.0f, 0.0f }, 10, { 0.0f, 1.0f, 0.0f });
 
 	upload_mesh(triMesh);
 	upload_mesh(monkeyMesh);
