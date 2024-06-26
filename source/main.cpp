@@ -29,23 +29,59 @@ int main(int argc, char* argv[])
 
 	transform_component->set_position({ 0.f,-6.f,-10.f });
 
-	EC::Entity* monkey_entity = entity_manager->create_entity();
+	//EC::Entity* monkey_entity = entity_manager->create_entity();
 
-	auto monkey_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
-	monkey_mesh_component->set_mesh_name("monkey");
-	monkey_mesh_component->set_material_name("defaultmesh");
-	monkey_mesh_component->_temp_transform = glm::mat4{ 1.0f };
+	//auto monkey_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
+	//monkey_mesh_component->set_mesh_name("monkey");
+	//monkey_mesh_component->set_material_name("defaultmesh");
+	//monkey_mesh_component->_temp_transform = glm::mat4{ 1.0f };
 
-	monkey_entity->add_component(std::move(monkey_mesh_component));
+	//monkey_entity->add_component(std::move(monkey_mesh_component));
 
-	EC::Entity* sphere_entity = entity_manager->create_entity();
+	//EC::Entity* sphere_entity = entity_manager->create_entity();
 
-	auto sphere_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
-	sphere_mesh_component->set_mesh_name("sphere");
-	sphere_mesh_component->set_material_name("coloredmesh");
-	sphere_mesh_component->_temp_transform = glm::mat4{ 1.0f };
+	//auto sphere_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
+	//sphere_mesh_component->set_mesh_name("sphere");
+	//sphere_mesh_component->set_material_name("coloredmesh");
+	//sphere_mesh_component->_temp_transform = glm::mat4{ 1.0f };
 
-	sphere_entity->add_component(std::move(sphere_mesh_component));
+	//sphere_entity->add_component(std::move(sphere_mesh_component));
+
+	//EC::Entity* pyramid_entity = entity_manager->create_entity();
+
+	//auto pyramid_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
+	//pyramid_mesh_component->set_mesh_name("pyramid");
+	//pyramid_mesh_component->set_material_name("coloredmesh");
+	//pyramid_mesh_component->_temp_transform = glm::mat4{ 1.0f };  // glm::rotate(glm::pi<float>(), glm::vec3{ 0.0f, 0.0f, 1.0f });
+
+	//pyramid_entity->add_component(std::move(pyramid_mesh_component));
+
+	//EC::Entity* box_entity = entity_manager->create_entity();
+
+	//auto box_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
+	//box_mesh_component->set_mesh_name("box");
+	//box_mesh_component->set_material_name("coloredmesh");
+	//box_mesh_component->_temp_transform = glm::mat4{ 1.0f };  // glm::rotate(glm::pi<float>(), glm::vec3{ 0.0f, 0.0f, 1.0f });
+
+	//box_entity->add_component(std::move(box_mesh_component));
+
+	//EC::Entity* arrow_entity = entity_manager->create_entity();
+
+	//auto arrow_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
+	//arrow_mesh_component->set_mesh_name("arrow");
+	//arrow_mesh_component->set_material_name("coloredmesh");
+	//arrow_mesh_component->_temp_transform = glm::mat4{ 1.0f };  // glm::rotate(glm::pi<float>(), glm::vec3{ 0.0f, 0.0f, 1.0f });
+
+	//arrow_entity->add_component(std::move(arrow_mesh_component));
+
+	EC::Entity* gizmo_entity = entity_manager->create_entity();
+
+	auto gizmo_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
+	gizmo_mesh_component->set_mesh_name("gizmo");
+	gizmo_mesh_component->set_material_name("coloredmesh");
+	gizmo_mesh_component->_temp_transform = glm::mat4{ 1.0f };  // glm::rotate(glm::pi<float>(), glm::vec3{ 0.0f, 0.0f, 1.0f });
+
+	gizmo_entity->add_component(std::move(gizmo_mesh_component));
 
 	//EC::Entity* empire_entity = entity_manager->create_entity();
 

@@ -2,6 +2,9 @@
 
 #include <functional>
 
+#include <glm/gtc/matrix_transform.hpp>
+
+
 void Geometry::create_sphere(std::vector<Vertex>& out_vertices, float radius, glm::vec3 center, uint32_t resolution, glm::vec3 color)
 {
 	assert(resolution > 1);
@@ -130,4 +133,308 @@ void Geometry::create_sphere(std::vector<Vertex>& out_vertices, float radius, gl
 	add_negative_face();
 
 	unique_vertices.clear();
+}
+
+void Geometry::create_piramyd(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, float base, float height, glm::vec3 color)
+{
+	const float sqert2div2 = std::sqrt(2.0f) / 2.0f;
+	const float half_base = base * 0.5f;
+	const float one_third_base = base / 3.0f;
+	const float one_third_height = height / 3.0f;
+
+	const uint32_t a = out_vertices.size() + 0;
+	const uint32_t b = out_vertices.size() + 1;
+	const uint32_t c = out_vertices.size() + 2;
+	const uint32_t d = out_vertices.size() + 3;
+	const uint32_t e = out_vertices.size() + 4;
+	
+	Vertex vertex;
+	vertex.color = color;
+	vertex.position = { half_base, 0.0f, half_base };
+	vertex.normal = { one_third_base, one_third_height, one_third_base };
+	vertex.uv = { 1.0f, 0.0f };
+	out_vertices.push_back(vertex);
+
+	vertex.position = { half_base, 0.0f, -half_base };
+	vertex.normal = { one_third_base, one_third_height, -one_third_base };
+	vertex.uv = { 1.0f, 1.0f };
+	out_vertices.push_back(vertex);
+
+	vertex.position = { -half_base, 0.0f, -half_base };
+	vertex.normal = { -one_third_base, one_third_height, -one_third_base };
+	vertex.uv = { 0.0f, 1.0f };
+	out_vertices.push_back(vertex);
+
+	vertex.position = { -half_base, 0.0f, half_base };
+	vertex.normal = { -one_third_base, -one_third_height, one_third_base };
+	vertex.uv = { 0.0f, 0.0f };
+	out_vertices.push_back(vertex);
+
+	vertex.position = { 0.0f, height, 0.0f };
+	vertex.normal = { 0.0f, 1.0f, 0.0f };	
+	vertex.uv = { 0.5f, 0.5f };
+	out_vertices.push_back(vertex);
+
+	out_indices.push_back(c);
+	out_indices.push_back(b);
+	out_indices.push_back(a);
+
+	out_indices.push_back(a);
+	out_indices.push_back(d);
+	out_indices.push_back(c);
+
+	out_indices.push_back(e);
+	out_indices.push_back(a);
+	out_indices.push_back(b);
+
+	out_indices.push_back(e);
+	out_indices.push_back(b);
+	out_indices.push_back(c);
+
+	out_indices.push_back(e);
+	out_indices.push_back(c);
+	out_indices.push_back(d);
+
+	out_indices.push_back(e);
+	out_indices.push_back(d);
+	out_indices.push_back(a);
+}
+
+
+void Geometry::create_piramyd(std::vector<Vertex>& out_vertices, float base, float height, glm::vec3 color)
+{
+	std::vector<Vertex> vertices;
+	std::vector<uint16_t> indices;
+
+	create_piramyd(vertices, indices, base, height, color);
+
+	std::vector<Vertex> unique_vertices = convert_to_unique_vertices(vertices, indices);
+
+	out_vertices.insert(
+		out_vertices.end(),
+		std::make_move_iterator(unique_vertices.begin()),
+		std::make_move_iterator(unique_vertices.end())
+	);
+}
+
+void Geometry::create_box(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, glm::vec3 dimensions, glm::vec3 color)
+{
+	const uint32_t a = out_vertices.size() + 0;
+	const uint32_t b = out_vertices.size() + 1;
+	const uint32_t c = out_vertices.size() + 2;
+	const uint32_t d = out_vertices.size() + 3;
+	const uint32_t e = out_vertices.size() + 4;
+	const uint32_t f = out_vertices.size() + 5;
+	const uint32_t g = out_vertices.size() + 6;
+	const uint32_t h = out_vertices.size() + 7;
+
+	const glm::vec3 half_dim = dimensions / 2.0f;
+
+	Vertex vertex;
+	vertex.color = color;
+
+	vertex.position = { half_dim.x, half_dim.y, half_dim.z };
+	vertex.normal = glm::normalize(vertex.position);
+	vertex.uv = { 0.0f, 0.0f };
+	out_vertices.push_back(vertex);
+
+	vertex.position = { half_dim.x, half_dim.y, -half_dim.z };
+	vertex.normal = glm::normalize(vertex.position);
+	vertex.uv = { 0.0f, 1.0f };
+	out_vertices.push_back(vertex);
+
+	vertex.position = { -half_dim.x, half_dim.y, -half_dim.z };
+	vertex.normal = glm::normalize(vertex.position);
+	vertex.uv = { 1.0f, 1.0f };
+	out_vertices.push_back(vertex);
+
+	vertex.position = { -half_dim.x, half_dim.y, half_dim.z };
+	vertex.normal = glm::normalize(vertex.position);
+	vertex.uv = { 1.0f, 0.0f };
+	out_vertices.push_back(vertex);
+
+
+	vertex.position = { half_dim.x, -half_dim.y, half_dim.z };
+	vertex.normal = glm::normalize(vertex.position);
+	vertex.uv = { 0.0f, 0.0f };
+	out_vertices.push_back(vertex);
+
+	vertex.position = { half_dim.x, -half_dim.y, -half_dim.z };
+	vertex.normal = glm::normalize(vertex.position);
+	vertex.uv = { 0.0f, 1.0f };
+	out_vertices.push_back(vertex);
+
+	vertex.position = { -half_dim.x, -half_dim.y, -half_dim.z };
+	vertex.normal = glm::normalize(vertex.position);
+	vertex.uv = { 1.0f, 1.0f };
+	out_vertices.push_back(vertex);
+
+	vertex.position = { -half_dim.x, -half_dim.y, half_dim.z };
+	vertex.normal = glm::normalize(vertex.position);
+	vertex.uv = { 1.0f, 0.0f };
+	out_vertices.push_back(vertex);
+
+	out_indices.push_back(a);
+	out_indices.push_back(b);
+	out_indices.push_back(c);
+
+	out_indices.push_back(c);
+	out_indices.push_back(d);
+	out_indices.push_back(a);
+
+	out_indices.push_back(e);
+	out_indices.push_back(h);
+	out_indices.push_back(g);
+
+	out_indices.push_back(g);
+	out_indices.push_back(f);
+	out_indices.push_back(e);
+
+	out_indices.push_back(a);
+	out_indices.push_back(e);
+	out_indices.push_back(f);
+
+	out_indices.push_back(f);
+	out_indices.push_back(b);
+	out_indices.push_back(a);
+
+	out_indices.push_back(c);
+	out_indices.push_back(b);
+	out_indices.push_back(f);
+
+	out_indices.push_back(f);
+	out_indices.push_back(g);
+	out_indices.push_back(c);
+
+	out_indices.push_back(c);
+	out_indices.push_back(g);
+	out_indices.push_back(h);
+
+	out_indices.push_back(h);
+	out_indices.push_back(d);
+	out_indices.push_back(c);
+
+	out_indices.push_back(d);
+	out_indices.push_back(h);
+	out_indices.push_back(e);
+
+	out_indices.push_back(e);
+	out_indices.push_back(a);
+	out_indices.push_back(d);
+}
+
+void Geometry::create_box(std::vector<Vertex>& out_vertices, glm::vec3 dimensions, glm::vec3 color)
+{
+	std::vector<Vertex> vertices;
+	std::vector<uint16_t> indices;
+
+	create_box(vertices, indices, dimensions, color);
+
+	std::vector<Vertex> unique_vertices = convert_to_unique_vertices(vertices, indices);
+
+	out_vertices.insert(
+		out_vertices.end(),
+		std::make_move_iterator(unique_vertices.begin()),
+		std::make_move_iterator(unique_vertices.end())
+	);
+}
+
+void Geometry::create_arrow(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, glm::vec3 color)
+{
+	uint32_t box_start_index = out_vertices.size();
+
+	create_box(out_vertices, out_indices, { 0.25f, 1.0f, 0.25f }, color);
+
+	glm::vec3 box_translation{ 0.0f, 0.5f, 0.0f };
+
+	for (uint32_t i = box_start_index; i < out_vertices.size(); ++i)
+	{
+		Vertex& vertex = out_vertices[i];
+		vertex.position += box_translation;
+	}
+
+	const uint32_t pyramid_start_index = out_vertices.size();
+
+	create_piramyd(out_vertices, out_indices, 0.5f, 0.25, color);
+
+	glm::vec3 pyramid_translation{ 0.0f, 1.0f, 0.0f };
+
+	for (uint32_t i = pyramid_start_index; i < out_vertices.size(); ++i)
+	{
+		Vertex& vertex = out_vertices[i];
+		vertex.position += pyramid_translation;
+	}
+}
+
+void Geometry::create_arrow(std::vector<Vertex>&out_vertices, glm::vec3 color)
+{
+	std::vector<Vertex> vertices;
+	std::vector<uint16_t> indices;
+
+	create_arrow(vertices, indices, color);
+
+	std::vector<Vertex> unique_vertices = convert_to_unique_vertices(vertices, indices);
+
+	out_vertices.insert(
+		out_vertices.end(),
+		std::make_move_iterator(unique_vertices.begin()),
+		std::make_move_iterator(unique_vertices.end())
+	);
+}
+
+void Geometry::create_gizmo(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices)
+{
+	uint32_t x_arrow_start_index = out_vertices.size();
+
+	create_arrow(out_vertices, out_indices, { 1.0f, 0.0f, 0.0f });
+
+	glm::mat4 rotate_x = glm::rotate(glm::mat4{ 1.0f }, glm::half_pi<float>(), glm::vec3{ 0.0f, 0.0f, -1.0f });
+
+	for (uint32_t i = x_arrow_start_index; i < out_vertices.size(); ++i)
+	{
+		Vertex& vertex = out_vertices[i];
+		glm::vec4 vertex_4 = { vertex.position, 1.0f };
+		vertex_4 = rotate_x * vertex_4;
+		vertex.position = vertex_4;
+		glm::vec4 normal_4 = { vertex.normal, 1.0f };
+		normal_4 = rotate_x * normal_4;
+		vertex.normal = normal_4;
+	}
+
+	uint32_t y_arrow_start_index = out_vertices.size();
+	
+	create_arrow(out_vertices, out_indices, { 0.0f, 1.0f, 0.0f });
+
+	uint32_t z_arrow_start_index = out_vertices.size();
+
+	create_arrow(out_vertices, out_indices, { 0.0f, 0.0f, 1.0f });
+
+	glm::mat4 rotate_z = glm::rotate(glm::mat4{ 1.0f }, glm::half_pi<float>(), glm::vec3{ 1.0f, 0.0f, 0.0f });
+
+	for (uint32_t i = z_arrow_start_index; i < out_vertices.size(); ++i)
+	{
+		Vertex& vertex = out_vertices[i];
+		glm::vec4 vertex_4 = { vertex.position, 1.0f };
+		vertex_4 = rotate_z * vertex_4;
+		vertex.position = vertex_4;
+		glm::vec4 normal_4 = { vertex.normal, 1.0f };
+		normal_4 = rotate_z * normal_4;
+		vertex.normal = normal_4;
+	}
+}
+
+void Geometry::create_gizmo(std::vector<Vertex>& out_vertices)
+{
+	std::vector<Vertex> vertices;
+	std::vector<uint16_t> indices;
+
+	create_gizmo(vertices, indices);
+
+	std::vector<Vertex> unique_vertices = convert_to_unique_vertices(vertices, indices);
+
+	out_vertices.insert(
+		out_vertices.end(),
+		std::make_move_iterator(unique_vertices.begin()),
+		std::make_move_iterator(unique_vertices.end())
+	);
 }

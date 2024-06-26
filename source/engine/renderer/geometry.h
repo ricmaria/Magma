@@ -2,8 +2,35 @@
 
 #include "mesh.h"
 #include <glm/glm.hpp>
+#include <concepts>
 
 namespace Geometry
 {
 	void create_sphere(std::vector<Vertex>& out_vertices, float radius, glm::vec3 center, uint32_t resolution, glm::vec3 color);
+
+	void create_piramyd(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, float base, float height, glm::vec3 color);
+	void create_piramyd(std::vector<Vertex>& out_vertices, float base, float height, glm::vec3 color);
+
+	void create_box(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, glm::vec3 dimensions, glm::vec3 color);
+	void create_box(std::vector<Vertex>& out_vertices, glm::vec3 dimensions, glm::vec3 color);
+
+	void create_arrow(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, glm::vec3 color);
+	void create_arrow(std::vector<Vertex>& out_vertices, glm::vec3 color);
+
+	void create_gizmo(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices);
+	void create_gizmo(std::vector<Vertex>& out_vertices);
+
+	template<std::integral TIndex>
+	std::vector<Vertex> convert_to_unique_vertices(const std::vector<Vertex>& vertices, const std::vector<TIndex> indices)
+	{
+		std::vector<Vertex> res;
+		res.reserve(indices.size());
+
+		for (const auto index : indices)
+		{
+			res.push_back(vertices[index]);
+		}
+
+		return res;
+	}
 }

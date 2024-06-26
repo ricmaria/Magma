@@ -774,17 +774,36 @@ void VulkanRenderer::load_meshes()
 	Mesh sphere{};
 	Geometry::create_sphere(sphere.vertices, 5, { 0.0f, 0.0f, 0.0f }, 10, { 0.0f, 1.0f, 0.0f });
 
+	Mesh pyramid{};
+	Geometry::create_piramyd(pyramid.vertices, 1, 1, { 1.0f, 0.0f, 0.0f });
+
+	Mesh box{};
+	Geometry::create_box(box.vertices, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f, 0.0f });
+
+	Mesh arrow{};
+	Geometry::create_arrow(arrow.vertices, { 1.0f, 0.0f, 0.0f });
+
+	Mesh gizmo{};
+	Geometry::create_gizmo(gizmo.vertices);
+
 	upload_mesh(triMesh);
 	upload_mesh(monkeyMesh);
 	upload_mesh(lostEmpire);
 	upload_mesh(sphere);
+	upload_mesh(pyramid);
+	upload_mesh(box);
+	upload_mesh(arrow);
+	upload_mesh(gizmo);
 
 	_meshes["monkey"] = monkeyMesh;
 	_meshes["triangle"] = triMesh;
 	_meshes["empire"] = lostEmpire;
 	_meshes["sphere"] = sphere;
+	_meshes["pyramid"] = pyramid;
+	_meshes["box"] = box;
+	_meshes["arrow"] = arrow;
+	_meshes["gizmo"] = gizmo;
 }
-
 
 void VulkanRenderer::load_images()
 {
