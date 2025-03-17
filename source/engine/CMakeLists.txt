@@ -44,4 +44,4 @@ find_package(SDL2 REQUIRED)
 
 target_link_libraries(MagmaEngine vkbootstrap vma glm tinyobjloader imgui stb_image)
 
-target_link_libraries(MagmaEngine Vulkan::Vulkan SDL2::SDL2main SDL2::SDL2)
+target_link_libraries(MagmaEngine Vulkan::Vulkan fmt::fmt SDL2::SDL2main SDL2::SDL2 fastgltf::fastgltf)

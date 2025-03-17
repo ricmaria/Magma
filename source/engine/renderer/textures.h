@@ -5,5 +5,5 @@
 
 namespace vkutil
 {
-	bool load_image_from_file(VulkanRenderer& renderer, const char* file, AllocatedImage& outImage);
+	//bool load_image_from_file(VulkanRenderer& renderer, const char* file, AllocatedImage& outImage);
 }
