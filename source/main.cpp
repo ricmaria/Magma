@@ -1,3 +1,5 @@
+#define SDL_MAIN_HANDLED
+
 #include <engine.h>
 
 #include <ec/mouse_keyboard_input_component.h>

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "core/injector.h"
 #include "core/logger.h"
 #include "core/time_manager.h"
@@ -5,8 +7,6 @@
 #include "ec/entity_manager.h"
 #include "renderer/renderer.h"
 #include <bitset>
-
-#pragma once
 
 class MagmaEngine
 {
