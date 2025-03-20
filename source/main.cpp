@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 	player_entity->add_component<EC::FirstPersonControllerComponent>();
 	player_entity->add_component<EC::CameraComponent>();
 
-	transform_component->set_position({ 0.f,-6.f,-10.f });
+	transform_component->set_position(glm::vec3(30.f, -00.f, -085.f));
 
 	//EC::Entity* monkey_entity = entity_manager->create_entity();
 
