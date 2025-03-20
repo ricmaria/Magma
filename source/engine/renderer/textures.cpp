@@ -1,12 +1,12 @@
-﻿
-#include <iostream>
-
-#include "textures.h"
-#include "initializers.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+﻿//
+//#include <iostream>
 //
+//#include "textures.h"
+//#include "initializers.h"
+//
+//#define STB_IMAGE_IMPLEMENTATION
+//#include <stb_image.h>
+////
 //bool vkutil::load_image_from_file(VulkanRenderer& renderer, const char* file, AllocatedImage & outImage)
 //{
 //	int texWidth, texHeight, texChannels;

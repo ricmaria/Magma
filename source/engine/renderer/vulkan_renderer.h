@@ -5,7 +5,7 @@
 
 #include "types.h"
 #include "descriptors.h"
-//#include "loader.h"
+#include "loader.h"
 //#include "camera.h"
 
 #include "core/id_pool.h"
@@ -24,7 +24,7 @@ public:
 	static VulkanRenderer& get();
 
 	//initializes everything in the engine
-	void init();
+	void init(uint32_t width, uint32_t height, struct SDL_Window* window);
 
 	//shuts down the engine
 	void cleanup();
@@ -32,8 +32,12 @@ public:
 	//draw loop
 	void draw();
 
-	//run main loop
-	void run();
+	inline glm::vec3 get_camera_position() { return _camera_position; }
+	inline void set_camera_position(glm::vec3 position) { _camera_position = position; }
+	void set_camera_view(const glm::vec3& forward, const glm::vec3& left, const glm::vec3& up);
+
+	RenderObjectId add_render_object(const std::string& mesh_name, const std::string& material_name, glm::mat4 transform);
+	void remove_render_object(RenderObjectId id);
 
 private:
 	class DeletionQueue
@@ -121,7 +125,6 @@ private:
 	void init_mesh_pipeline();
 	void init_default_data();
 	void init_scenes();
-	void init_camera();
 	void init_imgui();
 
 	void create_swapchain(uint32_t width, uint32_t height);
@@ -136,6 +139,8 @@ private:
 	void destroy_image(const AllocatedImage& image);
 
 	GPUMeshBuffers upload_mesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
+
+	void draw_scene();
 
 	void update_scene();
 
@@ -215,8 +220,6 @@ private:
 	VkPipelineLayout _meshPipelineLayout;
 	VkPipeline _meshPipeline;
 
-	Camera _mainCamera;
-
 	GPUMeshBuffers _rectangle;
 
 	std::vector<std::shared_ptr<MeshAsset>> _testMeshes;
@@ -238,4 +241,10 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<LoadedGLTF>> _loadedScenes;
 
 	EngineStats _stats;
+
+	IdPool _id_pool;
+
+	glm::vec3 _camera_position = { 0.f,-6.f,-10.f };
+
+	glm::mat4 _camera_view{ glm::vec4{1,0,0,0}, glm::vec4{0,1,0,0}, glm::vec4{0,0,-1,0}, glm::vec4{0,0,0,1} };
 };

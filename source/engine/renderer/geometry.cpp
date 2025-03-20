@@ -5,7 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-void Geometry::create_sphere(std::vector<Vertex>& out_vertices, float radius, glm::vec3 center, uint32_t resolution, glm::vec3 color)
+void Geometry::create_sphere(std::vector<Vertex>& out_vertices, float radius, glm::vec3 center, uint32_t resolution, glm::vec4 color)
 {
 	assert(resolution > 1);
 
@@ -25,13 +25,14 @@ void Geometry::create_sphere(std::vector<Vertex>& out_vertices, float radius, gl
 					float a = -1.0f + i * delta;
 					float b = -1.0f + j * delta;
 
-					glm::vec3 cube_position = get_position(a,b);
+					glm::vec3 cube_position = get_position(a, b);
 
 					Vertex vertex;
 					vertex.color = color;
-					vertex.normal = glm::normalize(cube_position);;
+					vertex.normal = glm::normalize(cube_position);
 					vertex.position = radius * vertex.normal;
-					vertex.uv = { float(i) / float(resolution), float(j) / float(resolution) };
+					vertex.uv_x = float(i) / float(resolution);
+					vertex.uv_y = float(j) / float(resolution);
 
 					unique_vertices.push_back(vertex);
 				}
@@ -135,7 +136,7 @@ void Geometry::create_sphere(std::vector<Vertex>& out_vertices, float radius, gl
 	unique_vertices.clear();
 }
 
-void Geometry::create_piramyd(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, float base, float height, glm::vec3 color)
+void Geometry::create_piramyd(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, float base, float height, glm::vec4 color)
 {
 	const float sqert2div2 = std::sqrt(2.0f) / 2.0f;
 	const float half_base = base * 0.5f;
@@ -152,27 +153,32 @@ void Geometry::create_piramyd(std::vector<Vertex>& out_vertices, std::vector<uin
 	vertex.color = color;
 	vertex.position = { half_base, 0.0f, half_base };
 	vertex.normal = { one_third_base, one_third_height, one_third_base };
-	vertex.uv = { 1.0f, 0.0f };
+	vertex.uv_x = 1.0f;
+	vertex.uv_y = 0.0f;
 	out_vertices.push_back(vertex);
 
 	vertex.position = { half_base, 0.0f, -half_base };
 	vertex.normal = { one_third_base, one_third_height, -one_third_base };
-	vertex.uv = { 1.0f, 1.0f };
+	vertex.uv_x = 1.0f;
+	vertex.uv_y = 1.0f;
 	out_vertices.push_back(vertex);
 
 	vertex.position = { -half_base, 0.0f, -half_base };
 	vertex.normal = { -one_third_base, one_third_height, -one_third_base };
-	vertex.uv = { 0.0f, 1.0f };
+	vertex.uv_x = 0.0f;
+	vertex.uv_y = 1.0f;
 	out_vertices.push_back(vertex);
 
 	vertex.position = { -half_base, 0.0f, half_base };
 	vertex.normal = { -one_third_base, -one_third_height, one_third_base };
-	vertex.uv = { 0.0f, 0.0f };
+	vertex.uv_x = 0.0f;
+	vertex.uv_y = 0.0f;
 	out_vertices.push_back(vertex);
 
 	vertex.position = { 0.0f, height, 0.0f };
 	vertex.normal = { 0.0f, 1.0f, 0.0f };	
-	vertex.uv = { 0.5f, 0.5f };
+	vertex.uv_x = 0.5f;
+	vertex.uv_y = 0.5f;
 	out_vertices.push_back(vertex);
 
 	out_indices.push_back(c);
@@ -201,7 +207,7 @@ void Geometry::create_piramyd(std::vector<Vertex>& out_vertices, std::vector<uin
 }
 
 
-void Geometry::create_piramyd(std::vector<Vertex>& out_vertices, float base, float height, glm::vec3 color)
+void Geometry::create_piramyd(std::vector<Vertex>& out_vertices, float base, float height, glm::vec4 color)
 {
 	std::vector<Vertex> vertices;
 	std::vector<uint16_t> indices;
@@ -217,7 +223,7 @@ void Geometry::create_piramyd(std::vector<Vertex>& out_vertices, float base, flo
 	);
 }
 
-void Geometry::create_box(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, glm::vec3 dimensions, glm::vec3 color)
+void Geometry::create_box(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, glm::vec3 dimensions, glm::vec4 color)
 {
 	const uint32_t a = out_vertices.size() + 0;
 	const uint32_t b = out_vertices.size() + 1;
@@ -235,43 +241,51 @@ void Geometry::create_box(std::vector<Vertex>& out_vertices, std::vector<uint16_
 
 	vertex.position = { half_dim.x, half_dim.y, half_dim.z };
 	vertex.normal = glm::normalize(vertex.position);
-	vertex.uv = { 0.0f, 0.0f };
+	vertex.uv_x = 0.0f;
+	vertex.uv_y = 0.0f;
 	out_vertices.push_back(vertex);
 
 	vertex.position = { half_dim.x, half_dim.y, -half_dim.z };
 	vertex.normal = glm::normalize(vertex.position);
-	vertex.uv = { 0.0f, 1.0f };
+	vertex.uv_x = 0.0f;
+	vertex.uv_y = 1.0f;
 	out_vertices.push_back(vertex);
 
 	vertex.position = { -half_dim.x, half_dim.y, -half_dim.z };
 	vertex.normal = glm::normalize(vertex.position);
-	vertex.uv = { 1.0f, 1.0f };
+	vertex.uv_x = 1.0f;
+	vertex.uv_y = 1.0f;
 	out_vertices.push_back(vertex);
 
 	vertex.position = { -half_dim.x, half_dim.y, half_dim.z };
 	vertex.normal = glm::normalize(vertex.position);
-	vertex.uv = { 1.0f, 0.0f };
+	vertex.uv_x = 1.0f;
+	vertex.uv_y = 0.0f;
 	out_vertices.push_back(vertex);
 
 
 	vertex.position = { half_dim.x, -half_dim.y, half_dim.z };
 	vertex.normal = glm::normalize(vertex.position);
-	vertex.uv = { 0.0f, 0.0f };
+	vertex.uv_x = 0.0f;
+	vertex.uv_y = 0.0f;
 	out_vertices.push_back(vertex);
 
 	vertex.position = { half_dim.x, -half_dim.y, -half_dim.z };
 	vertex.normal = glm::normalize(vertex.position);
-	vertex.uv = { 0.0f, 1.0f };
+	vertex.uv_x = 0.0f;
+	vertex.uv_y = 1.0f;
 	out_vertices.push_back(vertex);
 
 	vertex.position = { -half_dim.x, -half_dim.y, -half_dim.z };
 	vertex.normal = glm::normalize(vertex.position);
-	vertex.uv = { 1.0f, 1.0f };
+	vertex.uv_x = 1.0f;
+	vertex.uv_y = 1.0f;
 	out_vertices.push_back(vertex);
 
 	vertex.position = { -half_dim.x, -half_dim.y, half_dim.z };
 	vertex.normal = glm::normalize(vertex.position);
-	vertex.uv = { 1.0f, 0.0f };
+	vertex.uv_x = 1.0f;
+	vertex.uv_y = 0.0f;
 	out_vertices.push_back(vertex);
 
 	out_indices.push_back(a);
@@ -323,7 +337,7 @@ void Geometry::create_box(std::vector<Vertex>& out_vertices, std::vector<uint16_
 	out_indices.push_back(d);
 }
 
-void Geometry::create_box(std::vector<Vertex>& out_vertices, glm::vec3 dimensions, glm::vec3 color)
+void Geometry::create_box(std::vector<Vertex>& out_vertices, glm::vec3 dimensions, glm::vec4 color)
 {
 	std::vector<Vertex> vertices;
 	std::vector<uint16_t> indices;
@@ -339,7 +353,7 @@ void Geometry::create_box(std::vector<Vertex>& out_vertices, glm::vec3 dimension
 	);
 }
 
-void Geometry::create_arrow(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, glm::vec3 color)
+void Geometry::create_arrow(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, glm::vec4 color)
 {
 	uint32_t box_start_index = out_vertices.size();
 
@@ -366,7 +380,7 @@ void Geometry::create_arrow(std::vector<Vertex>& out_vertices, std::vector<uint1
 	}
 }
 
-void Geometry::create_arrow(std::vector<Vertex>&out_vertices, glm::vec3 color)
+void Geometry::create_arrow(std::vector<Vertex>&out_vertices, glm::vec4 color)
 {
 	std::vector<Vertex> vertices;
 	std::vector<uint16_t> indices;
@@ -386,7 +400,7 @@ void Geometry::create_gizmo(std::vector<Vertex>& out_vertices, std::vector<uint1
 {
 	uint32_t x_arrow_start_index = out_vertices.size();
 
-	create_arrow(out_vertices, out_indices, { 1.0f, 0.0f, 0.0f });
+	create_arrow(out_vertices, out_indices, { 1.0f, 0.0f, 0.0f, 1.0f });
 
 	glm::mat4 rotate_x = glm::rotate(glm::mat4{ 1.0f }, glm::half_pi<float>(), glm::vec3{ 0.0f, 0.0f, -1.0f });
 
@@ -403,11 +417,11 @@ void Geometry::create_gizmo(std::vector<Vertex>& out_vertices, std::vector<uint1
 
 	uint32_t y_arrow_start_index = out_vertices.size();
 	
-	create_arrow(out_vertices, out_indices, { 0.0f, 1.0f, 0.0f });
+	create_arrow(out_vertices, out_indices, { 0.0f, 1.0f, 0.0f, 1.0f });
 
 	uint32_t z_arrow_start_index = out_vertices.size();
 
-	create_arrow(out_vertices, out_indices, { 0.0f, 0.0f, 1.0f });
+	create_arrow(out_vertices, out_indices, { 0.0f, 0.0f, 1.0f, 1.0f });
 
 	glm::mat4 rotate_z = glm::rotate(glm::mat4{ 1.0f }, glm::half_pi<float>(), glm::vec3{ 1.0f, 0.0f, 0.0f });
 

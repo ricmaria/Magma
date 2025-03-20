@@ -1,6 +1,8 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.8)
 
 project(Magma VERSION 0.1.0)
+
+find_package(Vulkan REQUIRED)
 
 add_subdirectory(third_party)
 
@@ -41,3 +43,8 @@ add_custom_target(
     Shaders 
     DEPENDS ${SPIRV_BINARY_FILES}
     )
+	
+add_custom_command(TARGET MagmaGame POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:MagmaGame> $<TARGET_FILE_DIR:MagmaGame>
+  COMMAND_EXPAND_LISTS
+  )

@@ -36,25 +36,16 @@ VulkanRenderer& VulkanRenderer::get()
 	return *loadedEngine;
 }
 
-void VulkanRenderer::init()
+void VulkanRenderer::init(uint32_t width, uint32_t height, SDL_Window* window)
 {
 	// only one engine initialization is allowed with the application.
 	assert(loadedEngine == nullptr);
 	loadedEngine = this;
 
-	// We initialize SDL and create a window with it. 
-	SDL_Init(SDL_INIT_VIDEO);
+	_windowExtent.width = width;
+	_windowExtent.height = height;
 
-	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
-
-	_window = SDL_CreateWindow(
-		"Vulkan Engine",
-		SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED,
-		_windowExtent.width,
-		_windowExtent.height,
-		window_flags
-	);
+	_window = window;
 
 	init_vulkan();
 
@@ -71,8 +62,6 @@ void VulkanRenderer::init()
 	init_default_data();
 
 	init_scenes();
-
-	init_camera();
 
 	init_imgui();
 
@@ -126,10 +115,29 @@ void VulkanRenderer::cleanup()
 
 void VulkanRenderer::draw()
 {
-	// update the scene (and add render objects to the context)
+	auto start = std::chrono::system_clock::now();
+
+	if (_resizeRequested)
+	{
+		resize_swapchain();
+	}
+
+	update_imgui();
 
 	update_scene();
 
+	draw_scene();
+
+	//get clock again, compare with start clock
+	auto end = std::chrono::system_clock::now();
+
+	//convert to microseconds (integer), and then come back to miliseconds
+	auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+	_stats.frametime = elapsed.count() / 1000.f;
+}
+
+void VulkanRenderer::draw_scene()
+{
 	// wait on the fence
 
 // wait until the gpu has finished rendering the last frame. Timeout of 1
@@ -244,69 +252,6 @@ void VulkanRenderer::draw()
 
 	//increase the number of frames drawn
 	_frameNumber++;
-}
-
-void VulkanRenderer::run()
-{
-	SDL_Event e;
-	bool bQuit = false;
-
-	// main loop
-	while (!bQuit)
-	{
-		auto start = std::chrono::system_clock::now();
-
-		// Handle events on queue
-		while (SDL_PollEvent(&e) != 0)
-		{
-			// close the window when user alt-f4s or clicks the X button
-			if (e.type == SDL_QUIT)
-			{
-				bQuit = true;
-			}
-
-			if (e.type == SDL_WINDOWEVENT)
-			{
-				if (e.window.event == SDL_WINDOWEVENT_MINIMIZED)
-				{
-					_stopRendering = true;
-				}
-				if (e.window.event == SDL_WINDOWEVENT_RESTORED)
-				{
-					_stopRendering = false;
-				}
-			}
-
-			_mainCamera.process_sdl_event(e);
-
-			//send SDL event to imgui for handling
-			ImGui_ImplSDL2_ProcessEvent(&e);
-		}
-
-		// do not draw if we are minimized
-		if (_stopRendering)
-		{
-			// throttle the speed to avoid the endless spinning
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			continue;
-		}
-
-		if (_resizeRequested)
-		{
-			resize_swapchain();
-		}
-
-		update_imgui();
-
-		draw();
-
-		//get clock again, compare with start clock
-		auto end = std::chrono::system_clock::now();
-
-		//convert to microseconds (integer), and then come back to miliseconds
-		auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-		_stats.frametime = elapsed.count() / 1000.f;
-	}
 }
 
 void VulkanRenderer::init_vulkan()
@@ -992,11 +937,6 @@ void VulkanRenderer::init_scenes()
 	_loadedScenes["structure"] = *structureFile;
 }
 
-void VulkanRenderer::init_camera()
-{
-	_mainCamera.init(glm::vec3(30.f, -00.f, -085.f), glm::vec3(0.f), 0.0f, 0.0f);
-}
-
 void VulkanRenderer::init_imgui()
 {
 	// 1: create descriptor pool for IMGUI
@@ -1277,9 +1217,7 @@ void VulkanRenderer::update_scene()
 	_mainDrawContext.OpaqueSurfaces.clear();
 	_mainDrawContext.TransparentSurfaces.clear();
 
-	_mainCamera.update();
-
-	glm::mat4 view = _mainCamera.get_view_matrix();
+	glm::mat4 view = _camera_view;
 
 	// camera projection
 	glm::mat4 projection = glm::perspective(glm::radians(70.f), (float)_windowExtent.width / (float)_windowExtent.height, 10000.f, 0.1f);
@@ -1436,8 +1374,8 @@ void VulkanRenderer::draw_geometry(VkCommandBuffer cmd)
 		{
 			const RenderObject& A = _mainDrawContext.TransparentSurfaces[iA];
 			const RenderObject& B = _mainDrawContext.TransparentSurfaces[iB];
-			float distA = (_mainCamera.get_position() - A.bounds.origin).length() - A.bounds.sphereRadius;
-			float distB = (_mainCamera.get_position() - B.bounds.origin).length() - B.bounds.sphereRadius;
+			float distA = (_camera_position - A.bounds.origin).length() - A.bounds.sphereRadius;
+			float distB = (_camera_position - B.bounds.origin).length() - B.bounds.sphereRadius;
 
 			return distA < distB;
 		});
@@ -1736,4 +1674,41 @@ void GLTFMetallic_Roughness::build_pipelines(VkDevice device, VkDescriptorSetLay
 
 	vkDestroyShaderModule(device, meshFragShader, nullptr);
 	vkDestroyShaderModule(device, meshVertexShader, nullptr);
+}
+
+void VulkanRenderer::set_camera_view(const glm::vec3& forward, const glm::vec3& right, const glm::vec3& up)
+{
+	// Why right must be negated???
+	_camera_view = glm::transpose(glm::mat4(-glm::vec4(right, 0.0f), -glm::vec4(up, 0.0f), glm::vec4(forward, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+}
+
+VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object(const std::string& mesh_name, const std::string& material_name, glm::mat4 transform)
+{
+	//RenderObject object;
+	//object.id = _id_pool.acquire_id();
+	//object.mesh = get_mesh(mesh_name);
+	//object.material = get_material(material_name);
+	//object.transformMatrix = transform;
+
+	//assert(object.mesh);
+	//assert(object.material);
+
+	//_renderables.push_back(object);
+
+	//return object.id;
+
+	return invalid_render_object_id;
+}
+
+void VulkanRenderer::remove_render_object(RenderObjectId id)
+{
+	//auto it = std::find_if(_renderables.begin(), _renderables.end(),
+	//	[id](const RenderObject& render_object)
+	//	{
+	//		return render_object.id == id;
+	//	});
+	//if (it != _renderables.end())
+	//{
+	//	_renderables.erase(it);
+	//}
 }

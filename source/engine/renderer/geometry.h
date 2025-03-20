@@ -1,21 +1,21 @@
 #pragma once
 
-#include "mesh.h"
 #include <glm/glm.hpp>
 #include <concepts>
+#include "types.h"
 
 namespace Geometry
 {
-	void create_sphere(std::vector<Vertex>& out_vertices, float radius, glm::vec3 center, uint32_t resolution, glm::vec3 color);
+	void create_sphere(std::vector<Vertex>& out_vertices, float radius, glm::vec3 center, uint32_t resolution, glm::vec4 color);
 
-	void create_piramyd(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, float base, float height, glm::vec3 color);
-	void create_piramyd(std::vector<Vertex>& out_vertices, float base, float height, glm::vec3 color);
+	void create_piramyd(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, float base, float height, glm::vec4 color);
+	void create_piramyd(std::vector<Vertex>& out_vertices, float base, float height, glm::vec4 color);
 
-	void create_box(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, glm::vec3 dimensions, glm::vec3 color);
-	void create_box(std::vector<Vertex>& out_vertices, glm::vec3 dimensions, glm::vec3 color);
+	void create_box(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, glm::vec3 dimensions, glm::vec4 color);
+	void create_box(std::vector<Vertex>& out_vertices, glm::vec3 dimensions, glm::vec4 color);
 
-	void create_arrow(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, glm::vec3 color);
-	void create_arrow(std::vector<Vertex>& out_vertices, glm::vec3 color);
+	void create_arrow(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, glm::vec4 color);
+	void create_arrow(std::vector<Vertex>& out_vertices, glm::vec4 color);
 
 	void create_gizmo(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices);
 	void create_gizmo(std::vector<Vertex>& out_vertices);
