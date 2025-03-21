@@ -1225,7 +1225,7 @@ void VulkanRenderer::update_scene()
 	_mainDrawContext.OpaqueSurfaces.clear();
 	_mainDrawContext.TransparentSurfaces.clear();
 
-	glm::mat4 view = _camera_view;
+	glm::mat4 view = glm::translate(_camera_view, _camera_position);
 
 	// camera projection
 	glm::mat4 projection = glm::perspective(glm::radians(70.f), (float)_windowExtent.width / (float)_windowExtent.height, 10000.f, 0.1f);

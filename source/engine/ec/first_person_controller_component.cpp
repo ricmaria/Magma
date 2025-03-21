@@ -99,8 +99,8 @@ void FirstPersonControllerComponent::update(float delta_time)
 		}		
 	}
 
-	const float default_speed = 1.0f;
-	const float run_speed = 5.0f;
+	const float default_speed = 10.0f;
+	const float run_speed = 50.0f;
 
 	float speed = std::max(default_speed, run_speed * run_input);
 
