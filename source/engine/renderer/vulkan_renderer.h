@@ -210,8 +210,8 @@ private:
 	VkPipeline _trianglePipeline;
 
 	// immediate submit structures
-	VkFence _immFence;
-	VkCommandBuffer _immCommandBuffer;
+	VkFence _immediate_fence;
+	VkCommandBuffer _immediate_command_buffer;
 	VkCommandPool _immCommandPool;
 
 	std::vector<ComputeEffect> _backgroundEffects;
