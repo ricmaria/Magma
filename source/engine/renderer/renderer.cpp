@@ -7,6 +7,11 @@ void Renderer::init(uint32_t width, uint32_t height, SDL_Window* window)
 	_vulkan_renderer.init(width, height, window);
 }
 
+void Renderer::process_sdl_event(const SDL_Event* sdl_event)
+{
+	_vulkan_renderer.process_sdl_event(sdl_event);
+}
+
 void Renderer::draw()
 {
 	_vulkan_renderer.draw();

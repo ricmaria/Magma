@@ -28,6 +28,7 @@ public:
 
 private:
 
+	void process_sdl_event(const SDL_Event* sdl_event);
 	bool update();
 
 	InjectorRegister _injector;

@@ -10,6 +10,8 @@
 
 #include "core/id_pool.h"
 
+union SDL_Event;
+
 class VulkanRenderer
 {
 private:
@@ -28,6 +30,8 @@ public:
 
 	//shuts down the engine
 	void cleanup();
+
+	void process_sdl_event(const SDL_Event* sdl_event);
 
 	//draw loop
 	void draw();

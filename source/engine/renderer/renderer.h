@@ -4,6 +4,8 @@
 #include "vulkan_renderer.h"
 #include <glm/vec3.hpp>
 
+union SDL_Event;
+
 class Renderer
 {
 public:
@@ -13,6 +15,7 @@ public:
 	static const RenderObjectId invalid_render_object_id = VulkanRenderer::invalid_render_object_id;
 
 	void init(uint32_t width, uint32_t height, struct SDL_Window* window);
+	void process_sdl_event(const SDL_Event* sdl_event);
 	void draw();
 	void cleanup();
 

@@ -113,6 +113,11 @@ void VulkanRenderer::cleanup()
 	loadedEngine = nullptr;
 }
 
+void VulkanRenderer::process_sdl_event(const SDL_Event* sdl_event)
+{
+	ImGui_ImplSDL2_ProcessEvent(sdl_event);
+}
+
 void VulkanRenderer::draw()
 {
 	auto start = std::chrono::system_clock::now();
