@@ -27,6 +27,8 @@
 #include "pipelines.h"
 #include "loader.h"
 
+#include "geometry.h"
+
 VulkanRenderer* loadedEngine = nullptr;
 
 constexpr bool bUseValidationLayers = true;
@@ -90,7 +92,7 @@ void VulkanRenderer::cleanup()
 			_frames[i]._deletionQueue.flush();
 		}
 
-		for (auto& mesh : _testMeshes)
+		for (auto& mesh : _test_meshes)
 		{
 			destroy_buffer(mesh->meshBuffers.indexBuffer);
 			destroy_buffer(mesh->meshBuffers.vertexBuffer);
@@ -791,7 +793,7 @@ void VulkanRenderer::init_default_data()
 
 	_rectangle = upload_mesh(rect_indices, rect_vertices);
 
-	_testMeshes = LoadedGLTF::load_gltf_meshes("..\\assets\\basicmesh.glb",
+	_test_meshes = LoadedGLTF::load_gltf_meshes("..\\assets\\basicmesh.glb",
 		[this](std::span<uint32_t> indices, std::span<Vertex> vertices)
 		{
 			return this->upload_mesh(indices, vertices);
@@ -878,7 +880,7 @@ void VulkanRenderer::init_default_data()
 
 	// meshes
 
-	for (auto& mesh : _testMeshes)
+	for (auto& mesh : _test_meshes)
 	{
 		std::shared_ptr<MeshNode> new_node = std::make_shared<MeshNode>();
 		new_node->mesh = mesh;
@@ -893,16 +895,44 @@ void VulkanRenderer::init_default_data()
 
 		_loadedNodes[mesh->name] = std::move(new_node);
 	}
+
+	std::vector<Vertex> gizmo_vertices;
+	std::vector<uint32_t> gizmo_indices;
+	Geometry::create_gizmo(gizmo_vertices, gizmo_indices);
+
+	GeoSurface gizmo_geosurface;
+	gizmo_geosurface.startIndex = 0;
+	gizmo_geosurface.count = gizmo_indices.size();
+	gizmo_geosurface.bounds = Geometry::compute_bounds(gizmo_vertices);
+	gizmo_geosurface.material = std::make_shared<GLTFMaterial>(_defaultData);
+
+	std::shared_ptr<MeshAsset> gizmo_mesh_asset = std::make_shared<MeshAsset>();
+	gizmo_mesh_asset->name = "gizmo";
+	gizmo_mesh_asset->surfaces.push_back(gizmo_geosurface);
+	gizmo_mesh_asset->meshBuffers = upload_mesh(gizmo_indices, gizmo_vertices);
+	
+	std::shared_ptr<MeshNode> gizmo_node = std::make_shared<MeshNode>();
+	gizmo_node->mesh = gizmo_mesh_asset;
+	gizmo_node->localTransform = glm::mat4{ 1.f };
+	gizmo_node->worldTransform = glm::mat4{ 1.f };
+
+	_loadedNodes["gizmo"] = std::move(gizmo_node);
+
+	_mainDeletionQueue.push_function([=]()
+		{
+			destroy_buffer(gizmo_mesh_asset->meshBuffers.indexBuffer);
+			destroy_buffer(gizmo_mesh_asset->meshBuffers.vertexBuffer);
+		});
 }
 
 void VulkanRenderer::init_scenes()
 {
-	std::string structurePath = { "..\\assets\\structure.glb" };
-	const BufferAllocator bufferAllocator
+	std::string structure_path = { "..\\assets\\structure.glb" };
+	const BufferAllocator buffer_allocator
 	{
-		[this](size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage)
+		[this](size_t alloc_size, VkBufferUsageFlags usage, VmaMemoryUsage memory_usage)
 		{
-			return this->create_buffer(allocSize, usage, memoryUsage);
+			return this->create_buffer(alloc_size, usage, memory_usage);
 		},
 		[this](const AllocatedBuffer& buffer)
 		{
@@ -910,7 +940,7 @@ void VulkanRenderer::init_scenes()
 		}
 	};
 
-	const ImageAllocator imageAllocator =
+	const ImageAllocator image_allocator =
 	{
 		[this](void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmapped)
 		{
@@ -922,9 +952,9 @@ void VulkanRenderer::init_scenes()
 		}
 	};
 
-	auto buildMaterial = [this](VkDevice device, MaterialPass pass, const GLTFMetallic_Roughness::MaterialResources& resources, DescriptorAllocatorGrowable& descriptorAllocator)
+	auto build_material = [this](VkDevice device, MaterialPass pass, const GLTFMetallic_Roughness::MaterialResources& resources, DescriptorAllocatorGrowable& descriptor_allocator)
 		{
-			return _metalRoughMaterial.write_material(device, pass, resources, descriptorAllocator);
+			return _metalRoughMaterial.write_material(device, pass, resources, descriptor_allocator);
 		};
 
 	auto uploadMesh = [this](std::span<uint32_t> indices, std::span<Vertex> vertices)
@@ -933,11 +963,11 @@ void VulkanRenderer::init_scenes()
 		};
 
 	LoadedGLTF::LoadGLTFParams loadGLTFParams;
-	loadGLTFParams.filePath = structurePath;
+	loadGLTFParams.filePath = structure_path;
 	loadGLTFParams.device = _device;
-	loadGLTFParams.bufferAllocator = bufferAllocator;
-	loadGLTFParams.imageAllocator = imageAllocator;
-	loadGLTFParams.buildMaterial = buildMaterial;
+	loadGLTFParams.bufferAllocator = buffer_allocator;
+	loadGLTFParams.imageAllocator = image_allocator;
+	loadGLTFParams.buildMaterial = build_material;
 	loadGLTFParams.uploadMesh = uploadMesh;
 	loadGLTFParams.whiteImage = _whiteImage;
 	loadGLTFParams.errorImage = _errorCheckerboardImage;
@@ -1247,15 +1277,20 @@ void VulkanRenderer::update_scene()
 	_sceneData.sunlightColor = glm::vec4(1.f);
 	_sceneData.sunlightDirection = glm::vec4(0, 1, 0.5, 1.f);
 
-	_loadedNodes["Suzanne"]->draw(glm::mat4{ 1.f }, _mainDrawContext);
-
-	for (int x = -3; x < 3; x++)
+	for (auto& render_instance : _render_instances)
 	{
-		glm::mat4 scale = glm::scale(glm::vec3{ 0.2f });
-		glm::mat4 translation = glm::translate(glm::vec3{ x, 1, 0 });
-
-		_loadedNodes["Cube"]->draw(translation * scale, _mainDrawContext);
+		_loadedNodes[render_instance.mesh_name]->draw(render_instance.transform, _mainDrawContext);
 	}
+
+	//_loadedNodes["Suzanne"]->draw(glm::mat4{ 1.f }, _mainDrawContext);
+
+	//for (int x = -3; x < 3; x++)
+	//{
+	//	glm::mat4 scale = glm::scale(glm::vec3{ 0.2f });
+	//	glm::mat4 translation = glm::translate(glm::vec3{ x, 1, 0 });
+
+	//	_loadedNodes["Cube"]->draw(translation * scale, _mainDrawContext);
+	//}
 
 	_loadedScenes["structure"]->draw(glm::mat4{ 1.f }, _mainDrawContext);
 
@@ -1694,33 +1729,25 @@ void VulkanRenderer::set_camera_view(const glm::vec3& forward, const glm::vec3& 
 	_camera_view = glm::transpose(glm::mat4(-glm::vec4(right, 0.0f), -glm::vec4(up, 0.0f), glm::vec4(forward, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)));
 }
 
-VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object(const std::string& mesh_name, const std::string& material_name, glm::mat4 transform)
+VulkanRenderer::RenderInstanceId VulkanRenderer::add_render_instance(const std::string& mesh_name, glm::mat4 transform)
 {
-	//RenderObject object;
-	//object.id = _id_pool.acquire_id();
-	//object.mesh = get_mesh(mesh_name);
-	//object.material = get_material(material_name);
-	//object.transformMatrix = transform;
+	RenderInstance render_instance = { _id_pool.acquire_id(), mesh_name, transform };
 
-	//assert(object.mesh);
-	//assert(object.material);
+	_render_instances.push_back({ _id_pool.acquire_id(), mesh_name, transform });
 
-	//_renderables.push_back(object);
-
-	//return object.id;
-
-	return invalid_render_object_id;
+	return _render_instances.back().id;
 }
 
-void VulkanRenderer::remove_render_object(RenderObjectId id)
+void VulkanRenderer::remove_render_instance(RenderInstanceId id)
 {
-	//auto it = std::find_if(_renderables.begin(), _renderables.end(),
-	//	[id](const RenderObject& render_object)
-	//	{
-	//		return render_object.id == id;
-	//	});
-	//if (it != _renderables.end())
-	//{
-	//	_renderables.erase(it);
-	//}
+	auto it = std::find_if(_render_instances.begin(), _render_instances.end(),
+		[id](const RenderInstance& render_instance)
+		{
+			return render_instance.id == id;
+		});
+
+	if (it != _render_instances.end())
+	{
+		_render_instances.erase(it);
+	}
 }

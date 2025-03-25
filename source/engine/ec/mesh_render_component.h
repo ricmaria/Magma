@@ -27,9 +27,6 @@ namespace EC
 		const std::string& get_mesh_name() { return _mesh_name; }
 		void set_mesh_name(const std::string& mesh_name) { _mesh_name = mesh_name; }
 
-		const std::string& get_material_name() { return _material_name; }
-		void set_material_name(const std::string& material_name) { _material_name = material_name; }
-
 		glm::mat4 _temp_transform;
 
 	protected:
@@ -47,7 +44,6 @@ namespace EC
 		Renderer* _renderer = nullptr;
 
 		std::string _mesh_name;
-		std::string _material_name;
 
 		Renderer::RenderObjectId _render_object_id = Renderer::invalid_render_object_id;
 	};

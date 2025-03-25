@@ -19,9 +19,9 @@ private:
 
 public:
 
-	using RenderObjectId = IdPool::Id;
+	using RenderInstanceId = IdPool::Id;
 
-	static const RenderObjectId invalid_render_object_id = IdPool::Invalid;
+	static const RenderInstanceId invalid_render_instance_id = IdPool::Invalid;
 
 	static VulkanRenderer& get();
 
@@ -40,8 +40,8 @@ public:
 	inline void set_camera_position(glm::vec3 position) { _camera_position = position; }
 	void set_camera_view(const glm::vec3& forward, const glm::vec3& left, const glm::vec3& up);
 
-	RenderObjectId add_render_object(const std::string& mesh_name, const std::string& material_name, glm::mat4 transform);
-	void remove_render_object(RenderObjectId id);
+	RenderInstanceId add_render_instance(const std::string& mesh_name, glm::mat4 transform);
+	void remove_render_instance(RenderInstanceId id);
 
 private:
 	class DeletionQueue
@@ -105,6 +105,13 @@ private:
 		glm::vec4 ambientColor;
 		glm::vec4 sunlightDirection; // w for sun power
 		glm::vec4 sunlightColor;
+	};
+
+	struct RenderInstance
+	{
+		RenderInstanceId id;
+		std::string mesh_name;
+		glm::mat4 transform;
 	};
 
 	struct EngineStats
@@ -226,7 +233,7 @@ private:
 
 	GPUMeshBuffers _rectangle;
 
-	std::vector<std::shared_ptr<MeshAsset>> _testMeshes;
+	std::vector<std::shared_ptr<MeshAsset>> _test_meshes;
 
 	AllocatedImage _whiteImage;
 	AllocatedImage _blackImage;
@@ -251,4 +258,6 @@ private:
 	glm::vec3 _camera_position = { 0.f,-6.f,-10.f };
 
 	glm::mat4 _camera_view{ glm::vec4{1,0,0,0}, glm::vec4{0,1,0,0}, glm::vec4{0,0,-1,0}, glm::vec4{0,0,0,1} };
+
+	std::vector<RenderInstance> _render_instances;
 };

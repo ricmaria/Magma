@@ -80,7 +80,6 @@ int main(int argc, char* argv[])
 
 	auto gizmo_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
 	gizmo_mesh_component->set_mesh_name("gizmo");
-	gizmo_mesh_component->set_material_name("coloredmesh");
 	gizmo_mesh_component->_temp_transform = glm::mat4{ 1.0f };  // glm::rotate(glm::pi<float>(), glm::vec3{ 0.0f, 0.0f, 1.0f });
 
 	gizmo_entity->add_component(std::move(gizmo_mesh_component));

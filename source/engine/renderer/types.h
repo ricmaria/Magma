@@ -118,7 +118,7 @@ struct DrawContext
 // base class for a renderable dynamic object
 struct IRenderable
 {
-	virtual void draw(const glm::mat4& topMatrix, DrawContext& ctx) = 0;
+	virtual void draw(const glm::mat4& top_matrix, DrawContext& context) = 0;
 };
 
 // implementation of a drawable scene node.

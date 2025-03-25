@@ -136,7 +136,7 @@ void Geometry::create_sphere(std::vector<Vertex>& out_vertices, float radius, gl
 	unique_vertices.clear();
 }
 
-void Geometry::create_piramyd(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, float base, float height, glm::vec4 color)
+void Geometry::create_piramyd(std::vector<Vertex>& out_vertices, std::vector<uint32_t>& out_indices, float base, float height, glm::vec4 color)
 {
 	const float sqert2div2 = std::sqrt(2.0f) / 2.0f;
 	const float half_base = base * 0.5f;
@@ -210,7 +210,7 @@ void Geometry::create_piramyd(std::vector<Vertex>& out_vertices, std::vector<uin
 void Geometry::create_piramyd(std::vector<Vertex>& out_vertices, float base, float height, glm::vec4 color)
 {
 	std::vector<Vertex> vertices;
-	std::vector<uint16_t> indices;
+	std::vector<uint32_t> indices;
 
 	create_piramyd(vertices, indices, base, height, color);
 
@@ -223,7 +223,7 @@ void Geometry::create_piramyd(std::vector<Vertex>& out_vertices, float base, flo
 	);
 }
 
-void Geometry::create_box(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, glm::vec3 dimensions, glm::vec4 color)
+void Geometry::create_box(std::vector<Vertex>& out_vertices, std::vector<uint32_t>& out_indices, glm::vec3 dimensions, glm::vec4 color)
 {
 	const uint32_t a = out_vertices.size() + 0;
 	const uint32_t b = out_vertices.size() + 1;
@@ -340,7 +340,7 @@ void Geometry::create_box(std::vector<Vertex>& out_vertices, std::vector<uint16_
 void Geometry::create_box(std::vector<Vertex>& out_vertices, glm::vec3 dimensions, glm::vec4 color)
 {
 	std::vector<Vertex> vertices;
-	std::vector<uint16_t> indices;
+	std::vector<uint32_t> indices;
 
 	create_box(vertices, indices, dimensions, color);
 
@@ -353,7 +353,7 @@ void Geometry::create_box(std::vector<Vertex>& out_vertices, glm::vec3 dimension
 	);
 }
 
-void Geometry::create_arrow(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices, glm::vec4 color)
+void Geometry::create_arrow(std::vector<Vertex>& out_vertices, std::vector<uint32_t>& out_indices, glm::vec4 color)
 {
 	uint32_t box_start_index = out_vertices.size();
 
@@ -383,7 +383,7 @@ void Geometry::create_arrow(std::vector<Vertex>& out_vertices, std::vector<uint1
 void Geometry::create_arrow(std::vector<Vertex>&out_vertices, glm::vec4 color)
 {
 	std::vector<Vertex> vertices;
-	std::vector<uint16_t> indices;
+	std::vector<uint32_t> indices;
 
 	create_arrow(vertices, indices, color);
 
@@ -396,7 +396,7 @@ void Geometry::create_arrow(std::vector<Vertex>&out_vertices, glm::vec4 color)
 	);
 }
 
-void Geometry::create_gizmo(std::vector<Vertex>& out_vertices, std::vector<uint16_t>& out_indices)
+void Geometry::create_gizmo(std::vector<Vertex>& out_vertices, std::vector<uint32_t>& out_indices)
 {
 	uint32_t x_arrow_start_index = out_vertices.size();
 
@@ -440,7 +440,7 @@ void Geometry::create_gizmo(std::vector<Vertex>& out_vertices, std::vector<uint1
 void Geometry::create_gizmo(std::vector<Vertex>& out_vertices)
 {
 	std::vector<Vertex> vertices;
-	std::vector<uint16_t> indices;
+	std::vector<uint32_t> indices;
 
 	create_gizmo(vertices, indices);
 
@@ -451,4 +451,24 @@ void Geometry::create_gizmo(std::vector<Vertex>& out_vertices)
 		std::make_move_iterator(unique_vertices.begin()),
 		std::make_move_iterator(unique_vertices.end())
 	);
+}
+
+Bounds Geometry::compute_bounds(std::vector<Vertex>& vertices)
+{
+	Bounds bounds;
+
+	glm::vec3 minpos = vertices[0].position;
+	glm::vec3 maxpos = vertices[0].position;
+
+	for (size_t i = 0; i < vertices.size(); i++)
+	{
+		minpos = glm::min(minpos, vertices[i].position);
+		maxpos = glm::max(maxpos, vertices[i].position);
+	}
+	// calculate origin and extents from the min/max, use extent lenght for radius
+	bounds.origin = (maxpos + minpos) / 2.f;
+	bounds.extents = (maxpos - minpos) / 2.f;
+	bounds.sphereRadius = glm::length(bounds.extents);
+
+	return bounds;
 }

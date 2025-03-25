@@ -7,7 +7,7 @@ using namespace EC;
 
 void MeshRenderComponent::on_being_added()
 {
-	_render_object_id = _renderer->add_render_object(_mesh_name.c_str(), _material_name.c_str(), _temp_transform);
+	_render_object_id = _renderer->add_render_object(_mesh_name, _temp_transform);
 }
 
 void MeshRenderComponent::on_being_removed()
