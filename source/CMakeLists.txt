@@ -16,6 +16,9 @@ target_compile_features(compiler_flags INTERFACE cxx_std_20)
 add_subdirectory(engine)
 
 add_executable(MagmaGame main.cpp)
+target_sources(MagmaGame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glm.natvis)
+
+# add_source_group(Visualizers "Visualizers" FILES my_project.natvis)
 
 target_link_libraries(MagmaGame PUBLIC MagmaEngine compiler_flags)
 
