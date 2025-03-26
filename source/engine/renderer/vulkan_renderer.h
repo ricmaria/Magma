@@ -6,7 +6,6 @@
 #include "types.h"
 #include "descriptors.h"
 #include "loader.h"
-//#include "camera.h"
 
 #include "core/id_pool.h"
 
