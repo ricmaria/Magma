@@ -472,3 +472,24 @@ Bounds Geometry::compute_bounds(std::vector<Vertex>& vertices)
 
 	return bounds;
 }
+
+glm::mat4x4 Geometry::compute_perspective_projection_for_vulkan(float fov_y_rad, float aspect_ratio_w_over_h, float z_near, float z_far)
+{
+	// formula taken from https://johannesugb.github.io/gpu-programming/setting-up-a-proper-vulkan-projection-matrix/
+
+	glm::mat4x4 project(0.0f);
+
+	project[0][0] = (1.0f / aspect_ratio_w_over_h) / std::tanf(fov_y_rad / 2.0f);	// first index is column, second is row
+	project[1][1] = 1.0f / std::tanf(fov_y_rad / 2.0f);
+	project[2][2] = z_far / (z_far - z_near);
+	project[2][3] = 1.0f;
+	project[3][2] = -(z_near * z_far) / (z_far - z_near);
+
+	glm::mat4x4 vulkan_axes_align(1.0f);
+	vulkan_axes_align[1][1] = -1.0f;
+	vulkan_axes_align[2][2] = -1.0f;
+
+	glm::mat4x4 res = project * vulkan_axes_align;
+
+	return res;
+}

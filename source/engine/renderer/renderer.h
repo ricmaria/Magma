@@ -20,7 +20,7 @@ public:
 	void cleanup();
 
 	void set_camera_position(const glm::vec3& position);
-	void set_camera_view(const glm::vec3& forward, const glm::vec3& left, const glm::vec3& up);
+	void set_camera_axes(const glm::vec3& x, const glm::vec3& y, const glm::vec3& z);
 
 	RenderObjectId add_render_object(const std::string& mesh_name, glm::mat4 transform);
 	void remove_render_object(RenderObjectId id);

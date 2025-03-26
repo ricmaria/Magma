@@ -35,4 +35,6 @@ namespace Geometry
 	}
 
 	Bounds compute_bounds(std::vector<Vertex>& vertices);
+
+	glm::mat4x4 compute_perspective_projection_for_vulkan(float fov_y_rad, float aspect_ratio_w_over_h, float z_near, float z_far);
 }

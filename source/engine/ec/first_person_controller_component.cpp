@@ -43,7 +43,7 @@ void FirstPersonControllerComponent::update(float delta_time)
 	const float yaw_angle = -yaw_input * yaw_speed * delta_time * action_1;
 	const float pitch_angle = -pitch_input * pitch_speed * delta_time * action_1 * (_invert_mouse_y ? -1.0f : 1.0f);
 
-	const glm::vec3 global_up_vec{ 0.0f, -1.0f, 0.0f };
+	const glm::vec3 global_up_vec{ 0.0f, 1.0f, 0.0f };
 
 	glm::vec3 forward_vec = _transform_component->get_forward();
 	glm::vec3 right_vec = _transform_component->get_right();

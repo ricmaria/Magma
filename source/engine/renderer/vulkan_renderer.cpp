@@ -1259,14 +1259,17 @@ void VulkanRenderer::update_scene()
 	_mainDrawContext.OpaqueSurfaces.clear();
 	_mainDrawContext.TransparentSurfaces.clear();
 
-	glm::mat4 view = glm::translate(_camera_view, _camera_position);
+	// view matrix formula taken from https://johannesugb.github.io/gpu-programming/setting-up-a-proper-vulkan-projection-matrix/
 
-	// camera projection
-	glm::mat4 projection = glm::perspective(glm::radians(70.f), (float)_windowExtent.width / (float)_windowExtent.height, 10000.f, 0.1f);
+	glm::mat4 view;
+	view[0] = glm::vec4(_camera_axes[0], 0.0f);
+	view[1] = glm::vec4(_camera_axes[1], 0.0f);
+	view[2] = glm::vec4(_camera_axes[2], 0.0f);
+	view[3] = glm::vec4(_camera_position, 1.0f);
 
-	// invert the Y direction on projection matrix so that we are more similar
-	// to opengl and gltf axis
-	projection[1][1] *= -1;
+	view = glm::inverse(view);
+
+	glm::mat4 projection = Geometry::compute_perspective_projection_for_vulkan(glm::radians(70.f), (float)_windowExtent.width / (float)_windowExtent.height, 10000.f, 0.1f);
 
 	_sceneData.view = view;
 	_sceneData.proj = projection;
@@ -1329,6 +1332,7 @@ void VulkanRenderer::update_imgui()
 		ImGui::Text("update time %f ms", _stats.scene_update_time);
 		ImGui::Text("triangles %i", _stats.triangle_count);
 		ImGui::Text("draws %i", _stats.drawcall_count);
+		ImGui::Text("position %f %f %f", _camera_position.x, _camera_position.y, _camera_position.z);
 		ImGui::EndGroup();
 	}
 
@@ -1721,12 +1725,6 @@ void GLTFMetallic_Roughness::build_pipelines(VkDevice device, VkDescriptorSetLay
 
 	vkDestroyShaderModule(device, meshFragShader, nullptr);
 	vkDestroyShaderModule(device, meshVertexShader, nullptr);
-}
-
-void VulkanRenderer::set_camera_view(const glm::vec3& forward, const glm::vec3& right, const glm::vec3& up)
-{
-	// Why right must be negated???
-	_camera_view = glm::transpose(glm::mat4(-glm::vec4(right, 0.0f), -glm::vec4(up, 0.0f), glm::vec4(forward, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)));
 }
 
 VulkanRenderer::RenderInstanceId VulkanRenderer::add_render_instance(const std::string& mesh_name, glm::mat4 transform)
