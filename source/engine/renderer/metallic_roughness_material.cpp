@@ -52,7 +52,7 @@ void GLTFMetallic_Roughness::build_pipelines(VkDevice device, VkDescriptorSetLay
 	pipelineBuilder.set_cull_mode(VK_CULL_MODE_NONE, VK_FRONT_FACE_CLOCKWISE);
 	pipelineBuilder.set_multisampling_none();
 	pipelineBuilder.disable_blending();
-	pipelineBuilder.enable_depthtest(true, VK_COMPARE_OP_GREATER_OR_EQUAL);
+	pipelineBuilder.enable_depthtest(true, VK_COMPARE_OP_LESS);
 
 	//render format
 	pipelineBuilder.set_color_attachment_format(drawImageFormat);
@@ -67,7 +67,7 @@ void GLTFMetallic_Roughness::build_pipelines(VkDevice device, VkDescriptorSetLay
 	// create the transparent variant
 	pipelineBuilder.enable_blending_additive();
 
-	pipelineBuilder.enable_depthtest(false, VK_COMPARE_OP_GREATER_OR_EQUAL);
+	pipelineBuilder.enable_depthtest(false, VK_COMPARE_OP_LESS_OR_EQUAL);
 
 	_transparentPipeline.pipeline = pipelineBuilder.build_pipeline(device);
 

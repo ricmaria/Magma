@@ -671,7 +671,7 @@ void VulkanRenderer::init_triangle_pipeline()
 
 	//depth testing
 	//pipelineBuilder.disable_depthtest();
-	pipelineBuilder.enable_depthtest(true, VK_COMPARE_OP_GREATER_OR_EQUAL);
+	pipelineBuilder.enable_depthtest(true, VK_COMPARE_OP_LESS_OR_EQUAL);
 
 	//connect the image format we will draw into, from draw image
 	pipelineBuilder.set_color_attachment_format(_drawImage.imageFormat);
@@ -743,7 +743,7 @@ void VulkanRenderer::init_mesh_pipeline()
 	pipelineBuilder.disable_blending();
 
 	//pipelineBuilder.disable_depthtest();
-	pipelineBuilder.enable_depthtest(true, VK_COMPARE_OP_GREATER_OR_EQUAL);
+	pipelineBuilder.enable_depthtest(true, VK_COMPARE_OP_LESS_OR_EQUAL);
 
 	//connect the image format we will draw into, from draw image
 	pipelineBuilder.set_color_attachment_format(_drawImage.imageFormat);
@@ -1269,7 +1269,7 @@ void VulkanRenderer::update_scene()
 
 	view = glm::inverse(view);
 
-	glm::mat4 projection = Geometry::compute_perspective_projection_for_vulkan(glm::radians(70.f), (float)_windowExtent.width / (float)_windowExtent.height, 10000.f, 0.1f);
+	glm::mat4 projection = Geometry::compute_perspective_projection_for_vulkan(glm::radians(70.f), (float)_windowExtent.width / (float)_windowExtent.height, 0.1f, 10000.f);
 
 	_sceneData.view = view;
 	_sceneData.proj = projection;
