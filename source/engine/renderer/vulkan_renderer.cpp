@@ -1280,9 +1280,9 @@ void VulkanRenderer::update_scene()
 	_sceneData.sunlightColor = glm::vec4(1.f);
 	_sceneData.sunlightDirection = glm::vec4(0, 1, 0.5, 1.f);
 
-	for (auto& render_instance : _render_instances)
+	for (auto& render_instance : m_render_instance_id_to_render_instance)
 	{
-		_loadedNodes[render_instance.mesh_name]->draw(render_instance.transform, _mainDrawContext);
+		_loadedNodes[render_instance.second.mesh_name]->draw(render_instance.second.transform, _mainDrawContext);
 	}
 
 	//_loadedNodes["Suzanne"]->draw(glm::mat4{ 1.f }, _mainDrawContext);
@@ -1655,25 +1655,31 @@ bool VulkanRenderer::is_visible(const RenderObject& obj, const glm::mat4& viewpr
 	}
 }
 
-VulkanRenderer::RenderInstanceId VulkanRenderer::add_render_instance(const std::string& mesh_name, glm::mat4 transform)
+VulkanRenderer::RenderInstanceId VulkanRenderer::add_render_instance(const std::string& mesh_name, const glm::mat4& transform)
 {
 	RenderInstance render_instance = { _id_pool.acquire_id(), mesh_name, transform };
 
-	_render_instances.push_back({ _id_pool.acquire_id(), mesh_name, transform });
+	m_render_instance_id_to_render_instance[render_instance.id] = render_instance;
 
-	return _render_instances.back().id;
+	return render_instance.id;
 }
 
 void VulkanRenderer::remove_render_instance(RenderInstanceId id)
 {
-	auto it = std::find_if(_render_instances.begin(), _render_instances.end(),
-		[id](const RenderInstance& render_instance)
-		{
-			return render_instance.id == id;
-		});
+	auto it = m_render_instance_id_to_render_instance.find(id);
 
-	if (it != _render_instances.end())
+	if (it != m_render_instance_id_to_render_instance.end())
 	{
-		_render_instances.erase(it);
+		m_render_instance_id_to_render_instance.erase(it);
+	}
+}
+
+void VulkanRenderer::update_render_instance(RenderInstanceId id, const glm::mat4& transform)
+{
+	auto it = m_render_instance_id_to_render_instance.find(id);
+
+	if (it != m_render_instance_id_to_render_instance.end())
+	{
+		it->second.transform = transform;
 	}
 }

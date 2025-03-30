@@ -39,8 +39,9 @@ public:
 	inline void set_camera_position(glm::vec3 position) { _camera_position = position; }
 	inline void set_camera_axes(const glm::vec3& x, const glm::vec3& y, const glm::vec3& z) { _camera_axes[0] = x; _camera_axes[1] = y; _camera_axes[2] = z; }
 
-	RenderInstanceId add_render_instance(const std::string& mesh_name, glm::mat4 transform);
+	RenderInstanceId add_render_instance(const std::string& mesh_name, const glm::mat4& transform);
 	void remove_render_instance(RenderInstanceId id);
+	void update_render_instance(RenderInstanceId id, const glm::mat4& transform);
 
 private:
 	class DeletionQueue
@@ -258,5 +259,5 @@ private:
 
 	std::array<glm::vec3,3> _camera_axes;
 
-	std::vector<RenderInstance> _render_instances;
+	std::unordered_map<RenderInstanceId, RenderInstance> m_render_instance_id_to_render_instance;
 };

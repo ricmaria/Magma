@@ -41,3 +41,8 @@ void Renderer::remove_render_object(RenderObjectId id)
 {
 	_vulkan_renderer.remove_render_instance(id);
 }
+
+void Renderer::update_render_instance(RenderObjectId id, const glm::mat4& transform)
+{
+	_vulkan_renderer.update_render_instance(id, transform);
+}

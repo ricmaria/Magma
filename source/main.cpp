@@ -25,11 +25,16 @@ int main(int argc, char* argv[])
 	EC::Entity* player_entity = entity_manager->create_entity();
 
 	player_entity->add_component<EC::MouseKeyboardInputComponent>();
-	auto transform_component = player_entity->add_component<EC::TransformComponent>();
 	player_entity->add_component<EC::FirstPersonControllerComponent>();
 	player_entity->add_component<EC::CameraComponent>();
+	auto player_transform_component = player_entity->add_component<EC::TransformComponent>();
 
-	transform_component->set_position(glm::vec3(0.f, 0.f, 5.f));
+	player_transform_component->set_position(glm::vec3(0.f, 0.f, 5.f));
+
+	EC::Entity* gizmo_entity = entity_manager->create_entity();
+	gizmo_entity->add_component<EC::TransformComponent>();
+	auto gizmo_mesh_component = gizmo_entity->add_component< EC::MeshRenderComponent>();
+	gizmo_mesh_component->set_mesh_name("gizmo");
 
 	//EC::Entity* monkey_entity = entity_manager->create_entity();
 
@@ -75,14 +80,6 @@ int main(int argc, char* argv[])
 	//arrow_mesh_component->_temp_transform = glm::mat4{ 1.0f };  // glm::rotate(glm::pi<float>(), glm::vec3{ 0.0f, 0.0f, 1.0f });
 
 	//arrow_entity->add_component(std::move(arrow_mesh_component));
-
-	EC::Entity* gizmo_entity = entity_manager->create_entity();
-
-	auto gizmo_mesh_component = EC::Entity::create_component<EC::MeshRenderComponent>();
-	gizmo_mesh_component->set_mesh_name("gizmo");
-	gizmo_mesh_component->_temp_transform = glm::mat4{ 1.0f };  // glm::rotate(glm::pi<float>(), glm::vec3{ 0.0f, 0.0f, 1.0f });
-
-	gizmo_entity->add_component(std::move(gizmo_mesh_component));
 
 	//EC::Entity* empire_entity = entity_manager->create_entity();
 

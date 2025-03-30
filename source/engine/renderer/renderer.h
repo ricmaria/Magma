@@ -24,6 +24,7 @@ public:
 
 	RenderObjectId add_render_object(const std::string& mesh_name, glm::mat4 transform);
 	void remove_render_object(RenderObjectId id);
+	void update_render_instance(RenderObjectId id, const glm::mat4& transform);
 
 private:
 	VulkanRenderer _vulkan_renderer;
