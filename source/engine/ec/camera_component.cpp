@@ -11,9 +11,9 @@ void CameraComponent::update(float delta_time)
 	
 	_renderer->set_camera_position(position);
 
-	const auto& forward = _transform_component->get_forward();
-	const auto& right = _transform_component->get_right();
-	const auto& up = _transform_component->get_up();
+	const auto& x = _transform_component->get_x();
+	const auto& y = _transform_component->get_y();
+	const auto& z = _transform_component->get_z();
 
-	_renderer->set_camera_axes(right, up, -forward);
+	_renderer->set_camera_axes(x, y, z);
 }

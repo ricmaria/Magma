@@ -28,36 +28,36 @@ namespace EC
 			m_dirty = true;
 		}
 
-		inline const glm::vec3& get_forward() const
+		inline const glm::vec3& get_z() const
 		{
-			return m_forward;
+			return m_z;
 		}
 
-		inline void set_forward(const glm::vec3& forward)
+		inline void set_z(const glm::vec3& z)
 		{
-			m_forward = forward;
+			m_z = z;
 			m_dirty = true;
 		}
 
-		inline const glm::vec3& get_right() const
+		inline const glm::vec3& get_x() const
 		{
-			return m_right;
+			return m_x;
 		}
 
-		inline void set_right(const glm::vec3& right)
+		inline void set_x(const glm::vec3& x)
 		{
-			m_right = right;
+			m_x = x;
 			m_dirty = true;
 		}
 
-		inline const glm::vec3& get_up() const
+		inline const glm::vec3& get_y() const
 		{
-			return m_up;
+			return m_y;
 		}
 
-		inline void set_up(const glm::vec3& up)
+		inline void set_y(const glm::vec3& y)
 		{
-			m_up = up;
+			m_y = y;
 			m_dirty = true;
 		}
 
@@ -65,9 +65,9 @@ namespace EC
 		{
 			if (m_dirty)
 			{
-				m_transform[0] = glm::vec4(m_right, 0.0f);
-				m_transform[1] = glm::vec4(m_up, 0.0f);
-				m_transform[2] = glm::vec4(- m_forward, 0.0f);
+				m_transform[0] = glm::vec4(m_x, 0.0f);
+				m_transform[1] = glm::vec4(m_y, 0.0f);
+				m_transform[2] = glm::vec4(m_z, 0.0f);
 				m_transform[3] = glm::vec4(m_position, 1.0f);
 				m_dirty = false;
 			}
@@ -78,9 +78,9 @@ namespace EC
 	private:
 		glm::vec3 m_position = { 0, 0, 0 };
 
-		glm::vec3 m_right = { 1, 0, 0 };
-		glm::vec3 m_up = { 0, 1, 0 };
-		glm::vec3 m_forward = { 0, 0, -1 };
+		glm::vec3 m_x = { 1, 0, 0 };
+		glm::vec3 m_y = { 0, 1, 0 };
+		glm::vec3 m_z = { 0, 0, 1 };
 
 		glm::mat4x4 m_transform;
 

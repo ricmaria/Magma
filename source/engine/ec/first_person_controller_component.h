@@ -22,22 +22,22 @@ namespace EC
 
 		void update(float delta_time) override;
 
-		bool get_invert_mouse_y() { return _invert_mouse_y; }
-		bool set_invert_mouse_y(bool value) { _invert_mouse_y = value; }
+		bool get_invert_mouse_y() { return m_invert_mouse_y; }
+		bool set_invert_mouse_y(bool value) { m_invert_mouse_y = value; }
 
 	protected:
 		const std::vector<Dependency>& get_dependencies() const override
 		{
-			static Dependency transform = Dependency::make(&FirstPersonControllerComponent::_transform_component);
-			static Dependency input = Dependency::make(&FirstPersonControllerComponent::_input_components);
+			static Dependency transform = Dependency::make(&FirstPersonControllerComponent::m_transform_component);
+			static Dependency input = Dependency::make(&FirstPersonControllerComponent::m_input_components);
 			static auto dependencies = append_dependencies(ParentType::get_dependencies(), { transform, input });
 			
 			return dependencies;
 		}
 
 	private:
-		std::vector<InputComponent*> _input_components;
-		TransformComponent* _transform_component = nullptr;
-		bool _invert_mouse_y = false;
+		std::vector<InputComponent*> m_input_components;
+		TransformComponent* m_transform_component = nullptr;
+		bool m_invert_mouse_y = false;
 	};
 }
