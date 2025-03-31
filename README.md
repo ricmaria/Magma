@@ -4,7 +4,7 @@ Next granular tasks:
 - implement proper loading of gltf meshes with a component
 - implement basic lighing where a light is an EC component
 - refactoring: put everything under a namespace
-- refactoring: convert all the _memebers to m_members
+- refactoring: convert all the class _members to m_members
 
 Future broad tasks:
 - skinned meshes
