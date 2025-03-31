@@ -1,6 +1,8 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.8...3.31.3)
 
 project(Magma VERSION 0.1.0)
+
+find_package(Vulkan REQUIRED)
 
 add_subdirectory(third_party)
 
@@ -14,6 +16,9 @@ target_compile_features(compiler_flags INTERFACE cxx_std_20)
 add_subdirectory(engine)
 
 add_executable(MagmaGame main.cpp)
+target_sources(MagmaGame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/glm.natvis)
+
+# add_source_group(Visualizers "Visualizers" FILES my_project.natvis)
 
 target_link_libraries(MagmaGame PUBLIC MagmaEngine compiler_flags)
 
@@ -41,3 +46,8 @@ add_custom_target(
     Shaders 
     DEPENDS ${SPIRV_BINARY_FILES}
     )
+	
+add_custom_command(TARGET MagmaGame POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:MagmaGame> $<TARGET_FILE_DIR:MagmaGame>
+  COMMAND_EXPAND_LISTS
+  )

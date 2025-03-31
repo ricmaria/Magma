@@ -34,14 +34,12 @@ source_group("Source Files/core" FILES ${SRC_CORE})
 source_group("Source Files/renderer" FILES ${SRC_RENDERER})
 source_group("Source Files/ec" FILES ${SRC_EC})
 
+target_compile_definitions(MagmaEngine PUBLIC GLM_FORCE_DEPTH_ZERO_TO_ONE NOMINMAX)
+
 target_include_directories(MagmaEngine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${Vulkan_INCLUDE_DIR})
 
-target_link_libraries(MagmaEngine compiler_flags)
+target_link_libraries(MagmaEngine PUBLIC compiler_flags)
 
-find_package(Vulkan REQUIRED)
+target_link_libraries(MagmaEngine PUBLIC vma glm Vulkan::Vulkan fmt::fmt stb_image SDL2::SDL2 vkbootstrap imgui fastgltf::fastgltf)
 
-find_package(SDL2 REQUIRED)
-
-target_link_libraries(MagmaEngine vkbootstrap vma glm tinyobjloader imgui stb_image)
-
-target_link_libraries(MagmaEngine Vulkan::Vulkan SDL2::SDL2main SDL2::SDL2)
+target_precompile_headers(MagmaEngine PUBLIC <optional> <vector> <memory> <string> <vector> <unordered_map> <glm/mat4x4.hpp>  <glm/vec4.hpp> <vulkan/vulkan.h>)

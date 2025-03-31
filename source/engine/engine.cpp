@@ -1,4 +1,6 @@
-#include <engine.h>
+#include "engine.h"
+
+#include <thread>
 
 void MagmaEngine::init(Features features)
 {
@@ -38,7 +40,15 @@ void MagmaEngine::run()
 {
 	_logger.log("MagmaEngine loop started.");
 
-	_sdl_manager.run(Delegate<bool>(this, &MagmaEngine::update));
+	auto process_sdl_event = std::bind(&MagmaEngine::process_sdl_event, this, std::placeholders::_1);
+	auto update = std::bind(&MagmaEngine::update, this);
+
+	_sdl_manager.run(process_sdl_event, update);
+}
+
+void MagmaEngine::process_sdl_event(const SDL_Event* sdl_event)
+{
+	_renderer.process_sdl_event(sdl_event);
 }
 
 bool MagmaEngine::update()
@@ -55,6 +65,11 @@ bool MagmaEngine::update()
 	if (_sdl_manager.is_window_visible())
 	{
 		_renderer.draw();
+	}
+	else
+	{
+		// throttle the speed to avoid the endless spinning
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
 	return true;

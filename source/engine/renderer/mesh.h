@@ -1,35 +1,31 @@
 ﻿#pragma once
 
-#include <vector>
-#include <glm/vec3.hpp>
+#include "metallic_roughness_material.h"
 
-#include <glm/vec2.hpp>
-
-#include "types.h"
-
-struct VertexInputDescription
+struct GLTFMaterial
 {
-	std::vector<VkVertexInputBindingDescription> bindings;
-	std::vector<VkVertexInputAttributeDescription> attributes;
-
-	VkPipelineVertexInputStateCreateFlags flags = 0;
+	MaterialInstance data;
 };
 
-
-struct Vertex
+struct GeoSurface
 {
-	glm::vec3 position;
-	glm::vec3 normal;
-	glm::vec3 color;
-	glm::vec2 uv;
-	static VertexInputDescription get_vertex_description();
-}; 
+	uint32_t startIndex;
+	uint32_t count;
+	Bounds bounds;
+	std::shared_ptr<GLTFMaterial> material;
+};
 
-struct Mesh
+struct MeshAsset
 {
-	std::vector<Vertex> vertices;
+	std::string name;
 
-	AllocatedBuffer vertexBuffer;
+	std::vector<GeoSurface> surfaces;
+	GPUMeshBuffers meshBuffers;
+};
 
-	bool load_from_obj(const char* filename);
+struct MeshNode : public Node
+{
+	std::shared_ptr<MeshAsset> mesh;
+
+	virtual void draw(const glm::mat4& topMatrix, DrawContext& ctx) override;
 };

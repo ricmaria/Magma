@@ -1,3 +1,5 @@
+#pragma once
+
 #include "core/injector.h"
 #include "core/logger.h"
 #include "core/time_manager.h"
@@ -5,8 +7,6 @@
 #include "ec/entity_manager.h"
 #include "renderer/renderer.h"
 #include <bitset>
-
-#pragma once
 
 class MagmaEngine
 {
@@ -28,6 +28,7 @@ public:
 
 private:
 
+	void process_sdl_event(const SDL_Event* sdl_event);
 	bool update();
 
 	InjectorRegister _injector;
