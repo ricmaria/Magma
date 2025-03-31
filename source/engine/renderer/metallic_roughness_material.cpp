@@ -19,7 +19,7 @@ void GLTFMetallic_Roughness::build_pipelines(VkDevice device, VkDescriptorSetLay
 
 	VkPushConstantRange matrixRange{};
 	matrixRange.offset = 0;
-	matrixRange.size = sizeof(GPUDrawPushConstants);
+	matrixRange.size = sizeof(GpuDrawPushConstants);
 	matrixRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
 	DescriptorLayoutBuilder layoutBuilder;

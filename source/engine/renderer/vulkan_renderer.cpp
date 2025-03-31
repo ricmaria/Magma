@@ -714,7 +714,7 @@ void VulkanRenderer::init_mesh_pipeline()
 
 	VkPushConstantRange bufferRange{};
 	bufferRange.offset = 0;
-	bufferRange.size = sizeof(GPUDrawPushConstants);
+	bufferRange.size = sizeof(GpuDrawPushConstants);
 	bufferRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
 	VkPipelineLayoutCreateInfo pipeline_layout_info = vkinit::pipeline_layout_create_info();
@@ -1540,11 +1540,11 @@ void VulkanRenderer::draw_geometry(VkCommandBuffer cmd)
 			}
 
 			// calculate final mesh matrix
-			GPUDrawPushConstants push_constants;
+			GpuDrawPushConstants push_constants;
 			push_constants.worldMatrix = r.transform;
 			push_constants.vertexBuffer = r.vertexBufferAddress;
 
-			vkCmdPushConstants(cmd, r.material->pipeline->layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(GPUDrawPushConstants), &push_constants);
+			vkCmdPushConstants(cmd, r.material->pipeline->layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(GpuDrawPushConstants), &push_constants);
 
 			vkCmdDrawIndexed(cmd, r.indexCount, 1, r.firstIndex, 0, 0);
 
