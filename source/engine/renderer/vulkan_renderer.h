@@ -18,9 +18,9 @@ private:
 
 public:
 
-	using RenderInstanceId = IdPool::Id;
+	using RenderObjectId = IdPool::Id;
 
-	static const RenderInstanceId invalid_render_instance_id = IdPool::Invalid;
+	static const RenderObjectId invalid_render_object_id = IdPool::Invalid;
 
 	static VulkanRenderer& get();
 
@@ -39,9 +39,9 @@ public:
 	inline void set_camera_position(glm::vec3 position) { _camera_position = position; }
 	inline void set_camera_axes(const glm::vec3& x, const glm::vec3& y, const glm::vec3& z) { _camera_axes[0] = x; _camera_axes[1] = y; _camera_axes[2] = z; }
 
-	RenderInstanceId add_render_instance(const std::string& mesh_name, const glm::mat4& transform);
-	void remove_render_instance(RenderInstanceId id);
-	void update_render_instance(RenderInstanceId id, const glm::mat4& transform);
+	RenderObjectId add_render_object(const std::string& mesh_name, const glm::mat4& transform);
+	void remove_render_object(RenderObjectId id);
+	void update_render_object(RenderObjectId id, const glm::mat4& transform);
 
 private:
 	class DeletionQueue
@@ -107,9 +107,9 @@ private:
 		glm::vec4 sunlightColor;
 	};
 
-	struct RenderInstance
+	struct RenderObject
 	{
-		RenderInstanceId id;
+		RenderObjectId id;
 		std::string mesh_name;
 		glm::mat4 transform;
 	};
@@ -149,7 +149,7 @@ private:
 	AllocatedImage create_image(void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmapped = false);
 	void destroy_image(const AllocatedImage& image);
 
-	GPUMeshBuffers upload_mesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
+	GpuMeshBuffers upload_mesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
 
 	void draw_scene();
 
@@ -165,7 +165,7 @@ private:
 
 	void immediate_submit(std::function<void(VkCommandBuffer cmd)>&& function);
 
-	static bool is_visible(const RenderObject& obj, const glm::mat4& viewproj);
+	static bool is_visible(const GpuRenderObject& obj, const glm::mat4& viewproj);
 
 	struct SDL_Window* _window{ nullptr };
 
@@ -231,7 +231,7 @@ private:
 	VkPipelineLayout _meshPipelineLayout;
 	VkPipeline _meshPipeline;
 
-	GPUMeshBuffers _rectangle;
+	GpuMeshBuffers _rectangle;
 
 	std::vector<std::shared_ptr<MeshAsset>> _test_meshes;
 
@@ -259,5 +259,5 @@ private:
 
 	std::array<glm::vec3,3> _camera_axes;
 
-	std::unordered_map<RenderInstanceId, RenderInstance> m_render_instance_id_to_render_instance;
+	std::unordered_map<RenderObjectId, RenderObject> m_render_object_id_to_render_object;
 };

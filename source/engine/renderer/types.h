@@ -47,7 +47,7 @@ struct Vertex
 };
 
 // holds the resources needed for a mesh
-struct GPUMeshBuffers
+struct GpuMeshBuffers
 {
 	AllocatedBuffer indexBuffer;
 	AllocatedBuffer vertexBuffer;
@@ -55,7 +55,7 @@ struct GPUMeshBuffers
 };
 
 // push constants for our mesh object draws
-struct GPUDrawPushConstants
+struct GpuDrawPushConstants
 {
 	glm::mat4 worldMatrix;
 	VkDeviceAddress vertexBuffer;
@@ -97,7 +97,7 @@ struct Bounds
 	glm::vec3 extents;
 };
 
-struct RenderObject
+struct GpuRenderObject
 {
 	uint32_t indexCount;
 	uint32_t firstIndex;
@@ -111,8 +111,8 @@ struct RenderObject
 
 struct DrawContext
 {
-	std::vector<RenderObject> OpaqueSurfaces;
-	std::vector<RenderObject> TransparentSurfaces;
+	std::vector<GpuRenderObject> OpaqueSurfaces;
+	std::vector<GpuRenderObject> TransparentSurfaces;
 };
 
 // base class for a renderable dynamic object

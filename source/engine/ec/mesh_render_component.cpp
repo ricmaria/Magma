@@ -28,7 +28,7 @@ void MeshRenderComponent::on_being_removed()
 
 void MeshRenderComponent::update(float delta_time)
 {
-	m_renderer->update_render_instance(m_render_object_id, m_transform_component->get_transform());
+	m_renderer->update_render_object(m_render_object_id, m_transform_component->get_transform());
 }
 
 void EC::MeshRenderComponent::set_mesh_name(const std::string& mesh_name)

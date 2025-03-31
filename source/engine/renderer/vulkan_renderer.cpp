@@ -1202,12 +1202,12 @@ void VulkanRenderer::destroy_image(const AllocatedImage& img)
 	vmaDestroyImage(_allocator, img.image, img.allocation);
 }
 
-GPUMeshBuffers VulkanRenderer::upload_mesh(std::span<uint32_t> indices, std::span<Vertex> vertices)
+GpuMeshBuffers VulkanRenderer::upload_mesh(std::span<uint32_t> indices, std::span<Vertex> vertices)
 {
 	const size_t vertex_buffer_size = vertices.size() * sizeof(Vertex);
 	const size_t index_buffer_size = indices.size() * sizeof(uint32_t);
 
-	GPUMeshBuffers new_surface;
+	GpuMeshBuffers new_surface;
 
 	//create vertex buffer
 	new_surface.vertexBuffer = create_buffer(vertex_buffer_size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
@@ -1280,7 +1280,7 @@ void VulkanRenderer::update_scene()
 	_sceneData.sunlightColor = glm::vec4(1.f);
 	_sceneData.sunlightDirection = glm::vec4(0, 1, 0.5, 1.f);
 
-	for (auto& render_instance : m_render_instance_id_to_render_instance)
+	for (auto& render_instance : m_render_object_id_to_render_object)
 	{
 		_loadedNodes[render_instance.second.mesh_name]->draw(render_instance.second.transform, _mainDrawContext);
 	}
@@ -1394,8 +1394,8 @@ void VulkanRenderer::draw_geometry(VkCommandBuffer cmd)
 	std::sort(opaque_draws.begin(), opaque_draws.end(),
 		[&](const auto& iA, const auto& iB)
 		{
-			const RenderObject& A = _mainDrawContext.OpaqueSurfaces[iA];
-			const RenderObject& B = _mainDrawContext.OpaqueSurfaces[iB];
+			const GpuRenderObject& A = _mainDrawContext.OpaqueSurfaces[iA];
+			const GpuRenderObject& B = _mainDrawContext.OpaqueSurfaces[iB];
 			if (A.material == B.material)
 			{
 				return A.indexBuffer < B.indexBuffer;
@@ -1423,8 +1423,8 @@ void VulkanRenderer::draw_geometry(VkCommandBuffer cmd)
 	std::sort(transparent_draws.begin(), transparent_draws.end(),
 		[&](const auto& iA, const auto& iB)
 		{
-			const RenderObject& A = _mainDrawContext.TransparentSurfaces[iA];
-			const RenderObject& B = _mainDrawContext.TransparentSurfaces[iB];
+			const GpuRenderObject& A = _mainDrawContext.TransparentSurfaces[iA];
+			const GpuRenderObject& B = _mainDrawContext.TransparentSurfaces[iB];
 			float distA = (_camera_position - A.bounds.origin).length() - A.bounds.sphereRadius;
 			float distB = (_camera_position - B.bounds.origin).length() - B.bounds.sphereRadius;
 
@@ -1498,7 +1498,7 @@ void VulkanRenderer::draw_geometry(VkCommandBuffer cmd)
 	MaterialInstance* last_material = nullptr;
 	VkBuffer last_index_buffer = VK_NULL_HANDLE;
 
-	auto draw = [&](const RenderObject& r)
+	auto draw = [&](const GpuRenderObject& r)
 		{
 			if (r.material != last_material)
 			{
@@ -1611,7 +1611,7 @@ void VulkanRenderer::immediate_submit(std::function<void(VkCommandBuffer cmd)>&&
 	VK_CHECK(vkWaitForFences(_device, 1, &_immediate_fence, true, 9999999999));
 }
 
-bool VulkanRenderer::is_visible(const RenderObject& obj, const glm::mat4& viewproj)
+bool VulkanRenderer::is_visible(const GpuRenderObject& obj, const glm::mat4& viewproj)
 {
 	std::array<glm::vec3, 8> corners
 	{
@@ -1655,30 +1655,30 @@ bool VulkanRenderer::is_visible(const RenderObject& obj, const glm::mat4& viewpr
 	}
 }
 
-VulkanRenderer::RenderInstanceId VulkanRenderer::add_render_instance(const std::string& mesh_name, const glm::mat4& transform)
+VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object(const std::string& mesh_name, const glm::mat4& transform)
 {
-	RenderInstance render_instance = { _id_pool.acquire_id(), mesh_name, transform };
+	RenderObject render_instance = { _id_pool.acquire_id(), mesh_name, transform };
 
-	m_render_instance_id_to_render_instance[render_instance.id] = render_instance;
+	m_render_object_id_to_render_object[render_instance.id] = render_instance;
 
 	return render_instance.id;
 }
 
-void VulkanRenderer::remove_render_instance(RenderInstanceId id)
+void VulkanRenderer::remove_render_object(RenderObjectId id)
 {
-	auto it = m_render_instance_id_to_render_instance.find(id);
+	auto it = m_render_object_id_to_render_object.find(id);
 
-	if (it != m_render_instance_id_to_render_instance.end())
+	if (it != m_render_object_id_to_render_object.end())
 	{
-		m_render_instance_id_to_render_instance.erase(it);
+		m_render_object_id_to_render_object.erase(it);
 	}
 }
 
-void VulkanRenderer::update_render_instance(RenderInstanceId id, const glm::mat4& transform)
+void VulkanRenderer::update_render_object(RenderObjectId id, const glm::mat4& transform)
 {
-	auto it = m_render_instance_id_to_render_instance.find(id);
+	auto it = m_render_object_id_to_render_object.find(id);
 
-	if (it != m_render_instance_id_to_render_instance.end())
+	if (it != m_render_object_id_to_render_object.end())
 	{
 		it->second.transform = transform;
 	}

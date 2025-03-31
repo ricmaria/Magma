@@ -34,15 +34,15 @@ void Renderer::set_camera_axes(const glm::vec3& x, const glm::vec3& y, const glm
 
 Renderer::RenderObjectId Renderer::add_render_object(const std::string& mesh_name, glm::mat4 transform)
 {
-	return _vulkan_renderer.add_render_instance(mesh_name, transform);
+	return _vulkan_renderer.add_render_object(mesh_name, transform);
 }
 
 void Renderer::remove_render_object(RenderObjectId id)
 {
-	_vulkan_renderer.remove_render_instance(id);
+	_vulkan_renderer.remove_render_object(id);
 }
 
-void Renderer::update_render_instance(RenderObjectId id, const glm::mat4& transform)
+void Renderer::update_render_object(RenderObjectId id, const glm::mat4& transform)
 {
-	_vulkan_renderer.update_render_instance(id, transform);
+	_vulkan_renderer.update_render_object(id, transform);
 }

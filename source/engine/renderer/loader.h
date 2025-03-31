@@ -33,7 +33,7 @@ struct LoadedGLTF : public IRenderable
 	AllocatedBuffer materialDataBuffer;
 
 	using BuildMaterial = std::function<MaterialInstance(VkDevice, MaterialPass, const GLTFMetallic_Roughness::MaterialResources&, DescriptorAllocatorGrowable&)>;
-	using UploadMesh = std::function<GPUMeshBuffers(std::span<uint32_t> indices, std::span<Vertex> vertices)>;
+	using UploadMesh = std::function<GpuMeshBuffers(std::span<uint32_t> indices, std::span<Vertex> vertices)>;
 
 	struct LoadedGLTFParams
 	{

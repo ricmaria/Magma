@@ -6,7 +6,7 @@ void MeshNode::draw(const glm::mat4& topMatrix, DrawContext& ctx)
 
 	for (auto& surface : mesh->surfaces)
 	{
-		RenderObject def;
+		GpuRenderObject def;
 		def.indexCount = surface.count;
 		def.firstIndex = surface.startIndex;
 		def.indexBuffer = mesh->meshBuffers.indexBuffer.buffer;
