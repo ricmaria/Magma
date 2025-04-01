@@ -22,14 +22,9 @@ void Renderer::cleanup()
 	_vulkan_renderer.cleanup();
 }
 
-void Renderer::set_camera_position(const glm::vec3& position)
+void Renderer::set_camera_transform(const glm::mat4x4& transform)
 {
-	_vulkan_renderer.set_camera_position(position);
-}
-
-void Renderer::set_camera_axes(const glm::vec3& x, const glm::vec3& y, const glm::vec3& z)
-{
-	_vulkan_renderer.set_camera_axes(x, y, z);
+	_vulkan_renderer.set_camera_transform(transform);
 }
 
 Renderer::RenderObjectId Renderer::add_render_object(const std::string& mesh_name, glm::mat4 transform)

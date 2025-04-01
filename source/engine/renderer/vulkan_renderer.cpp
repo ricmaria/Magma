@@ -1261,13 +1261,7 @@ void VulkanRenderer::update_scene()
 
 	// view matrix formula taken from https://johannesugb.github.io/gpu-programming/setting-up-a-proper-vulkan-projection-matrix/
 
-	glm::mat4 view;
-	view[0] = glm::vec4(_camera_axes[0], 0.0f);
-	view[1] = glm::vec4(_camera_axes[1], 0.0f);
-	view[2] = glm::vec4(_camera_axes[2], 0.0f);
-	view[3] = glm::vec4(_camera_position, 1.0f);
-
-	view = glm::inverse(view);
+	glm::mat4 view = glm::inverse(m_camera_transform);
 
 	glm::mat4 projection = Geometry::compute_perspective_projection_for_vulkan(glm::radians(70.f), (float)_windowExtent.width / (float)_windowExtent.height, 0.1f, 10000.f);
 
@@ -1332,7 +1326,7 @@ void VulkanRenderer::update_imgui()
 		ImGui::Text("update time %f ms", _stats.scene_update_time);
 		ImGui::Text("triangles %i", _stats.triangle_count);
 		ImGui::Text("draws %i", _stats.drawcall_count);
-		ImGui::Text("position %f %f %f", _camera_position.x, _camera_position.y, _camera_position.z);
+		ImGui::Text("position %f %f %f", m_camera_transform[3].x, m_camera_transform[3].y, m_camera_transform[3].z);
 		ImGui::EndGroup();
 	}
 
@@ -1419,14 +1413,16 @@ void VulkanRenderer::draw_geometry(VkCommandBuffer cmd)
 		}
 	}
 
+	const glm::vec3 camera_position = m_camera_transform[3];
+
 	// sort the transparent surfaces by distance from camera
 	std::sort(transparent_draws.begin(), transparent_draws.end(),
 		[&](const auto& iA, const auto& iB)
 		{
 			const GpuRenderObject& A = _mainDrawContext.TransparentSurfaces[iA];
 			const GpuRenderObject& B = _mainDrawContext.TransparentSurfaces[iB];
-			float distA = (_camera_position - A.bounds.origin).length() - A.bounds.sphereRadius;
-			float distB = (_camera_position - B.bounds.origin).length() - B.bounds.sphereRadius;
+			float distA = (camera_position - A.bounds.origin).length() - A.bounds.sphereRadius;
+			float distB = (camera_position - B.bounds.origin).length() - B.bounds.sphereRadius;
 
 			return distA < distB;
 		});

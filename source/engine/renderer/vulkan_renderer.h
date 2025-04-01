@@ -35,9 +35,7 @@ public:
 	//draw loop
 	void draw();
 
-	inline glm::vec3 get_camera_position() { return _camera_position; }
-	inline void set_camera_position(glm::vec3 position) { _camera_position = position; }
-	inline void set_camera_axes(const glm::vec3& x, const glm::vec3& y, const glm::vec3& z) { _camera_axes[0] = x; _camera_axes[1] = y; _camera_axes[2] = z; }
+	inline void set_camera_transform(const glm::mat4x4& transform) { m_camera_transform = transform; }
 
 	RenderObjectId add_render_object(const std::string& mesh_name, const glm::mat4& transform);
 	void remove_render_object(RenderObjectId id);
@@ -255,9 +253,7 @@ private:
 
 	IdPool _id_pool;
 
-	glm::vec3 _camera_position = { 0.f,-6.f,-10.f };
-
-	std::array<glm::vec3,3> _camera_axes;
+	glm::mat4x4 m_camera_transform = glm::mat4x4{ 1.f };
 
 	std::unordered_map<RenderObjectId, RenderObject> m_render_object_id_to_render_object;
 };

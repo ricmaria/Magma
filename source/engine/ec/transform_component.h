@@ -17,73 +17,52 @@ namespace EC
 			return type_ids;
 		}
 
-		inline const glm::vec3& get_position() const
+		inline const glm::mat4x4& get_transform()
 		{
-			return m_position;
+			return m_transform;
 		}
 
-		inline void set_position(const glm::vec3& position)
+		inline glm::vec3 get_x() const
 		{
-			m_position = position;
-			m_dirty = true;
-		}
-
-		inline const glm::vec3& get_z() const
-		{
-			return m_z;
-		}
-
-		inline void set_z(const glm::vec3& z)
-		{
-			m_z = z;
-			m_dirty = true;
-		}
-
-		inline const glm::vec3& get_x() const
-		{
-			return m_x;
+			return m_transform[0];
 		}
 
 		inline void set_x(const glm::vec3& x)
 		{
-			m_x = x;
-			m_dirty = true;
+			m_transform[0] = glm::vec4(x, 0.0);
 		}
 
-		inline const glm::vec3& get_y() const
+		inline glm::vec3 get_y() const
 		{
-			return m_y;
+			return m_transform[1];
 		}
 
 		inline void set_y(const glm::vec3& y)
 		{
-			m_y = y;
-			m_dirty = true;
+			m_transform[1] = glm::vec4(y, 0.0);
 		}
 
-		inline const glm::mat4x4& get_transform()
+		inline glm::vec3 get_z() const
 		{
-			if (m_dirty)
-			{
-				m_transform[0] = glm::vec4(m_x, 0.0f);
-				m_transform[1] = glm::vec4(m_y, 0.0f);
-				m_transform[2] = glm::vec4(m_z, 0.0f);
-				m_transform[3] = glm::vec4(m_position, 1.0f);
-				m_dirty = false;
-			}
+			return m_transform[2];
+		}
 
-			return m_transform;
+		inline void set_z(const glm::vec3& z)
+		{
+			m_transform[2] = glm::vec4(z, 0.0);
+		}		
+
+		inline glm::vec3 get_translation() const
+		{
+			return m_transform[3];
+		}
+
+		inline void set_translation(const glm::vec3& position)
+		{
+			m_transform[3] = glm::vec4(position, 1.0);
 		}
 
 	private:
-		glm::vec3 m_position = { 0, 0, 0 };
-
-		glm::vec3 m_x = { 1, 0, 0 };
-		glm::vec3 m_y = { 0, 1, 0 };
-		glm::vec3 m_z = { 0, 0, 1 };
-
-		glm::mat4x4 m_transform;
-
-		bool m_dirty = true;
+		glm::mat4x4 m_transform = glm::mat4x4{ 1.0f };
 	};
 }

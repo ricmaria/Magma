@@ -25,16 +25,16 @@ namespace EC
 	protected:
 		const std::vector<Dependency>& get_dependencies() const override
 		{
-			static Dependency renderer = Dependency::make(&CameraComponent::_renderer);
-			static Dependency transform = Dependency::make(&CameraComponent::_transform_component);
+			static Dependency renderer = Dependency::make(&CameraComponent::m_renderer);
+			static Dependency transform = Dependency::make(&CameraComponent::m_transform_component);
 			static auto dependencies = append_dependencies(ParentType::get_dependencies(), { renderer, transform });
 			
 			return dependencies;
 		}
 	
 	private:
-		TransformComponent* _transform_component = nullptr;
+		TransformComponent* m_transform_component = nullptr;
 
-		Renderer* _renderer = nullptr;
+		Renderer* m_renderer = nullptr;
 	};
 }

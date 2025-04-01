@@ -104,11 +104,11 @@ void FirstPersonControllerComponent::update(float delta_time)
 
 	float speed = std::max(default_speed, run_speed * run_input);
 
-	glm::vec3 position = m_transform_component->get_position();
+	glm::vec3 position = m_transform_component->get_translation();
 
 	position += (- m_transform_component->get_z()) * forward_input * speed * delta_time;
 	position += m_transform_component->get_x() * strafe_input * speed * delta_time;
 	position += m_transform_component->get_y() * fly_input * speed * delta_time;
 
-	m_transform_component->set_position(position);
+	m_transform_component->set_translation(position);
 }
