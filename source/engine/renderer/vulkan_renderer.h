@@ -109,8 +109,8 @@ private:
 	struct RenderObject
 	{
 		RenderObjectId id;
-		std::string mesh_name;
 		glm::mat4 transform;
+		std::shared_ptr<IRenderable> renderable;
 	};
 
 	struct EngineStats
@@ -150,11 +150,11 @@ private:
 
 	GpuMeshBuffers upload_mesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
 
-	void draw_scene();
-
-	void update_scene();
+	void add_scene_to_context();
 
 	void update_imgui();
+
+	void draw_scene();
 
 	void draw_background(VkCommandBuffer cmd);
 
@@ -254,7 +254,7 @@ private:
 
 	IdPool _id_pool;
 
-	Transform m_camera_transform;;
+	Transform m_camera_transform;
 
 	std::unordered_map<RenderObjectId, RenderObject> m_render_object_id_to_render_object;
 };

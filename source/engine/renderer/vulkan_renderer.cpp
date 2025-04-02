@@ -131,7 +131,7 @@ void VulkanRenderer::draw()
 
 	update_imgui();
 
-	update_scene();
+	add_scene_to_context();
 
 	draw_scene();
 
@@ -1251,7 +1251,7 @@ GpuMeshBuffers VulkanRenderer::upload_mesh(std::span<uint32_t> indices, std::spa
 	return new_surface;
 }
 
-void VulkanRenderer::update_scene()
+void VulkanRenderer::add_scene_to_context()
 {
 	//begin clock
 	auto start = std::chrono::system_clock::now();
@@ -1274,9 +1274,9 @@ void VulkanRenderer::update_scene()
 	_sceneData.sunlightColor = glm::vec4(1.f);
 	_sceneData.sunlightDirection = glm::vec4(0, 1, 0.5, 1.f);
 
-	for (auto& render_instance : m_render_object_id_to_render_object)
+	for (auto& render_object : m_render_object_id_to_render_object)
 	{
-		_loadedNodes[render_instance.second.mesh_name]->draw(render_instance.second.transform, _mainDrawContext);
+		render_object.second.renderable->draw(render_object.second.transform, _mainDrawContext);
 	}
 
 	//_loadedNodes["Suzanne"]->draw(glm::mat4{ 1.f }, _mainDrawContext);
@@ -1653,11 +1653,17 @@ bool VulkanRenderer::is_visible(const GpuRenderObject& obj, const glm::mat4& vie
 
 VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object(const std::string& mesh_name, const glm::mat4& transform)
 {
-	RenderObject render_instance = { _id_pool.acquire_id(), mesh_name, transform };
+	assert(_loadedNodes.find(mesh_name) != _loadedNodes.end());
 
-	m_render_object_id_to_render_object[render_instance.id] = render_instance;
+	auto id = _id_pool.acquire_id();
 
-	return render_instance.id;
+	RenderObject render_object;
+	render_object.transform = transform;
+	render_object.renderable = _loadedNodes[mesh_name];
+
+	m_render_object_id_to_render_object[id] = render_object;
+
+	return id;
 }
 
 void VulkanRenderer::remove_render_object(RenderObjectId id)
