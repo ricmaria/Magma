@@ -28,7 +28,7 @@ void MeshRenderComponent::on_being_removed()
 
 void MeshRenderComponent::update(float delta_time)
 {
-	m_renderer->update_render_object(m_render_object_id, m_transform_component->get_transform());
+	m_renderer->update_render_object(m_render_object_id, m_transform_component->get_transform().get_matrix());
 }
 
 void EC::MeshRenderComponent::set_mesh_name(const std::string& mesh_name)
@@ -44,11 +44,14 @@ void EC::MeshRenderComponent::set_mesh_name(const std::string& mesh_name)
 	}
 
 	m_mesh_name = mesh_name;
-			
-	add_mesh_to_renderer();
+
+	if (m_transform_component != nullptr)
+	{
+		add_mesh_to_renderer();
+	}
 }
 
 void EC::MeshRenderComponent::add_mesh_to_renderer()
 {
-	m_render_object_id = m_renderer->add_render_object(m_mesh_name, m_transform_component->get_transform());
+	m_render_object_id = m_renderer->add_render_object(m_mesh_name, m_transform_component->get_transform().get_matrix());
 }

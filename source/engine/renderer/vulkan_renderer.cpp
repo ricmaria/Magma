@@ -1261,7 +1261,7 @@ void VulkanRenderer::update_scene()
 
 	// view matrix formula taken from https://johannesugb.github.io/gpu-programming/setting-up-a-proper-vulkan-projection-matrix/
 
-	glm::mat4 view = glm::inverse(m_camera_transform);
+	glm::mat4 view = glm::inverse(m_camera_transform.get_matrix());
 
 	glm::mat4 projection = Geometry::compute_perspective_projection_for_vulkan(glm::radians(70.f), (float)_windowExtent.width / (float)_windowExtent.height, 0.1f, 10000.f);
 
@@ -1326,7 +1326,7 @@ void VulkanRenderer::update_imgui()
 		ImGui::Text("update time %f ms", _stats.scene_update_time);
 		ImGui::Text("triangles %i", _stats.triangle_count);
 		ImGui::Text("draws %i", _stats.drawcall_count);
-		ImGui::Text("position %f %f %f", m_camera_transform[3].x, m_camera_transform[3].y, m_camera_transform[3].z);
+		ImGui::Text("position %f %f %f", m_camera_transform.get_translation().x, m_camera_transform.get_translation().y, m_camera_transform.get_translation().z);
 		ImGui::EndGroup();
 	}
 
@@ -1413,7 +1413,7 @@ void VulkanRenderer::draw_geometry(VkCommandBuffer cmd)
 		}
 	}
 
-	const glm::vec3 camera_position = m_camera_transform[3];
+	const glm::vec3 camera_position = m_camera_transform.get_translation();
 
 	// sort the transparent surfaces by distance from camera
 	std::sort(transparent_draws.begin(), transparent_draws.end(),

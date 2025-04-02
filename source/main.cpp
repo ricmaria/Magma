@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 	player_entity->add_component<EC::CameraComponent>();
 	auto player_transform_component = player_entity->add_component<EC::TransformComponent>();
 
-	player_transform_component->set_translation(glm::vec3(0.f, 0.f, 5.f));
+	player_transform_component->get_transform().set_translation(glm::vec3(0.f, 0.f, 5.f));
 
 	EC::Entity* gizmo_entity = entity_manager->create_entity();
 	gizmo_entity->add_component<EC::TransformComponent>();

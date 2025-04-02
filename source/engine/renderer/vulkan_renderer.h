@@ -8,6 +8,7 @@
 #include "loader.h"
 
 #include "core/id_pool.h"
+#include "core/math.h"
 
 union SDL_Event;
 
@@ -35,7 +36,7 @@ public:
 	//draw loop
 	void draw();
 
-	inline void set_camera_transform(const glm::mat4x4& transform) { m_camera_transform = transform; }
+	inline void set_camera_transform(const Transform& transform) { m_camera_transform = transform; }
 
 	RenderObjectId add_render_object(const std::string& mesh_name, const glm::mat4& transform);
 	void remove_render_object(RenderObjectId id);
@@ -253,7 +254,7 @@ private:
 
 	IdPool _id_pool;
 
-	glm::mat4x4 m_camera_transform = glm::mat4x4{ 1.f };
+	Transform m_camera_transform;;
 
 	std::unordered_map<RenderObjectId, RenderObject> m_render_object_id_to_render_object;
 };

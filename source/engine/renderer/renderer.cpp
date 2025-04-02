@@ -22,7 +22,7 @@ void Renderer::cleanup()
 	_vulkan_renderer.cleanup();
 }
 
-void Renderer::set_camera_transform(const glm::mat4x4& transform)
+void Renderer::set_camera_transform(const Transform& transform)
 {
 	_vulkan_renderer.set_camera_transform(transform);
 }

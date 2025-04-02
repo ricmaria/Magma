@@ -45,8 +45,8 @@ void FirstPersonControllerComponent::update(float delta_time)
 
 	const glm::vec3 global_up_vec{ 0.0f, 1.0f, 0.0f };
 
-	glm::vec3 forward_vec = - m_transform_component->get_z();
-	glm::vec3 right_vec = m_transform_component->get_x();
+	glm::vec3 forward_vec = - m_transform_component->get_transform().get_z();
+	glm::vec3 right_vec = m_transform_component->get_transform().get_x();
 
 	right_vec = glm::rotate(right_vec, yaw_angle, global_up_vec);
 	forward_vec = glm::rotate(forward_vec, yaw_angle, global_up_vec);
@@ -67,17 +67,17 @@ void FirstPersonControllerComponent::update(float delta_time)
 	up_vec = glm::cross(right_vec, forward_vec);
 	up_vec = glm::normalize(up_vec);
 
-	m_transform_component->set_z(- forward_vec);
-	m_transform_component->set_x(right_vec);
-	m_transform_component->set_y(up_vec);
+	m_transform_component->get_transform().set_z(- forward_vec);
+	m_transform_component->get_transform().set_x(right_vec);
+	m_transform_component->get_transform().set_y(up_vec);
 
 	{
 		static bool test_rotation = false;
 
 		if (test_rotation)
 		{
-			glm::vec3 forward_db = - m_transform_component->get_z();
-			glm::vec3 right_db = m_transform_component->get_x();
+			glm::vec3 forward_db = - m_transform_component->get_transform().get_z();
+			glm::vec3 right_db = m_transform_component->get_transform().get_x();
 
 			const float rotation_speed = 1.0f;
 			float rotation_angle = rotation_speed * delta_time;
@@ -93,9 +93,9 @@ void FirstPersonControllerComponent::update(float delta_time)
 			right_db = glm::cross(forward_db, up_db);
 			right_db = glm::normalize(right_db);
 
-			m_transform_component->set_z(- forward_db);
-			m_transform_component->set_x(right_db);
-			m_transform_component->set_y(up_db);
+			m_transform_component->get_transform().set_z(- forward_db);
+			m_transform_component->get_transform().set_x(right_db);
+			m_transform_component->get_transform().set_y(up_db);
 		}		
 	}
 
@@ -104,11 +104,11 @@ void FirstPersonControllerComponent::update(float delta_time)
 
 	float speed = std::max(default_speed, run_speed * run_input);
 
-	glm::vec3 position = m_transform_component->get_translation();
+	glm::vec3 position = m_transform_component->get_transform().get_translation();
 
-	position += (- m_transform_component->get_z()) * forward_input * speed * delta_time;
-	position += m_transform_component->get_x() * strafe_input * speed * delta_time;
-	position += m_transform_component->get_y() * fly_input * speed * delta_time;
+	position += (- m_transform_component->get_transform().get_z()) * forward_input * speed * delta_time;
+	position += m_transform_component->get_transform().get_x() * strafe_input * speed * delta_time;
+	position += m_transform_component->get_transform().get_y() * fly_input * speed * delta_time;
 
-	m_transform_component->set_translation(position);
+	m_transform_component->get_transform().set_translation(position);
 }
