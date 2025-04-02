@@ -22,6 +22,7 @@ namespace EC
 		}
 
 		void on_sibling_component_added(Component* sibling) override;
+		void on_sibling_component_removed(Component* sibling) override;
 		void on_being_removed() override;
 		void update(float delta_time) override;
 
@@ -41,6 +42,7 @@ namespace EC
 	private:
 
 		void add_mesh_to_renderer();
+		void remove_mesh_from_renderer();
 
 		TransformComponent* m_transform_component = nullptr;
 		Renderer* m_renderer = nullptr;

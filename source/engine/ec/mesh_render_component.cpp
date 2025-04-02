@@ -8,26 +8,35 @@ using namespace EC;
 
 void EC::MeshRenderComponent::on_sibling_component_added(Component* sibling)
 {
-	Component::on_sibling_component_added(sibling);
+	ParentType::on_sibling_component_added(sibling);
 
-	if (sibling->is_of_type(extract_type<TransformComponent>()))
-	{
-		if (! m_mesh_name.empty())
-		{
-			add_mesh_to_renderer();
-		}
-	}	
+	add_mesh_to_renderer();
+}
+
+void EC::MeshRenderComponent::on_sibling_component_removed(Component* sibling)
+{
+	ParentType::on_sibling_component_removed(sibling);
+
+	remove_mesh_from_renderer();
 }
 
 void MeshRenderComponent::on_being_removed()
 {
-	m_renderer->remove_render_object(m_render_object_id);
+	ParentType::on_being_removed();
 
-	m_render_object_id = Renderer::invalid_render_object_id;
+	remove_mesh_from_renderer();
 }
 
 void MeshRenderComponent::update(float delta_time)
 {
+	assert(m_renderer);
+	assert(m_transform_component);
+
+	if (m_render_object_id == Renderer::invalid_render_object_id)
+	{
+		return;
+	}
+
 	m_renderer->update_render_object(m_render_object_id, m_transform_component->get_transform().get_matrix());
 }
 
@@ -38,20 +47,41 @@ void EC::MeshRenderComponent::set_mesh_name(const std::string& mesh_name)
 		return;
 	}
 
-	if (m_render_object_id != Renderer::invalid_render_object_id)
-	{
-		m_renderer->remove_render_object(m_render_object_id);
-	}
-
 	m_mesh_name = mesh_name;
 
-	if (m_transform_component != nullptr)
-	{
-		add_mesh_to_renderer();
-	}
+	add_mesh_to_renderer();
 }
 
 void EC::MeshRenderComponent::add_mesh_to_renderer()
 {
+	remove_mesh_from_renderer();
+
+	if (m_mesh_name.empty())
+	{
+		return;
+	}
+
+	if (m_transform_component == nullptr)
+	{
+		return;
+	}
+
+	if (m_renderer == nullptr)
+	{
+		return;
+	}
+
 	m_render_object_id = m_renderer->add_render_object(m_mesh_name, m_transform_component->get_transform().get_matrix());
+}
+
+void EC::MeshRenderComponent::remove_mesh_from_renderer()
+{
+	if (m_render_object_id == Renderer::invalid_render_object_id)
+	{
+		return;
+	}
+
+	m_renderer->remove_render_object(m_render_object_id);
+
+	m_render_object_id = Renderer::invalid_render_object_id;
 }
