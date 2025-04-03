@@ -38,8 +38,11 @@ public:
 
 	inline void set_camera_transform(const Transform& transform) { m_camera_transform = transform; }
 
-	RenderObjectId add_render_object(const std::string& mesh_name, const glm::mat4& transform);
+	RenderObjectId add_render_object_predefined_mesh(const std::string& mesh_name, const glm::mat4& transform);
+	RenderObjectId add_render_object_gltf_mesh(const std::string& gltf_file_path, const glm::mat4& transform);
+
 	void remove_render_object(RenderObjectId id);
+	
 	void update_render_object(RenderObjectId id, const glm::mat4& transform);
 
 private:
@@ -149,6 +152,8 @@ private:
 	void destroy_image(const AllocatedImage& image);
 
 	GpuMeshBuffers upload_mesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
+
+	std::optional<std::shared_ptr<LoadedGLTF>> load_gltf_mesh(std::string_view gltf_file_path);
 
 	void add_scene_to_context();
 

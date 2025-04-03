@@ -928,53 +928,8 @@ void VulkanRenderer::init_default_data()
 void VulkanRenderer::init_scenes()
 {
 	std::string structure_path = { "..\\assets\\structure.glb" };
-	const BufferAllocator buffer_allocator
-	{
-		[this](size_t alloc_size, VkBufferUsageFlags usage, VmaMemoryUsage memory_usage)
-		{
-			return this->create_buffer(alloc_size, usage, memory_usage);
-		},
-		[this](const AllocatedBuffer& buffer)
-		{
-			this->destroy_buffer(buffer);
-		}
-	};
 
-	const ImageAllocator image_allocator =
-	{
-		[this](void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmapped)
-		{
-			return create_image(data, size, format, usage, mipmapped);
-		},
-		[this](const AllocatedImage& image)
-		{
-			destroy_image(image);
-		}
-	};
-
-	auto build_material = [this](VkDevice device, MaterialPass pass, const GLTFMetallic_Roughness::MaterialResources& resources, DescriptorAllocatorGrowable& descriptor_allocator)
-		{
-			return _metalRoughMaterial.write_material(device, pass, resources, descriptor_allocator);
-		};
-
-	auto uploadMesh = [this](std::span<uint32_t> indices, std::span<Vertex> vertices)
-		{
-			return upload_mesh(indices, vertices);
-		};
-
-	LoadedGLTF::LoadGLTFParams loadGLTFParams;
-	loadGLTFParams.filePath = structure_path;
-	loadGLTFParams.device = _device;
-	loadGLTFParams.bufferAllocator = buffer_allocator;
-	loadGLTFParams.imageAllocator = image_allocator;
-	loadGLTFParams.buildMaterial = build_material;
-	loadGLTFParams.uploadMesh = uploadMesh;
-	loadGLTFParams.whiteImage = _whiteImage;
-	loadGLTFParams.errorImage = _errorCheckerboardImage;
-	loadGLTFParams.defaultSampler = _defaultSamplerLinear;
-
-
-	auto structureFile = LoadedGLTF::load_gltf(loadGLTFParams);
+	auto structureFile = load_gltf_mesh(structure_path);
 
 	assert(structureFile.has_value());
 
@@ -1249,6 +1204,59 @@ GpuMeshBuffers VulkanRenderer::upload_mesh(std::span<uint32_t> indices, std::spa
 	destroy_buffer(staging);
 
 	return new_surface;
+}
+
+std::optional<std::shared_ptr<LoadedGLTF>> VulkanRenderer::load_gltf_mesh(std::string_view gltf_file_path)
+{
+	const BufferAllocator buffer_allocator_func
+	{
+		[this](size_t alloc_size, VkBufferUsageFlags usage, VmaMemoryUsage memory_usage)
+		{
+			return this->create_buffer(alloc_size, usage, memory_usage);
+		},
+		[this](const AllocatedBuffer& buffer)
+		{
+			this->destroy_buffer(buffer);
+		}
+	};
+
+	const ImageAllocator image_allocator_func =
+	{
+		[this](void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmapped)
+		{
+			return create_image(data, size, format, usage, mipmapped);
+		},
+		[this](const AllocatedImage& image)
+		{
+			destroy_image(image);
+		}
+	};
+
+	auto build_material_func = [this](VkDevice device, MaterialPass pass, const GLTFMetallic_Roughness::MaterialResources& resources, DescriptorAllocatorGrowable& descriptor_allocator)
+		{
+			return _metalRoughMaterial.write_material(device, pass, resources, descriptor_allocator);
+		};
+
+	auto upload_mesh_func = [this](std::span<uint32_t> indices, std::span<Vertex> vertices)
+		{
+			return upload_mesh(indices, vertices);
+		};
+
+	LoadedGLTF::LoadGLTFParams loadGLTFParams;
+	loadGLTFParams.filePath = gltf_file_path;
+	loadGLTFParams.device = _device;
+	loadGLTFParams.bufferAllocator = buffer_allocator_func;
+	loadGLTFParams.imageAllocator = image_allocator_func;
+	loadGLTFParams.buildMaterial = build_material_func;
+	loadGLTFParams.uploadMesh = upload_mesh_func;
+	loadGLTFParams.whiteImage = _whiteImage;
+	loadGLTFParams.errorImage = _errorCheckerboardImage;
+	loadGLTFParams.defaultSampler = _defaultSamplerLinear;
+
+
+	auto structureFile = LoadedGLTF::load_gltf(loadGLTFParams);
+
+	return structureFile;
 }
 
 void VulkanRenderer::add_scene_to_context()
@@ -1651,7 +1659,7 @@ bool VulkanRenderer::is_visible(const GpuRenderObject& obj, const glm::mat4& vie
 	}
 }
 
-VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object(const std::string& mesh_name, const glm::mat4& transform)
+VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object_predefined_mesh(const std::string& mesh_name, const glm::mat4& transform)
 {
 	assert(_loadedNodes.find(mesh_name) != _loadedNodes.end());
 
@@ -1662,6 +1670,15 @@ VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object(const std::stri
 	render_object.renderable = _loadedNodes[mesh_name];
 
 	m_render_object_id_to_render_object[id] = render_object;
+
+	return id;
+}
+
+VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object_gltf_mesh(const std::string& gltf_file_path, const glm::mat4& transform)
+{
+	auto id = _id_pool.acquire_id();
+
+	// TODO : implement
 
 	return id;
 }

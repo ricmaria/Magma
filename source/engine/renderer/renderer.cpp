@@ -29,7 +29,7 @@ void Renderer::set_camera_transform(const Transform& transform)
 
 Renderer::RenderObjectId Renderer::add_render_object(const std::string& mesh_name, glm::mat4 transform)
 {
-	return _vulkan_renderer.add_render_object(mesh_name, transform);
+	return _vulkan_renderer.add_render_object_predefined_mesh(mesh_name, transform);
 }
 
 void Renderer::remove_render_object(RenderObjectId id)
