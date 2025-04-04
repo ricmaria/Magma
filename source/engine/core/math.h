@@ -73,7 +73,7 @@ public:
 
 		glm::mat4x4 scale_matrix = glm::scale(glm::mat4x4{ 1.0f }, m_scale);
 
-		glm::mat4x4 matrix = scale_matrix * translation_matrix * rotation_matrix;
+		glm::mat4x4 matrix = translation_matrix * rotation_matrix * scale_matrix;
 
 		return matrix;
 	}
