@@ -5,7 +5,7 @@
 
 #include "types.h"
 #include "descriptors.h"
-#include "loader.h"
+#include "gltf_mesh.h"
 
 #include "core/id_pool.h"
 #include "core/math.h"
@@ -153,7 +153,7 @@ private:
 
 	GpuMeshBuffers upload_mesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
 
-	std::optional<std::shared_ptr<LoadedGLTF>> load_gltf_mesh(std::string_view gltf_file_path);
+	std::optional<std::shared_ptr<GltfMesh>> load_gltf_mesh(std::string_view gltf_file_path);
 
 	void add_scene_to_context();
 
@@ -163,7 +163,7 @@ private:
 
 	void draw_background(VkCommandBuffer cmd);
 
-	void draw_geometry(VkCommandBuffer cmd);
+	void draw_main_render_context(VkCommandBuffer cmd);
 
 	void draw_imgui(VkCommandBuffer cmd, VkImageView targetImageView);
 
@@ -250,10 +250,10 @@ private:
 	MaterialInstance _defaultData;
 	GLTFMetallic_Roughness _metalRoughMaterial;
 
-	DrawContext _mainDrawContext;
-	std::unordered_map<std::string, std::shared_ptr<Node>> _loadedNodes;
+	RenderContext m_main_render_context;
+	std::unordered_map<std::string, std::shared_ptr<Node>> m_predefined_meshes;
 
-	std::unordered_map<std::string, std::shared_ptr<LoadedGLTF>> _loadedScenes;
+	std::unordered_map<std::string, std::shared_ptr<GltfMesh>> _loadedScenes;
 
 	EngineStats _stats;
 

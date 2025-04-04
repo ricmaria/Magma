@@ -1,6 +1,6 @@
 ﻿#include "mesh.h"
 
-void MeshNode::draw(const glm::mat4& topMatrix, DrawContext& ctx)
+void MeshNode::add_to_render_context(const glm::mat4& topMatrix, RenderContext& ctx)
 {
 	glm::mat4 nodeMatrix = topMatrix * worldTransform;
 
@@ -8,12 +8,12 @@ void MeshNode::draw(const glm::mat4& topMatrix, DrawContext& ctx)
 	{
 		GpuRenderObject def;
 		def.indexCount = surface.count;
-		def.firstIndex = surface.startIndex;
-		def.indexBuffer = mesh->meshBuffers.indexBuffer.buffer;
+		def.firstIndex = surface.start_index;
+		def.indexBuffer = mesh->mesh_buffers.indexBuffer.buffer;
 		def.material = &surface.material->data;
 		def.bounds = surface.bounds;
 		def.transform = nodeMatrix;
-		def.vertexBufferAddress = mesh->meshBuffers.vertexBufferAddress;
+		def.vertexBufferAddress = mesh->mesh_buffers.vertexBufferAddress;
 
 		if (surface.material->data.passType == MaterialPass::Transparent)
 		{
@@ -26,5 +26,5 @@ void MeshNode::draw(const glm::mat4& topMatrix, DrawContext& ctx)
 	}
 
 	// recurse down
-	Node::draw(topMatrix, ctx);
+	Node::add_to_render_context(topMatrix, ctx);
 }

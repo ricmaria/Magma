@@ -109,7 +109,7 @@ struct GpuRenderObject
 	VkDeviceAddress vertexBufferAddress;
 };
 
-struct DrawContext
+struct RenderContext
 {
 	std::vector<GpuRenderObject> OpaqueSurfaces;
 	std::vector<GpuRenderObject> TransparentSurfaces;
@@ -118,7 +118,7 @@ struct DrawContext
 // base class for a renderable dynamic object
 struct IRenderable
 {
-	virtual void draw(const glm::mat4& top_matrix, DrawContext& context) = 0;
+	virtual void add_to_render_context(const glm::mat4& top_matrix, RenderContext& context) = 0;
 };
 
 // implementation of a drawable scene node.
@@ -142,12 +142,12 @@ struct Node : public IRenderable
 		}
 	}
 
-	virtual void draw(const glm::mat4& topMatrix, DrawContext& ctx)
+	virtual void add_to_render_context(const glm::mat4& topMatrix, RenderContext& ctx)
 	{
 		// draw children
 		for (auto& child : children)
 		{
-			child->draw(topMatrix, ctx);
+			child->add_to_render_context(topMatrix, ctx);
 		}
 	}
 };
@@ -159,6 +159,8 @@ struct BufferAllocator
 
 	CreateFunc create_buffer;
 	DestroyFunc destroy_buffer;
+
+	operator bool() const { return create_buffer && destroy_buffer; }
 };
 
 struct ImageAllocator
@@ -168,4 +170,6 @@ struct ImageAllocator
 
 	CreateFunc create_image;
 	DestroyFunc destroy_image;
+
+	operator bool() const { return create_image && destroy_image; }
 };

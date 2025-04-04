@@ -25,9 +25,9 @@
 #include "vk_mem_alloc.h"
 
 #include "pipelines.h"
-#include "loader.h"
 
 #include "geometry.h"
+#include "gltf_mesh_loader.h"
 
 VulkanRenderer* loadedEngine = nullptr;
 
@@ -94,8 +94,8 @@ void VulkanRenderer::cleanup()
 
 		for (auto& mesh : _test_meshes)
 		{
-			destroy_buffer(mesh->meshBuffers.indexBuffer);
-			destroy_buffer(mesh->meshBuffers.vertexBuffer);
+			destroy_buffer(mesh->mesh_buffers.indexBuffer);
+			destroy_buffer(mesh->mesh_buffers.vertexBuffer);
 		}
 
 		//flush the global deletion queue
@@ -194,7 +194,7 @@ void VulkanRenderer::draw_scene()
 	vkutil::transition_image(cmd, _drawImage.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 	vkutil::transition_image(cmd, _depthImage.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
 
-	draw_geometry(cmd);
+	draw_main_render_context(cmd);
 
 	//transition the draw image and the swapchain image into their correct transfer layouts
 	vkutil::transition_image(cmd, _drawImage.image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
@@ -793,7 +793,7 @@ void VulkanRenderer::init_default_data()
 
 	_rectangle = upload_mesh(rect_indices, rect_vertices);
 
-	_test_meshes = LoadedGLTF::load_gltf_meshes("..\\assets\\basicmesh.glb",
+	_test_meshes = GltfMeshLoader::load_gltf_meshes("..\\assets\\basicmesh.glb",
 		[this](std::span<uint32_t> indices, std::span<Vertex> vertices)
 		{
 			return this->upload_mesh(indices, vertices);
@@ -890,10 +890,10 @@ void VulkanRenderer::init_default_data()
 
 		for (auto& surface : new_node->mesh->surfaces)
 		{
-			surface.material = std::make_shared<GLTFMaterial>(_defaultData);
+			surface.material = std::make_shared<Material>(_defaultData);
 		}
 
-		_loadedNodes[mesh->name] = std::move(new_node);
+		m_predefined_meshes[mesh->name] = std::move(new_node);
 	}
 
 	std::vector<Vertex> gizmo_vertices;
@@ -901,27 +901,27 @@ void VulkanRenderer::init_default_data()
 	Geometry::create_gizmo(gizmo_vertices, gizmo_indices);
 
 	GeoSurface gizmo_geosurface;
-	gizmo_geosurface.startIndex = 0;
+	gizmo_geosurface.start_index = 0;
 	gizmo_geosurface.count = gizmo_indices.size();
 	gizmo_geosurface.bounds = Geometry::compute_bounds(gizmo_vertices);
-	gizmo_geosurface.material = std::make_shared<GLTFMaterial>(_defaultData);
+	gizmo_geosurface.material = std::make_shared<Material>(_defaultData);
 
 	std::shared_ptr<MeshAsset> gizmo_mesh_asset = std::make_shared<MeshAsset>();
 	gizmo_mesh_asset->name = "gizmo";
 	gizmo_mesh_asset->surfaces.push_back(gizmo_geosurface);
-	gizmo_mesh_asset->meshBuffers = upload_mesh(gizmo_indices, gizmo_vertices);
+	gizmo_mesh_asset->mesh_buffers = upload_mesh(gizmo_indices, gizmo_vertices);
 	
 	std::shared_ptr<MeshNode> gizmo_node = std::make_shared<MeshNode>();
 	gizmo_node->mesh = gizmo_mesh_asset;
 	gizmo_node->localTransform = glm::mat4{ 1.f };
 	gizmo_node->worldTransform = glm::mat4{ 1.f };
 
-	_loadedNodes["gizmo"] = std::move(gizmo_node);
+	m_predefined_meshes["gizmo"] = std::move(gizmo_node);
 
 	_mainDeletionQueue.push_function([=]()
 		{
-			destroy_buffer(gizmo_mesh_asset->meshBuffers.indexBuffer);
-			destroy_buffer(gizmo_mesh_asset->meshBuffers.vertexBuffer);
+			destroy_buffer(gizmo_mesh_asset->mesh_buffers.indexBuffer);
+			destroy_buffer(gizmo_mesh_asset->mesh_buffers.vertexBuffer);
 		});
 }
 
@@ -1206,7 +1206,7 @@ GpuMeshBuffers VulkanRenderer::upload_mesh(std::span<uint32_t> indices, std::spa
 	return new_surface;
 }
 
-std::optional<std::shared_ptr<LoadedGLTF>> VulkanRenderer::load_gltf_mesh(std::string_view gltf_file_path)
+std::optional<std::shared_ptr<GltfMesh>> VulkanRenderer::load_gltf_mesh(std::string_view gltf_file_path)
 {
 	const BufferAllocator buffer_allocator_func
 	{
@@ -1242,21 +1242,21 @@ std::optional<std::shared_ptr<LoadedGLTF>> VulkanRenderer::load_gltf_mesh(std::s
 			return upload_mesh(indices, vertices);
 		};
 
-	LoadedGLTF::LoadGLTFParams loadGLTFParams;
-	loadGLTFParams.filePath = gltf_file_path;
-	loadGLTFParams.device = _device;
-	loadGLTFParams.bufferAllocator = buffer_allocator_func;
-	loadGLTFParams.imageAllocator = image_allocator_func;
-	loadGLTFParams.buildMaterial = build_material_func;
-	loadGLTFParams.uploadMesh = upload_mesh_func;
-	loadGLTFParams.whiteImage = _whiteImage;
-	loadGLTFParams.errorImage = _errorCheckerboardImage;
-	loadGLTFParams.defaultSampler = _defaultSamplerLinear;
+	GltfMeshLoader gltf_loader;
+	gltf_loader.file_path = gltf_file_path;
+	gltf_loader.device = _device;
+	gltf_loader.buffer_allocator = buffer_allocator_func;
+	gltf_loader.image_allocator = image_allocator_func;
+	gltf_loader.build_material = build_material_func;
+	gltf_loader.upload_mesh = upload_mesh_func;
+	gltf_loader.white_image = _whiteImage;
+	gltf_loader.error_image = _errorCheckerboardImage;
+	gltf_loader.default_sampler = _defaultSamplerLinear;
 
 
-	auto structureFile = LoadedGLTF::load_gltf(loadGLTFParams);
+	auto gltf_mesh = gltf_loader.load_gltf_mesh();
 
-	return structureFile;
+	return gltf_mesh;
 }
 
 void VulkanRenderer::add_scene_to_context()
@@ -1264,8 +1264,8 @@ void VulkanRenderer::add_scene_to_context()
 	//begin clock
 	auto start = std::chrono::system_clock::now();
 
-	_mainDrawContext.OpaqueSurfaces.clear();
-	_mainDrawContext.TransparentSurfaces.clear();
+	m_main_render_context.OpaqueSurfaces.clear();
+	m_main_render_context.TransparentSurfaces.clear();
 
 	// view matrix formula taken from https://johannesugb.github.io/gpu-programming/setting-up-a-proper-vulkan-projection-matrix/
 
@@ -1284,7 +1284,7 @@ void VulkanRenderer::add_scene_to_context()
 
 	for (auto& render_object : m_render_object_id_to_render_object)
 	{
-		render_object.second.renderable->draw(render_object.second.transform, _mainDrawContext);
+		render_object.second.renderable->add_to_render_context(render_object.second.transform, m_main_render_context);
 	}
 
 	//_loadedNodes["Suzanne"]->draw(glm::mat4{ 1.f }, _mainDrawContext);
@@ -1297,7 +1297,7 @@ void VulkanRenderer::add_scene_to_context()
 	//	_loadedNodes["Cube"]->draw(translation * scale, _mainDrawContext);
 	//}
 
-	_loadedScenes["structure"]->draw(glm::mat4{ 1.f }, _mainDrawContext);
+	_loadedScenes["structure"]->add_to_render_context(glm::mat4{ 1.f }, m_main_render_context);
 
 	auto end = std::chrono::system_clock::now();
 
@@ -1370,7 +1370,7 @@ void VulkanRenderer::draw_background(VkCommandBuffer cmd)
 	vkCmdDispatch(cmd, static_cast<uint32_t>(std::ceil(_drawExtent.width / 16.0)), static_cast<uint32_t>(std::ceil(_drawExtent.height / 16.0)), 1);
 }
 
-void VulkanRenderer::draw_geometry(VkCommandBuffer cmd)
+void VulkanRenderer::draw_main_render_context(VkCommandBuffer cmd)
 {
 	//reset counters
 	_stats.drawcall_count = 0;
@@ -1382,11 +1382,11 @@ void VulkanRenderer::draw_geometry(VkCommandBuffer cmd)
 	// sort opaque surfaces
 
 	std::vector<uint32_t> opaque_draws;
-	opaque_draws.reserve(_mainDrawContext.OpaqueSurfaces.size());
+	opaque_draws.reserve(m_main_render_context.OpaqueSurfaces.size());
 
-	for (uint32_t i = 0; i < _mainDrawContext.OpaqueSurfaces.size(); i++)
+	for (uint32_t i = 0; i < m_main_render_context.OpaqueSurfaces.size(); i++)
 	{
-		if (is_visible(_mainDrawContext.OpaqueSurfaces[i], _sceneData.viewproj))
+		if (is_visible(m_main_render_context.OpaqueSurfaces[i], _sceneData.viewproj))
 		{
 			opaque_draws.push_back(i);
 		}
@@ -1396,8 +1396,8 @@ void VulkanRenderer::draw_geometry(VkCommandBuffer cmd)
 	std::sort(opaque_draws.begin(), opaque_draws.end(),
 		[&](const auto& iA, const auto& iB)
 		{
-			const GpuRenderObject& A = _mainDrawContext.OpaqueSurfaces[iA];
-			const GpuRenderObject& B = _mainDrawContext.OpaqueSurfaces[iB];
+			const GpuRenderObject& A = m_main_render_context.OpaqueSurfaces[iA];
+			const GpuRenderObject& B = m_main_render_context.OpaqueSurfaces[iB];
 			if (A.material == B.material)
 			{
 				return A.indexBuffer < B.indexBuffer;
@@ -1411,11 +1411,11 @@ void VulkanRenderer::draw_geometry(VkCommandBuffer cmd)
 	// sort transparent surfaces
 
 	std::vector<uint32_t> transparent_draws;
-	transparent_draws.reserve(_mainDrawContext.TransparentSurfaces.size());
+	transparent_draws.reserve(m_main_render_context.TransparentSurfaces.size());
 
-	for (uint32_t i = 0; i < _mainDrawContext.TransparentSurfaces.size(); i++)
+	for (uint32_t i = 0; i < m_main_render_context.TransparentSurfaces.size(); i++)
 	{
-		if (is_visible(_mainDrawContext.TransparentSurfaces[i], _sceneData.viewproj))
+		if (is_visible(m_main_render_context.TransparentSurfaces[i], _sceneData.viewproj))
 		{
 			transparent_draws.push_back(i);
 		}
@@ -1427,8 +1427,8 @@ void VulkanRenderer::draw_geometry(VkCommandBuffer cmd)
 	std::sort(transparent_draws.begin(), transparent_draws.end(),
 		[&](const auto& iA, const auto& iB)
 		{
-			const GpuRenderObject& A = _mainDrawContext.TransparentSurfaces[iA];
-			const GpuRenderObject& B = _mainDrawContext.TransparentSurfaces[iB];
+			const GpuRenderObject& A = m_main_render_context.TransparentSurfaces[iA];
+			const GpuRenderObject& B = m_main_render_context.TransparentSurfaces[iB];
 			float distA = (camera_position - A.bounds.origin).length() - A.bounds.sphereRadius;
 			float distB = (camera_position - B.bounds.origin).length() - B.bounds.sphereRadius;
 
@@ -1559,12 +1559,12 @@ void VulkanRenderer::draw_geometry(VkCommandBuffer cmd)
 
 	for (auto& r : opaque_draws)
 	{
-		draw(_mainDrawContext.OpaqueSurfaces[r]);
+		draw(m_main_render_context.OpaqueSurfaces[r]);
 	}
 
 	for (auto& r : transparent_draws)
 	{
-		draw(_mainDrawContext.TransparentSurfaces[r]);
+		draw(m_main_render_context.TransparentSurfaces[r]);
 	}
 
 	vkCmdEndRendering(cmd);
@@ -1661,13 +1661,13 @@ bool VulkanRenderer::is_visible(const GpuRenderObject& obj, const glm::mat4& vie
 
 VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object_predefined_mesh(const std::string& mesh_name, const glm::mat4& transform)
 {
-	assert(_loadedNodes.find(mesh_name) != _loadedNodes.end());
+	assert(m_predefined_meshes.find(mesh_name) != m_predefined_meshes.end());
 
 	auto id = _id_pool.acquire_id();
 
 	RenderObject render_object;
 	render_object.transform = transform;
-	render_object.renderable = _loadedNodes[mesh_name];
+	render_object.renderable = m_predefined_meshes[mesh_name];
 
 	m_render_object_id_to_render_object[id] = render_object;
 

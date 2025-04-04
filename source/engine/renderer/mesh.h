@@ -2,17 +2,17 @@
 
 #include "metallic_roughness_material.h"
 
-struct GLTFMaterial
+struct Material
 {
 	MaterialInstance data;
 };
 
 struct GeoSurface
 {
-	uint32_t startIndex;
+	uint32_t start_index;
 	uint32_t count;
 	Bounds bounds;
-	std::shared_ptr<GLTFMaterial> material;
+	std::shared_ptr<Material> material;
 };
 
 struct MeshAsset
@@ -20,12 +20,12 @@ struct MeshAsset
 	std::string name;
 
 	std::vector<GeoSurface> surfaces;
-	GpuMeshBuffers meshBuffers;
+	GpuMeshBuffers mesh_buffers;
 };
 
 struct MeshNode : public Node
 {
 	std::shared_ptr<MeshAsset> mesh;
 
-	virtual void draw(const glm::mat4& topMatrix, DrawContext& ctx) override;
+	virtual void add_to_render_context(const glm::mat4& top_matrix, RenderContext& ctx) override;
 };
