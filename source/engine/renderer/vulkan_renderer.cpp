@@ -1334,7 +1334,7 @@ void VulkanRenderer::update_imgui()
 		ImGui::Text("update time %f ms", _stats.scene_update_time);
 		ImGui::Text("triangles %i", _stats.triangle_count);
 		ImGui::Text("draws %i", _stats.drawcall_count);
-		ImGui::Text("position %f %f %f", m_camera_transform.get_position().x, m_camera_transform.get_position().y, m_camera_transform.get_position().z);
+		ImGui::Text("position %f %f %f", m_camera_transform.position.x, m_camera_transform.position.y, m_camera_transform.position.z);
 		ImGui::EndGroup();
 	}
 
@@ -1421,7 +1421,7 @@ void VulkanRenderer::draw_geometry(VkCommandBuffer cmd)
 		}
 	}
 
-	const glm::vec3 camera_position = m_camera_transform.get_position();
+	const glm::vec3 camera_position = m_camera_transform.position;
 
 	// sort the transparent surfaces by distance from camera
 	std::sort(transparent_draws.begin(), transparent_draws.end(),

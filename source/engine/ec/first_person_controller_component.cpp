@@ -43,22 +43,18 @@ void FirstPersonControllerComponent::update(float delta_time)
 	const float yaw_angle = -yaw_input * yaw_speed * delta_time * action_1;
 	const float pitch_angle = -pitch_input * pitch_speed * delta_time * action_1 * (m_invert_mouse_y ? -1.0f : 1.0f);
 
-	auto rotation = m_transform_component->get_transform().get_rotation();
+	auto& rotation = m_transform_component->get_transform().rotation;
 	rotation.x += pitch_angle;
 	rotation.y += yaw_angle;
-
-	m_transform_component->get_transform().set_rotation(rotation);
 
 	const float default_speed = 20.0f;
 	const float run_speed = 100.0f;
 
 	float speed = std::max(default_speed, run_speed * run_input);
 
-	glm::vec3 position = m_transform_component->get_transform().get_position();
+	auto& position = m_transform_component->get_transform().position;
 
 	position += (- m_transform_component->get_transform().get_axis_z()) * forward_input * speed * delta_time;
 	position += m_transform_component->get_transform().get_axis_x() * strafe_input * speed * delta_time;
 	position += m_transform_component->get_transform().get_axis_y() * fly_input * speed * delta_time;
-
-	m_transform_component->get_transform().set_position(position);
 }

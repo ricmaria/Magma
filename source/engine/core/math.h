@@ -39,11 +39,15 @@ namespace Math
 class Transform
 {
 public:
-	Transform()
-	{
-		m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-		m_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-		m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 position;
+	glm::vec3 rotation;
+	glm::vec3 scale;
+
+	Transform():
+		position{ 0.0f, 0.0f, 0.0f },
+		rotation{ 0.0f, 0.0f, 0.0f },
+		scale{ 1.0f, 1.0f, 1.0f }
+	{		
 	}
 
 	Transform(glm::mat4x4 matrix)
@@ -56,61 +60,31 @@ public:
 
 		glm::quat rotation_quat = glm::quat_cast(axes_matrix);
 
-		m_rotation = glm::eulerAngles(rotation_quat);
+		rotation = glm::eulerAngles(rotation_quat);
 
-		m_position = matrix[3];
+		position = matrix[3];
 
-		m_scale = { glm::length(matrix[0]), glm::length(matrix[1]), glm::length(matrix[2]) };
+		scale = { glm::length(matrix[0]), glm::length(matrix[1]), glm::length(matrix[2]) };
 	}
 
 	inline glm::mat4x4 get_matrix() const
 	{
-		glm::quat rotation_quat = glm::quat(m_rotation);
+		glm::quat rotation_quat = glm::quat(rotation);
 
 		glm::mat4x4 rotation_matrix = glm::mat4_cast(rotation_quat);
 
-		glm::mat4x4 translation_matrix = glm::translate(glm::mat4x4{ 1.0f }, m_position);
+		glm::mat4x4 translation_matrix = glm::translate(glm::mat4x4{ 1.0f }, position);
 
-		glm::mat4x4 scale_matrix = glm::scale(glm::mat4x4{ 1.0f }, m_scale);
+		glm::mat4x4 scale_matrix = glm::scale(glm::mat4x4{ 1.0f }, scale);
 
 		glm::mat4x4 matrix = translation_matrix * rotation_matrix * scale_matrix;
 
 		return matrix;
 	}
 
-	inline glm::vec3 get_position() const
-	{
-		return m_position;
-	}
-
-	inline void set_position(const glm::vec3& position)
-	{
-		m_position = position;
-	}
-
-	inline glm::vec3 get_rotation() const
-	{
-		return m_rotation;
-	}
-
-	inline void set_rotation(const glm::vec3& rotation)
-	{
-		m_rotation = Math::constrain_angle_2pi(rotation);
-	}
-
-	inline glm::vec3 get_scale() const
-	{
-		return m_scale;
-	}
-
-	inline void set_scale(const glm::vec3& scale)
-	{
-		m_scale = scale;
-	}
-
 	inline glm::vec3 get_axis_x() const
 	{
-		glm::quat rotation_quat = glm::quat(m_rotation);
+		glm::quat rotation_quat = glm::quat(rotation);
 		glm::vec3 axis_x = rotation_quat * glm::vec3(1.0f, 0.0f, 0.0f);
 
 		return axis_x;
@@ -118,7 +92,7 @@ public:
 
 	inline glm::vec3 get_axis_y() const
 	{
-		glm::quat rotation_quat = glm::quat(m_rotation);
+		glm::quat rotation_quat = glm::quat(rotation);
 		glm::vec3 axis_y = rotation_quat * glm::vec3(0.0f, 1.0f, 0.0f);
 
 		return axis_y;
@@ -126,14 +100,14 @@ public:
 
 	inline glm::vec3 get_axis_z() const
 	{
-		glm::quat rotation_quat = glm::quat(m_rotation);
+		glm::quat rotation_quat = glm::quat(rotation);
 		glm::vec3 axis_z = rotation_quat * glm::vec3(0.0f, 0.0f, 1.0f);
 
 		return axis_z;
 	}
 
-private:
-	glm::vec3 m_position;
-	glm::vec3 m_rotation;
-	glm::vec3 m_scale;
+	void constrain_rotation()
+	{
+		rotation = Math::constrain_angle_2pi(rotation);
+	}
 };
