@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 
 	EC::Entity* gizmo_entity = entity_manager->create_entity();
 	auto transform_component = gizmo_entity->add_component<EC::TransformComponent>();
-	auto gizmo_mesh_component = gizmo_entity->add_component<EC::MeshRenderComponent>();
+	auto gizmo_mesh_component = gizmo_entity->add_component<EC::PredefinedMeshRenderComponent>();
 	gizmo_mesh_component->set_mesh_name("gizmo");
 
 	//EC::Entity* monkey_entity = entity_manager->create_entity();

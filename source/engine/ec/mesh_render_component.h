@@ -26,9 +26,6 @@ namespace EC
 		void on_being_removed() override;
 		void update(float delta_time) override;
 
-		const std::string& get_mesh_name() const { return m_mesh_name; }
-		void set_mesh_name(const std::string& mesh_name);
-
 	protected:
 		const std::vector<Dependency>& get_dependencies() const override
 		{
@@ -39,16 +36,29 @@ namespace EC
 			return dependencies;
 		}
 
-	private:
+		virtual bool can_add_mesh_to_renderer() = 0;
+		virtual void add_mesh_to_renderer() = 0;
 
-		void add_mesh_to_renderer();
 		void remove_mesh_from_renderer();
 
 		TransformComponent* m_transform_component = nullptr;
 		Renderer* m_renderer = nullptr;
 
-		std::string m_mesh_name;
-
 		Renderer::RenderObjectId m_render_object_id = Renderer::invalid_render_object_id;
+	};
+
+	class PredefinedMeshRenderComponent : public MeshRenderComponent
+	{
+		using Super = MeshRenderComponent;
+	public:
+		const std::string& get_mesh_name() const { return m_mesh_name; }
+		void set_mesh_name(const std::string& mesh_name);
+
+	protected:
+		bool can_add_mesh_to_renderer() override;
+		void add_mesh_to_renderer() override;
+	private:
+
+		std::string m_mesh_name;
 	};
 }

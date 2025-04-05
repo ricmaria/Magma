@@ -10,7 +10,10 @@ void EC::MeshRenderComponent::on_sibling_component_added(Component* sibling)
 {
 	ParentType::on_sibling_component_added(sibling);
 
-	add_mesh_to_renderer();
+	if (can_add_mesh_to_renderer())
+	{
+		add_mesh_to_renderer();
+	}
 }
 
 void EC::MeshRenderComponent::on_sibling_component_removed(Component* sibling)
@@ -40,39 +43,11 @@ void MeshRenderComponent::update(float delta_time)
 	m_renderer->update_render_object(m_render_object_id, m_transform_component->get_transform().get_matrix());
 }
 
-void EC::MeshRenderComponent::set_mesh_name(const std::string& mesh_name)
+bool EC::MeshRenderComponent::can_add_mesh_to_renderer()
 {
-	if (mesh_name == m_mesh_name)
-	{
-		return;
-	}
-
-	m_mesh_name = mesh_name;
-
-	add_mesh_to_renderer();
+	return m_renderer != nullptr && m_transform_component != nullptr;
 }
 
-void EC::MeshRenderComponent::add_mesh_to_renderer()
-{
-	remove_mesh_from_renderer();
-
-	if (m_mesh_name.empty())
-	{
-		return;
-	}
-
-	if (m_transform_component == nullptr)
-	{
-		return;
-	}
-
-	if (m_renderer == nullptr)
-	{
-		return;
-	}
-
-	m_render_object_id = m_renderer->add_render_object(m_mesh_name, m_transform_component->get_transform().get_matrix());
-}
 
 void EC::MeshRenderComponent::remove_mesh_from_renderer()
 {
@@ -84,4 +59,30 @@ void EC::MeshRenderComponent::remove_mesh_from_renderer()
 	m_renderer->remove_render_object(m_render_object_id);
 
 	m_render_object_id = Renderer::invalid_render_object_id;
+}
+
+void EC::PredefinedMeshRenderComponent::set_mesh_name(const std::string& mesh_name)
+{
+	if (mesh_name == m_mesh_name)
+	{
+		return;
+	}
+
+	m_mesh_name = mesh_name;
+
+	if (can_add_mesh_to_renderer())
+	{
+		remove_mesh_from_renderer();
+		add_mesh_to_renderer();
+	}
+}
+
+bool EC::PredefinedMeshRenderComponent::can_add_mesh_to_renderer()
+{
+	return Super::can_add_mesh_to_renderer() && ! m_mesh_name.empty();
+}
+
+void EC::PredefinedMeshRenderComponent::add_mesh_to_renderer()
+{
+	m_render_object_id = m_renderer->add_render_object(m_mesh_name, m_transform_component->get_transform().get_matrix());
 }
