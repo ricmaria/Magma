@@ -4,12 +4,12 @@
 #include "types.h"
 #include "descriptors.h"
 
-class GLTFMetallic_Roughness
+class GltfMetallicRoughness
 {
 public:
 	struct MaterialConstants
 	{
-		glm::vec4 colorFactors;
+		glm::vec4 color_factors;
 		glm::vec4 metal_rough_factors;
 		//padding, we need it anyway for uniform buffers
 		glm::vec4 extra[14];
@@ -17,24 +17,24 @@ public:
 
 	struct MaterialResources
 	{
-		AllocatedImage colorImage;
-		VkSampler colorSampler;
-		AllocatedImage metalRoughImage;
-		VkSampler metalRoughSampler;
-		VkBuffer dataBuffer;
-		uint32_t dataBufferOffset;
+		AllocatedImage color_image;
+		VkSampler color_sampler;
+		AllocatedImage metal_rough_image;
+		VkSampler metal_rough_sampler;
+		VkBuffer data_buffer;
+		uint32_t data_buffer_offset;
 	};
 
-	void build_pipelines(VkDevice device, VkDescriptorSetLayout gpuSceneDataDescriptorLayout, VkFormat drawImageFormat, VkFormat depthImageFormat);
+	void build_pipelines(VkDevice device, VkDescriptorSetLayout gpuScene_data_descriptor_layout, VkFormat draw_image_format, VkFormat depth_image_format);
 	void clear_resources(VkDevice device);
 
-	MaterialInstance write_material(VkDevice device, MaterialPass pass, const MaterialResources& resources, DescriptorAllocatorGrowable& descriptorAllocator);
+	MaterialInstance write_material(VkDevice device, MaterialPassType pass, const MaterialResources& resources, DescriptorAllocatorGrowable& descriptor_allocator);
 
 private:
-	MaterialPipeline _opaquePipeline;
-	MaterialPipeline _transparentPipeline;
+	MaterialPipeline m_opaque_pipeline;
+	MaterialPipeline m_transparent_pipeline;
 
-	VkDescriptorSetLayout _materialLayout;
+	VkDescriptorSetLayout m_material_layout;
 
-	DescriptorWriter _writer;
+	DescriptorWriter m_writer;
 };

@@ -12,7 +12,7 @@ class GltfMeshLoader
 {
 public:
 
-	using BuildMaterial = std::function<MaterialInstance(VkDevice, MaterialPass, const GLTFMetallic_Roughness::MaterialResources&, DescriptorAllocatorGrowable&)>;
+	using BuildMaterial = std::function<MaterialInstance(VkDevice, MaterialPassType, const GltfMetallicRoughness::MaterialResources&, DescriptorAllocatorGrowable&)>;
 	using UploadMesh = std::function<GpuMeshBuffers(std::span<uint32_t> indices, std::span<Vertex> vertices)>;
 
 	std::string_view file_path;

@@ -468,7 +468,7 @@ Bounds Geometry::compute_bounds(std::vector<Vertex>& vertices)
 	// calculate origin and extents from the min/max, use extent lenght for radius
 	bounds.origin = (maxpos + minpos) / 2.f;
 	bounds.extents = (maxpos - minpos) / 2.f;
-	bounds.sphereRadius = glm::length(bounds.extents);
+	bounds.sphere_radius = glm::length(bounds.extents);
 
 	return bounds;
 }

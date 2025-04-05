@@ -16,8 +16,8 @@ void GltfMesh::clear_all()
 
 	for (auto& [k, v] : m_meshes)
 	{
-		m_buffer_allocator.destroy_buffer(v->mesh_buffers.indexBuffer);
-		m_buffer_allocator.destroy_buffer(v->mesh_buffers.vertexBuffer);
+		m_buffer_allocator.destroy_buffer(v->mesh_buffers.index_buffer);
+		m_buffer_allocator.destroy_buffer(v->mesh_buffers.vertex_buffer);
 	}
 
 	for (auto& [k, v] : m_images)

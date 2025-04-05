@@ -49,19 +49,19 @@ struct Vertex
 // holds the resources needed for a mesh
 struct GpuMeshBuffers
 {
-	AllocatedBuffer indexBuffer;
-	AllocatedBuffer vertexBuffer;
-	VkDeviceAddress vertexBufferAddress;
+	AllocatedBuffer index_buffer;
+	AllocatedBuffer vertex_buffer;
+	VkDeviceAddress vertex_buffer_address;
 };
 
 // push constants for our mesh object draws
 struct GpuDrawPushConstants
 {
-	glm::mat4 worldMatrix;
-	VkDeviceAddress vertexBuffer;
+	glm::mat4 world_matrix;
+	VkDeviceAddress vertex_buffer;
 };
 
-enum class MaterialPass :uint8_t
+enum class MaterialPassType :uint8_t
 {
 	MainColor,
 	Transparent,
@@ -77,42 +77,42 @@ struct MaterialPipeline
 struct MaterialInstance
 {
 	MaterialPipeline* pipeline;
-	VkDescriptorSet materialSet;
-	MaterialPass passType;
+	VkDescriptorSet material_set;
+	MaterialPassType pass_type;
 };
 
 struct AllocatedImage
 {
 	VkImage image;
-	VkImageView imageView;
+	VkImageView image_view;
 	VmaAllocation allocation;
-	VkExtent3D imageExtent;
-	VkFormat imageFormat;
+	VkExtent3D image_extent;
+	VkFormat image_format;
 };
 
 struct Bounds
 {
 	glm::vec3 origin;
-	float sphereRadius;
+	float sphere_radius;
 	glm::vec3 extents;
 };
 
 struct GpuRenderObject
 {
-	uint32_t indexCount;
-	uint32_t firstIndex;
-	VkBuffer indexBuffer;
+	uint32_t index_count;
+	uint32_t first_index;
+	VkBuffer index_buffer;
 
 	MaterialInstance* material;
 	Bounds bounds;
 	glm::mat4 transform;
-	VkDeviceAddress vertexBufferAddress;
+	VkDeviceAddress vertex_buffer_address;
 };
 
 struct RenderContext
 {
-	std::vector<GpuRenderObject> OpaqueSurfaces;
-	std::vector<GpuRenderObject> TransparentSurfaces;
+	std::vector<GpuRenderObject> opaque_surfaces;
+	std::vector<GpuRenderObject> transparent_surfaces;
 };
 
 // base class for a renderable dynamic object
@@ -130,15 +130,15 @@ struct Node : public IRenderable
 	std::weak_ptr<Node> parent;
 	std::vector<std::shared_ptr<Node>> children;
 
-	glm::mat4 localTransform;
-	glm::mat4 worldTransform;
+	glm::mat4 local_transform;
+	glm::mat4 world_transform;
 
 	void refresh_transform(const glm::mat4& parentMatrix)
 	{
-		worldTransform = parentMatrix * localTransform;
+		world_transform = parentMatrix * local_transform;
 		for (auto& child : children)
 		{
-			child->refresh_transform(worldTransform);
+			child->refresh_transform(world_transform);
 		}
 	}
 
@@ -154,7 +154,7 @@ struct Node : public IRenderable
 
 struct BufferAllocator
 {
-	using CreateFunc = std::function<AllocatedBuffer(size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage)>;
+	using CreateFunc = std::function<AllocatedBuffer(size_t alloc_size, VkBufferUsageFlags usage, VmaMemoryUsage memory_usage)>;
 	using DestroyFunc = std::function<void(const AllocatedBuffer& buffer)>;
 
 	CreateFunc create_buffer;

@@ -176,12 +176,12 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 	// load materials
 
 // create buffer to hold the material data
-	file.m_material_data_buffer = buffer_allocator.create_buffer(sizeof(GLTFMetallic_Roughness::MaterialConstants) * gltf.materials.size(),
+	file.m_material_data_buffer = buffer_allocator.create_buffer(sizeof(GltfMetallicRoughness::MaterialConstants) * gltf.materials.size(),
 		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
 	int data_index = 0;
 
-	GLTFMetallic_Roughness::MaterialConstants* sceneMaterialConstants = (GLTFMetallic_Roughness::MaterialConstants*)file.m_material_data_buffer.info.pMappedData;
+	GltfMetallicRoughness::MaterialConstants* sceneMaterialConstants = (GltfMetallicRoughness::MaterialConstants*)file.m_material_data_buffer.info.pMappedData;
 
 	for (fastgltf::Material& material : gltf.materials)
 	{
@@ -189,41 +189,41 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 		materials.push_back(new_material);
 		file.m_materials[material.name.c_str()] = new_material;
 
-		GLTFMetallic_Roughness::MaterialConstants constants;
-		constants.colorFactors.x = material.pbrData.baseColorFactor[0];
-		constants.colorFactors.y = material.pbrData.baseColorFactor[1];
-		constants.colorFactors.z = material.pbrData.baseColorFactor[2];
-		constants.colorFactors.w = material.pbrData.baseColorFactor[3];
+		GltfMetallicRoughness::MaterialConstants constants;
+		constants.color_factors.x = material.pbrData.baseColorFactor[0];
+		constants.color_factors.y = material.pbrData.baseColorFactor[1];
+		constants.color_factors.z = material.pbrData.baseColorFactor[2];
+		constants.color_factors.w = material.pbrData.baseColorFactor[3];
 
 		constants.metal_rough_factors.x = material.pbrData.metallicFactor;
 		constants.metal_rough_factors.y = material.pbrData.roughnessFactor;
 		// write material parameters to buffer
 		sceneMaterialConstants[data_index] = constants;
 
-		MaterialPass passType = MaterialPass::MainColor;
+		MaterialPassType passType = MaterialPassType::MainColor;
 		if (material.alphaMode == fastgltf::AlphaMode::Blend)
 		{
-			passType = MaterialPass::Transparent;
+			passType = MaterialPassType::Transparent;
 		}
 
-		GLTFMetallic_Roughness::MaterialResources material_resources;
+		GltfMetallicRoughness::MaterialResources material_resources;
 		// default the material textures
-		material_resources.colorImage = white_image;
-		material_resources.colorSampler = default_sampler;
-		material_resources.metalRoughImage = white_image;
-		material_resources.metalRoughSampler = default_sampler;
+		material_resources.color_image = white_image;
+		material_resources.color_sampler = default_sampler;
+		material_resources.metal_rough_image = white_image;
+		material_resources.metal_rough_sampler = default_sampler;
 
 		// set the uniform buffer for the material data
-		material_resources.dataBuffer = file.m_material_data_buffer.buffer;
-		material_resources.dataBufferOffset = data_index * sizeof(GLTFMetallic_Roughness::MaterialConstants);
+		material_resources.data_buffer = file.m_material_data_buffer.buffer;
+		material_resources.data_buffer_offset = data_index * sizeof(GltfMetallicRoughness::MaterialConstants);
 		// grab textures from gltf file
 		if (material.pbrData.baseColorTexture.has_value())
 		{
 			size_t img = gltf.textures[material.pbrData.baseColorTexture.value().textureIndex].imageIndex.value();
 			size_t sampler = gltf.textures[material.pbrData.baseColorTexture.value().textureIndex].samplerIndex.value();
 
-			material_resources.colorImage = images[img];
-			material_resources.colorSampler = file.m_samplers[sampler];
+			material_resources.color_image = images[img];
+			material_resources.color_sampler = file.m_samplers[sampler];
 		}
 		// build material
 		new_material->data = build_material(device, passType, material_resources, file.m_descriptor_pool);
@@ -338,7 +338,7 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 			// calculate origin and extents from the min/max, use extent lenght for radius
 			new_surface.bounds.origin = (max_pos + min_pos) / 2.f;
 			new_surface.bounds.extents = (max_pos - min_pos) / 2.f;
-			new_surface.bounds.sphereRadius = glm::length(new_surface.bounds.extents);
+			new_surface.bounds.sphere_radius = glm::length(new_surface.bounds.extents);
 
 			new_mesh->surfaces.push_back(new_surface);
 		}
@@ -370,7 +370,7 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 			{
 				[&](fastgltf::Node::TransformMatrix matrix)
 				{
-					memcpy(&new_node->localTransform, matrix.data(), sizeof(matrix));
+					memcpy(&new_node->local_transform, matrix.data(), sizeof(matrix));
 				},
 				[&](fastgltf::Node::TRS transform)
 				{
@@ -382,7 +382,7 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 					glm::mat4 rm = glm::toMat4(rot);
 					glm::mat4 sm = glm::scale(glm::mat4(1.f), sc);
 
-					new_node->localTransform = tm * rm * sm;
+					new_node->local_transform = tm * rm * sm;
 				}
 			},
 			node.transform);

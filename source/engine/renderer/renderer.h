@@ -27,5 +27,5 @@ public:
 	void update_render_object(RenderObjectId id, const glm::mat4& transform);
 
 private:
-	VulkanRenderer _vulkan_renderer;
+	VulkanRenderer m_vulkan_renderer;
 };
