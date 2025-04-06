@@ -31,8 +31,13 @@ int main(int argc, char* argv[])
 
 	player_transform_component->get_transform().position = { 0.f, 0.f, 5.f };
 
+	EC::Entity* gltf_structure_entity = entity_manager->create_entity();
+	auto gltf_structure_transform_component = gltf_structure_entity->add_component<EC::TransformComponent>();
+	auto gltf_structure_mesh_component = gltf_structure_entity->add_component<EC::GltfMeshRenderComponent>();
+	gltf_structure_mesh_component->set_gltf_file_path("..\\assets\\structure.glb");
+
 	EC::Entity* gizmo_entity = entity_manager->create_entity();
-	auto transform_component = gizmo_entity->add_component<EC::TransformComponent>();
+	auto gizmo_transform_component = gizmo_entity->add_component<EC::TransformComponent>();
 	auto gizmo_mesh_component = gizmo_entity->add_component<EC::PredefinedMeshRenderComponent>();
 	gizmo_mesh_component->set_mesh_name("gizmo");
 

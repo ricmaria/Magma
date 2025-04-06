@@ -135,7 +135,6 @@ private:
 	void init_triangle_pipeline();
 	void init_mesh_pipeline();
 	void init_default_data();
-	void init_scenes();
 	void init_imgui();
 
 	void create_swapchain(uint32_t width, uint32_t height);
@@ -153,7 +152,7 @@ private:
 
 	std::optional<std::shared_ptr<GltfMesh>> load_gltf_mesh(std::string_view gltf_file_path);
 
-	void add_scene_to_context();
+	void add_render_objects_to_context();
 
 	void update_imgui();
 
@@ -251,13 +250,11 @@ private:
 	RenderContext m_main_render_context;
 	std::unordered_map<std::string, std::shared_ptr<Node>> m_predefined_meshes;
 
-	std::unordered_map<std::string, std::shared_ptr<GltfMesh>> m_loaded_scenes;
-
 	EngineStats m_stats;
 
 	IdPool m_id_pool;
 
 	Transform m_camera_transform;
 
-	std::unordered_map<RenderObjectId, RenderObject> m_render_object_id_to_render_object;
+	std::unordered_map<RenderObjectId, std::shared_ptr<RenderObject>> m_render_object_id_to_render_object;
 };

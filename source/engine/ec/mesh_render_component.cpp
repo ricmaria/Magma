@@ -84,5 +84,31 @@ bool EC::PredefinedMeshRenderComponent::can_add_mesh_to_renderer()
 
 void EC::PredefinedMeshRenderComponent::add_mesh_to_renderer()
 {
-	m_render_object_id = m_renderer->add_render_object(m_mesh_name, m_transform_component->get_transform().get_matrix());
+	m_render_object_id = m_renderer->add_predefined_mesh_render_object(m_mesh_name, m_transform_component->get_transform().get_matrix());
+}
+
+void EC::GltfMeshRenderComponent::set_gltf_file_path(const std::string& gltf_file_path)
+{
+	if (gltf_file_path == m_gltf_file_path)
+	{
+		return;
+	}
+
+	m_gltf_file_path = gltf_file_path;
+
+	if (can_add_mesh_to_renderer())
+	{
+		remove_mesh_from_renderer();
+		add_mesh_to_renderer();
+	}
+}
+
+bool EC::GltfMeshRenderComponent::can_add_mesh_to_renderer()
+{
+	return Super::can_add_mesh_to_renderer() && !m_gltf_file_path.empty();
+}
+
+void EC::GltfMeshRenderComponent::add_mesh_to_renderer()
+{
+	m_render_object_id = m_renderer->add_gltf_mesh_render_object(m_gltf_file_path, m_transform_component->get_transform().get_matrix());
 }

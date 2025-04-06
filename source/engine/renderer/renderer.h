@@ -22,7 +22,8 @@ public:
 
 	void set_camera_transform(const Transform& transform);
 
-	RenderObjectId add_render_object(const std::string& mesh_name, glm::mat4 transform);
+	RenderObjectId add_predefined_mesh_render_object(const std::string& mesh_name, glm::mat4 transform);
+	RenderObjectId add_gltf_mesh_render_object(const std::string& gltf_file_path, glm::mat4 transform);
 	void remove_render_object(RenderObjectId id);
 	void update_render_object(RenderObjectId id, const glm::mat4& transform);
 

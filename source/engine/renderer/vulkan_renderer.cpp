@@ -52,11 +52,8 @@ void VulkanRenderer::init(uint32_t width, uint32_t height, SDL_Window* window)
 
 	init_default_data();
 
-	init_scenes();
-
 	init_imgui();
 
-	//everything went fine
 	m_is_initialized = true;
 }
 
@@ -67,7 +64,7 @@ void VulkanRenderer::cleanup()
 		//make sure the gpu has stopped doing its things
 		vkDeviceWaitIdle(m_device);
 
-		m_loaded_scenes.clear();
+		m_render_object_id_to_render_object.clear();
 
 		for (int i = 0; i < FRAME_OVERLAP; i++)
 		{
@@ -117,7 +114,7 @@ void VulkanRenderer::draw()
 
 	update_imgui();
 
-	add_scene_to_context();
+	add_render_objects_to_context();
 
 	draw_scene();
 
@@ -920,17 +917,6 @@ void VulkanRenderer::init_default_data()
 		});
 }
 
-void VulkanRenderer::init_scenes()
-{
-	std::string structure_path = { "..\\assets\\structure.glb" };
-
-	auto structureFile = load_gltf_mesh(structure_path);
-
-	assert(structureFile.has_value());
-
-	m_loaded_scenes["structure"] = *structureFile;
-}
-
 void VulkanRenderer::init_imgui()
 {
 	// 1: create descriptor pool for IMGUI
@@ -1254,7 +1240,7 @@ std::optional<std::shared_ptr<GltfMesh>> VulkanRenderer::load_gltf_mesh(std::str
 	return gltf_mesh;
 }
 
-void VulkanRenderer::add_scene_to_context()
+void VulkanRenderer::add_render_objects_to_context()
 {
 	//begin clock
 	auto start = std::chrono::system_clock::now();
@@ -1279,7 +1265,7 @@ void VulkanRenderer::add_scene_to_context()
 
 	for (auto& render_object : m_render_object_id_to_render_object)
 	{
-		render_object.second.renderable->add_to_render_context(render_object.second.transform, m_main_render_context);
+		render_object.second->renderable->add_to_render_context(render_object.second->transform, m_main_render_context);
 	}
 
 	//_loadedNodes["Suzanne"]->draw(glm::mat4{ 1.f }, _mainDrawContext);
@@ -1292,7 +1278,7 @@ void VulkanRenderer::add_scene_to_context()
 	//	_loadedNodes["Cube"]->draw(translation * scale, _mainDrawContext);
 	//}
 
-	m_loaded_scenes["structure"]->add_to_render_context(glm::mat4{ 1.f }, m_main_render_context);
+	//m_loaded_scenes["structure"]->add_to_render_context(glm::mat4{ 1.f }, m_main_render_context);
 
 	auto end = std::chrono::system_clock::now();
 
@@ -1660,9 +1646,9 @@ VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object_predefined_mesh
 
 	auto id = m_id_pool.acquire_id();
 
-	RenderObject render_object;
-	render_object.transform = transform;
-	render_object.renderable = m_predefined_meshes[mesh_name];
+	auto render_object = std::make_shared<RenderObject>();
+	render_object->transform = transform;
+	render_object->renderable = m_predefined_meshes[mesh_name];
 
 	m_render_object_id_to_render_object[id] = render_object;
 
@@ -1673,7 +1659,15 @@ VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object_gltf_mesh(const
 {
 	auto id = m_id_pool.acquire_id();
 
-	// TODO : implement
+	auto gltf_mesh = load_gltf_mesh(gltf_file_path);
+
+	assert(gltf_mesh.has_value());
+
+	auto render_object = std::make_shared<RenderObject>();
+	render_object->transform = transform;
+	render_object->renderable = gltf_mesh.value();
+
+	m_render_object_id_to_render_object[id] = render_object;
 
 	return id;
 }
@@ -1694,6 +1688,6 @@ void VulkanRenderer::update_render_object(RenderObjectId id, const glm::mat4& tr
 
 	if (it != m_render_object_id_to_render_object.end())
 	{
-		it->second.transform = transform;
+		it->second->transform = transform;
 	}
 }
