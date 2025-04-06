@@ -1063,18 +1063,6 @@ void VulkanRenderer::add_render_objects_to_context()
 		render_object.second->renderable->add_to_render_context(render_object.second->transform, m_main_render_context);
 	}
 
-	//_loadedNodes["Suzanne"]->draw(glm::mat4{ 1.f }, _mainDrawContext);
-
-	//for (int x = -3; x < 3; x++)
-	//{
-	//	glm::mat4 scale = glm::scale(glm::vec3{ 0.2f });
-	//	glm::mat4 translation = glm::translate(glm::vec3{ x, 1, 0 });
-
-	//	_loadedNodes["Cube"]->draw(translation * scale, _mainDrawContext);
-	//}
-
-	//m_loaded_scenes["structure"]->add_to_render_context(glm::mat4{ 1.f }, m_main_render_context);
-
 	auto end = std::chrono::system_clock::now();
 
 	//convert to microseconds (integer), and then come back to miliseconds
@@ -1213,7 +1201,7 @@ void VulkanRenderer::draw_main_render_context(VkCommandBuffer cmd)
 
 	// prepare GPU scene data descriptor set
 
-   // allocate a new uniform buffer for the scene data
+	// allocate a new uniform buffer for the scene data
 	AllocatedBuffer gpu_scene_data_buffer = create_buffer(sizeof(GPUSceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
 	//add it to the deletion queue of this frame so it gets deleted once it's been used
@@ -1236,7 +1224,7 @@ void VulkanRenderer::draw_main_render_context(VkCommandBuffer cmd)
 
 	// begin rendering
 
-// begin a render pass connected to our draw and depth images
+	// begin a render pass connected to our draw and depth images
 
 	VkRenderingAttachmentInfo color_attachment = vkinit::attachment_info(m_draw_image.image_view, nullptr, VK_IMAGE_LAYOUT_GENERAL);
 	VkRenderingAttachmentInfo depth_attachment = vkinit::depth_attachment_info(m_depth_image.image_view, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
@@ -1245,35 +1233,9 @@ void VulkanRenderer::draw_main_render_context(VkCommandBuffer cmd)
 
 	vkCmdBeginRendering(cmd, &render_info);
 
-	//// draw a triangle
-
-	//vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _trianglePipeline);
-
-	//// set dynamic viewport and scissor
-	//VkViewport viewport = {};
-	//viewport.x = 0;
-	//viewport.y = 0;
-	//viewport.width = static_cast<float>(_drawExtent.width);
-	//viewport.height = static_cast<float>(_drawExtent.height);
-	//viewport.minDepth = 0.f;
-	//viewport.maxDepth = 1.f;
-
-	//vkCmdSetViewport(cmd, 0, 1, &viewport);
-
-	//VkRect2D scissor = {};
-	//scissor.offset.x = 0;
-	//scissor.offset.y = 0;
-	//scissor.extent.width = _drawExtent.width;
-	//scissor.extent.height = _drawExtent.height;
-
-	//vkCmdSetScissor(cmd, 0, 1, &scissor);
-
-	//// launch a draw command to draw 3 vertices
-	//vkCmdDraw(cmd, 3, 1, 0, 0);
-
 	// draw meshes
 
-//defined outside of the draw function, this is the state we will try to skip
+	//defined outside of the draw function, this is the state we will try to skip
 	MaterialPipeline* last_pipeline = nullptr;
 	MaterialInstance* last_material = nullptr;
 	VkBuffer last_index_buffer = VK_NULL_HANDLE;
