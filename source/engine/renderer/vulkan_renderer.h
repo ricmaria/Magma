@@ -132,7 +132,6 @@ private:
 	void init_descriptors();
 	void init_pipelines();
 	void init_background_pipelines();
-	void init_triangle_pipeline();
 	void init_mesh_pipeline();
 	void init_default_data();
 	void init_imgui();
@@ -217,9 +216,6 @@ private:
 
 	VkPipeline m_compute_pipeline;
 	VkPipelineLayout m_compute_pipeline_layout ;
-
-	VkPipelineLayout m_triangle_pipeline_layout;
-	VkPipeline m_triangle_pipeline;
 
 	// immediate submit structures
 	VkFence m_immediate_fence;

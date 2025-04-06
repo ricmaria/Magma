@@ -515,7 +515,6 @@ void VulkanRenderer::init_pipelines()
 	init_background_pipelines();
 
 	// graphics pipelins
-	init_triangle_pipeline();
 	init_mesh_pipeline();
 
 	m_metal_rough_material.build_pipelines(m_device, m_gpu_scene_data_descriptor_layout, m_draw_image.image_format, m_depth_image.image_format);
@@ -611,72 +610,6 @@ void VulkanRenderer::init_background_pipelines()
 			vkDestroyPipelineLayout(m_device, m_compute_pipeline_layout, nullptr);
 			vkDestroyPipeline(m_device, sky.pipeline, nullptr);
 			vkDestroyPipeline(m_device, gradient.pipeline, nullptr);
-		});
-}
-
-void VulkanRenderer::init_triangle_pipeline()
-{
-	VkShaderModule triangle_frag_shader;
-	if (!vkutil::load_shader_module("../shaders/colored_triangle.frag.spv", m_device, &triangle_frag_shader))
-	{
-		fmt::println("Error when building the triangle fragment shader module (colored_triangle.frag)");
-	}
-	else
-	{
-		fmt::println("Triangle fragment shader succesfully loaded (colored_triangle.frag)");
-	}
-
-	VkShaderModule triangle_vertex_shader;
-	if (!vkutil::load_shader_module("../shaders/colored_triangle.vert.spv", m_device, &triangle_vertex_shader))
-	{
-		fmt::println("Error when building the triangle vertex shader module (colored_triangle.vert)");
-	}
-	else
-	{
-		fmt::println("Triangle vertex shader succesfully loaded (colored_triangle.vert)");
-	}
-
-	//build the pipeline layout that controls the inputs/outputs of the shader
-	//we are not using descriptor sets or other systems yet, so no need to use anything other than empty default
-	VkPipelineLayoutCreateInfo pipeline_layout_info = vkinit::pipeline_layout_create_info();
-	VK_CHECK(vkCreatePipelineLayout(m_device, &pipeline_layout_info, nullptr, &m_triangle_pipeline_layout));
-
-	PipelineBuilder pipeline_builder;
-
-	//use the triangle layout we created
-	pipeline_builder.set_pipeline_layout(m_triangle_pipeline_layout);
-	//connecting the vertex and pixel shaders to the pipeline
-	pipeline_builder.set_shaders(triangle_vertex_shader, triangle_frag_shader);
-	//it will draw triangles
-	pipeline_builder.set_input_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
-	//filled triangles
-	pipeline_builder.set_polygon_mode(VK_POLYGON_MODE_FILL);
-	//no backface culling
-	pipeline_builder.set_cull_mode(VK_CULL_MODE_NONE, VK_FRONT_FACE_CLOCKWISE);
-	//no multisampling
-	pipeline_builder.set_multisampling_none();
-	//no blending
-	pipeline_builder.disable_blending();
-
-	//depth testing
-	//pipelineBuilder.disable_depthtest();
-	pipeline_builder.enable_depthtest(true, VK_COMPARE_OP_LESS_OR_EQUAL);
-
-	//connect the image format we will draw into, from draw image
-	pipeline_builder.set_color_attachment_format(m_draw_image.image_format);
-	pipeline_builder.set_depth_format(m_depth_image.image_format);
-
-	//finally build the pipeline
-	m_triangle_pipeline = pipeline_builder.build_pipeline(m_device);
-
-	//clean structures
-	vkDestroyShaderModule(m_device, triangle_frag_shader, nullptr);
-	vkDestroyShaderModule(m_device, triangle_vertex_shader, nullptr);
-
-	m_main_deletion_queue.push_function([&]()
-		{
-			vkDestroyPipelineLayout(m_device, m_triangle_pipeline_layout, nullptr);
-			vkDestroyPipeline(m_device, m_triangle_pipeline, nullptr);
 		});
 }
 
