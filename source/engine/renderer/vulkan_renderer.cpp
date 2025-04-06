@@ -654,7 +654,7 @@ void VulkanRenderer::init_default_data()
 
 		// material
 
-	GltfMetallicRoughness::MaterialResources material_resources;
+	MetallicRoughnessMaterial::MaterialResources material_resources;
 	//default the material textures
 	material_resources.color_image = m_white_image;
 	material_resources.color_sampler = m_default_sampler_linear;
@@ -662,10 +662,10 @@ void VulkanRenderer::init_default_data()
 	material_resources.metal_rough_sampler = m_default_sampler_linear;
 
 	//set the uniform buffer for the material data
-	AllocatedBuffer material_constants = create_buffer(sizeof(GltfMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+	AllocatedBuffer material_constants = create_buffer(sizeof(MetallicRoughnessMaterial::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
 	//write the buffer
-	GltfMetallicRoughness::MaterialConstants* scene_uniform_data = (GltfMetallicRoughness::MaterialConstants*)material_constants.allocation->GetMappedData();
+	MetallicRoughnessMaterial::MaterialConstants* scene_uniform_data = (MetallicRoughnessMaterial::MaterialConstants*)material_constants.allocation->GetMappedData();
 	scene_uniform_data->color_factors = glm::vec4{ 1,1,1,1 };
 	scene_uniform_data->metal_rough_factors = glm::vec4{ 1,0.5,0,0 };
 
@@ -689,7 +689,7 @@ void VulkanRenderer::init_default_data()
 	gizmo_geosurface.start_index = 0;
 	gizmo_geosurface.count = gizmo_indices.size();
 	gizmo_geosurface.bounds = Geometry::compute_bounds(gizmo_vertices);
-	gizmo_geosurface.material = std::make_shared<Material>(m_default_data);
+	gizmo_geosurface.material_instance = std::make_shared<MaterialInstance>(m_default_data);
 
 	std::shared_ptr<MeshAsset> gizmo_mesh_asset = std::make_shared<MeshAsset>();
 	gizmo_mesh_asset->name = "gizmo";
@@ -1009,7 +1009,7 @@ std::optional<std::shared_ptr<GltfMesh>> VulkanRenderer::load_gltf_mesh(std::str
 		}
 	};
 
-	auto build_material_func = [this](VkDevice device, MaterialPassType pass, const GltfMetallicRoughness::MaterialResources& resources, DescriptorAllocatorGrowable& descriptor_allocator)
+	auto build_material_func = [this](VkDevice device, MaterialPassType pass, const MetallicRoughnessMaterial::MaterialResources& resources, DescriptorAllocatorGrowable& descriptor_allocator)
 		{
 			return m_metal_rough_material.write_material(device, pass, resources, descriptor_allocator);
 		};

@@ -2,17 +2,12 @@
 
 #include "metallic_roughness_material.h"
 
-struct Material
-{
-	MaterialInstance data;
-};
-
 struct GeoSurface
 {
 	uint32_t start_index;
 	uint32_t count;
 	Bounds bounds;
-	std::shared_ptr<Material> material;
+	std::shared_ptr<MaterialInstance> material_instance;
 };
 
 struct MeshAsset

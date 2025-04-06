@@ -3,7 +3,7 @@
 #include "pipelines.h"
 
 
-void GltfMetallicRoughness::build_pipelines(VkDevice device, VkDescriptorSetLayout gpu_scene_data_descriptor_layout, VkFormat draw_image_format, VkFormat depth_image_format)
+void MetallicRoughnessMaterial::build_pipelines(VkDevice device, VkDescriptorSetLayout gpu_scene_data_descriptor_layout, VkFormat draw_image_format, VkFormat depth_image_format)
 {
 	VkShaderModule mesh_vertex_shader;
 	if (!vkutil::load_shader_module("../shaders/mesh.vert.spv", device, &mesh_vertex_shader))
@@ -75,7 +75,7 @@ void GltfMetallicRoughness::build_pipelines(VkDevice device, VkDescriptorSetLayo
 	vkDestroyShaderModule(device, mesh_vertex_shader, nullptr);
 }
 
-MaterialInstance GltfMetallicRoughness::write_material(VkDevice device, MaterialPassType pass, const MaterialResources& resources, DescriptorAllocatorGrowable& descriptor_allocator)
+MaterialInstance MetallicRoughnessMaterial::write_material(VkDevice device, MaterialPassType pass, const MaterialResources& resources, DescriptorAllocatorGrowable& descriptor_allocator)
 {
 	MaterialInstance material_instance;
 	material_instance.pass_type = pass;
@@ -101,7 +101,7 @@ MaterialInstance GltfMetallicRoughness::write_material(VkDevice device, Material
 	return material_instance;
 }
 
-void GltfMetallicRoughness::clear_resources(VkDevice device)
+void MetallicRoughnessMaterial::clear_resources(VkDevice device)
 {
 	vkDestroyDescriptorSetLayout(device, m_material_layout, nullptr);
 	vkDestroyPipelineLayout(device, m_transparent_pipeline.layout, nullptr);

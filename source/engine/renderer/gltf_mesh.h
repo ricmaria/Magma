@@ -31,7 +31,7 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<MeshAsset>> m_meshes;
 	std::unordered_map<std::string, std::shared_ptr<Node>> m_nodes;
 	std::unordered_map<std::string, AllocatedImage> m_images;
-	std::unordered_map<std::string, std::shared_ptr<Material>> m_materials;
+	std::unordered_map<std::string, std::shared_ptr<MaterialInstance>> m_material_instances;
 
 	// nodes that dont have a parent, for iterating through the file in tree order
 	std::vector<std::shared_ptr<Node>> m_top_nodes;

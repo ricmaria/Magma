@@ -10,12 +10,12 @@ void MeshNode::add_to_render_context(const glm::mat4& topMatrix, RenderContext& 
 		def.index_count = surface.count;
 		def.first_index = surface.start_index;
 		def.index_buffer = mesh->mesh_buffers.index_buffer.buffer;
-		def.material = &surface.material->data;
+		def.material = surface.material_instance.get();
 		def.bounds = surface.bounds;
 		def.transform = nodeMatrix;
 		def.vertex_buffer_address = mesh->mesh_buffers.vertex_buffer_address;
 
-		if (surface.material->data.pass_type == MaterialPassType::Transparent)
+		if (surface.material_instance->pass_type == MaterialPassType::Transparent)
 		{
 			ctx.transparent_surfaces.push_back(def);
 		}

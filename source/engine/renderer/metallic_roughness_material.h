@@ -4,7 +4,7 @@
 #include "types.h"
 #include "descriptors.h"
 
-class GltfMetallicRoughness
+class MetallicRoughnessMaterial
 {
 public:
 	struct MaterialConstants

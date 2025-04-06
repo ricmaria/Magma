@@ -233,7 +233,7 @@ private:
 	VkSampler m_default_sampler_nearest;
 
 	MaterialInstance m_default_data;
-	GltfMetallicRoughness m_metal_rough_material;
+	MetallicRoughnessMaterial m_metal_rough_material;
 
 	RenderContext m_main_render_context;
 	std::unordered_map<std::string, std::shared_ptr<Node>> m_predefined_meshes;

@@ -150,7 +150,7 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 	std::vector<std::shared_ptr<MeshAsset>> meshes;
 	std::vector<std::shared_ptr<Node>> nodes;
 	std::vector<AllocatedImage> images;
-	std::vector<std::shared_ptr<Material>> materials;
+	std::vector<std::shared_ptr<MaterialInstance>> material_instances;
 
 	// load textures
 
@@ -176,20 +176,20 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 	// load materials
 
 // create buffer to hold the material data
-	gltf_mesh.m_material_data_buffer = buffer_allocator.create_buffer(sizeof(GltfMetallicRoughness::MaterialConstants) * gltf.materials.size(),
+	gltf_mesh.m_material_data_buffer = buffer_allocator.create_buffer(sizeof(MetallicRoughnessMaterial::MaterialConstants) * gltf.materials.size(),
 		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
 	int data_index = 0;
 
-	GltfMetallicRoughness::MaterialConstants* sceneMaterialConstants = (GltfMetallicRoughness::MaterialConstants*)gltf_mesh.m_material_data_buffer.info.pMappedData;
+	MetallicRoughnessMaterial::MaterialConstants* sceneMaterialConstants = (MetallicRoughnessMaterial::MaterialConstants*)gltf_mesh.m_material_data_buffer.info.pMappedData;
 
 	for (fastgltf::Material& material : gltf.materials)
 	{
-		std::shared_ptr<Material> new_material = std::make_shared<Material>();
-		materials.push_back(new_material);
-		gltf_mesh.m_materials[material.name.c_str()] = new_material;
+		std::shared_ptr<MaterialInstance> new_material_instance = std::make_shared<MaterialInstance>();
+		material_instances.push_back(new_material_instance);
+		gltf_mesh.m_material_instances[material.name.c_str()] = new_material_instance;
 
-		GltfMetallicRoughness::MaterialConstants constants;
+		MetallicRoughnessMaterial::MaterialConstants constants;
 		constants.color_factors.x = material.pbrData.baseColorFactor[0];
 		constants.color_factors.y = material.pbrData.baseColorFactor[1];
 		constants.color_factors.z = material.pbrData.baseColorFactor[2];
@@ -206,7 +206,7 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 			passType = MaterialPassType::Transparent;
 		}
 
-		GltfMetallicRoughness::MaterialResources material_resources;
+		MetallicRoughnessMaterial::MaterialResources material_resources;
 		// default the material textures
 		material_resources.color_image = white_image;
 		material_resources.color_sampler = default_sampler;
@@ -215,7 +215,7 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 
 		// set the uniform buffer for the material data
 		material_resources.data_buffer = gltf_mesh.m_material_data_buffer.buffer;
-		material_resources.data_buffer_offset = data_index * sizeof(GltfMetallicRoughness::MaterialConstants);
+		material_resources.data_buffer_offset = data_index * sizeof(MetallicRoughnessMaterial::MaterialConstants);
 		// grab textures from gltf file
 		if (material.pbrData.baseColorTexture.has_value())
 		{
@@ -226,7 +226,7 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 			material_resources.color_sampler = gltf_mesh.m_samplers[sampler];
 		}
 		// build material
-		new_material->data = build_material(device, passType, material_resources, gltf_mesh.m_descriptor_pool);
+		*new_material_instance = build_material(device, passType, material_resources, gltf_mesh.m_descriptor_pool);
 
 		data_index++;
 	}
@@ -318,11 +318,11 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 			// load material
 			if (p.materialIndex.has_value())
 			{
-				new_surface.material = materials[p.materialIndex.value()];
+				new_surface.material_instance = material_instances[p.materialIndex.value()];
 			}
 			else
 			{
-				new_surface.material = materials[0];
+				new_surface.material_instance = material_instances[0];
 			}
 
 			// compute bounds
