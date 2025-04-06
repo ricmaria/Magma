@@ -132,7 +132,6 @@ private:
 	void init_descriptors();
 	void init_pipelines();
 	void init_background_pipelines();
-	void init_mesh_pipeline();
 	void init_default_data();
 	void init_imgui();
 
@@ -224,13 +223,6 @@ private:
 
 	std::vector<ComputeEffect> m_background_effects;
 	int m_current_background_effect{ 0 };
-
-	VkPipelineLayout m_mesh_pipeline_layout;
-	VkPipeline m_mesh_pipeline;
-
-	GpuMeshBuffers m_rectangle;
-
-	std::vector<std::shared_ptr<MeshAsset>> m_test_meshes;
 
 	AllocatedImage m_white_image;
 	AllocatedImage m_black_image;

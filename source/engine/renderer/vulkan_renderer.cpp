@@ -78,12 +78,6 @@ void VulkanRenderer::cleanup()
 			m_frames[i].deletion_queue.flush();
 		}
 
-		for (auto& mesh : m_test_meshes)
-		{
-			destroy_buffer(mesh->mesh_buffers.index_buffer);
-			destroy_buffer(mesh->mesh_buffers.vertex_buffer);
-		}
-
 		//flush the global deletion queue
 		m_main_deletion_queue.flush();
 
@@ -514,9 +508,6 @@ void VulkanRenderer::init_pipelines()
 	// compute pipelines
 	init_background_pipelines();
 
-	// graphics pipelins
-	init_mesh_pipeline();
-
 	m_metal_rough_material.build_pipelines(m_device, m_gpu_scene_data_descriptor_layout, m_draw_image.image_format, m_depth_image.image_format);
 }
 
@@ -613,124 +604,9 @@ void VulkanRenderer::init_background_pipelines()
 		});
 }
 
-void VulkanRenderer::init_mesh_pipeline()
-{
-	VkShaderModule triangle_frag_shader;
-	if (!vkutil::load_shader_module("../shaders/tex_image.frag.spv", m_device, &triangle_frag_shader))
-	{
-		fmt::println("Error when building the texture image fragment shader (tex_image.frag)");
-	}
-	else
-	{
-		fmt::println("Texture image fragment shader succesfully loaded (tex_image.frag)");
-	}
-
-	VkShaderModule triangle_vertex_shader;
-	if (!vkutil::load_shader_module("../shaders/colored_triangle_mesh.vert.spv", m_device, &triangle_vertex_shader))
-	{
-		fmt::println("Error when building the colored triangle vertex shader (colored_triangle_mesh.vert)");
-	}
-	else
-	{
-		fmt::println("Colored triangle vertex shader succesfully loaded (colored_triangle_mesh.vert)");
-	}
-
-	VkPushConstantRange buffer_range{};
-	buffer_range.offset = 0;
-	buffer_range.size = sizeof(GpuDrawPushConstants);
-	buffer_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-	VkPipelineLayoutCreateInfo pipeline_layout_info = vkinit::pipeline_layout_create_info();
-	pipeline_layout_info.pPushConstantRanges = &buffer_range;
-	pipeline_layout_info.pushConstantRangeCount = 1;
-	pipeline_layout_info.pSetLayouts = &m_single_image_descriptor_layout;
-	pipeline_layout_info.setLayoutCount = 1;
-
-	VK_CHECK(vkCreatePipelineLayout(m_device, &pipeline_layout_info, nullptr, &m_mesh_pipeline_layout));
-
-	PipelineBuilder pipeline_builder;
-
-	//use the triangle layout we created
-	pipeline_builder.set_pipeline_layout(m_mesh_pipeline_layout);
-	//connecting the vertex and pixel shaders to the pipeline
-	pipeline_builder.set_shaders(triangle_vertex_shader, triangle_frag_shader);
-	//it will draw triangles
-	pipeline_builder.set_input_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
-	//filled triangles
-	pipeline_builder.set_polygon_mode(VK_POLYGON_MODE_FILL);
-	//no backface culling
-	pipeline_builder.set_cull_mode(VK_CULL_MODE_NONE, VK_FRONT_FACE_CLOCKWISE);
-	//no multisampling
-	pipeline_builder.set_multisampling_none();
-	//no blending
-	pipeline_builder.disable_blending();
-
-	//pipelineBuilder.disable_depthtest();
-	pipeline_builder.enable_depthtest(true, VK_COMPARE_OP_LESS_OR_EQUAL);
-
-	//connect the image format we will draw into, from draw image
-	pipeline_builder.set_color_attachment_format(m_draw_image.image_format);
-	pipeline_builder.set_depth_format(m_depth_image.image_format);
-
-	//pipelineBuilder.disable_blending();
-	pipeline_builder.enable_blending_additive();
-
-	//finally build the pipeline
-	m_mesh_pipeline = pipeline_builder.build_pipeline(m_device);
-
-	//clean structures
-	vkDestroyShaderModule(m_device, triangle_frag_shader, nullptr);
-	vkDestroyShaderModule(m_device, triangle_vertex_shader, nullptr);
-
-	m_main_deletion_queue.push_function([&]()
-		{
-			vkDestroyPipelineLayout(m_device, m_mesh_pipeline_layout, nullptr);
-			vkDestroyPipeline(m_device, m_mesh_pipeline, nullptr);
-		});
-}
-
 void VulkanRenderer::init_default_data()
 {
-	// meshes
-
-	std::array<Vertex, 4> rect_vertices;
-
-	rect_vertices[0].position = { 0.5,-0.5, 0 };
-	rect_vertices[1].position = { 0.5,0.5, 0 };
-	rect_vertices[2].position = { -0.5,-0.5, 0 };
-	rect_vertices[3].position = { -0.5,0.5, 0 };
-
-	rect_vertices[0].color = { 0,0, 0,1 };
-	rect_vertices[1].color = { 0.5,0.5,0.5 ,1 };
-	rect_vertices[2].color = { 1,0, 0,1 };
-	rect_vertices[3].color = { 0,1, 0,1 };
-
-	std::array<uint32_t, 6> rect_indices;
-
-	rect_indices[0] = 0;
-	rect_indices[1] = 1;
-	rect_indices[2] = 2;
-
-	rect_indices[3] = 2;
-	rect_indices[4] = 1;
-	rect_indices[5] = 3;
-
-	m_rectangle = upload_mesh(rect_indices, rect_vertices);
-
-	m_test_meshes = GltfMeshLoader::load_gltf_meshes("..\\assets\\basicmesh.glb",
-		[this](std::span<uint32_t> indices, std::span<Vertex> vertices)
-		{
-			return this->upload_mesh(indices, vertices);
-		}).value();
-
-	//delete the rectangle data on engine shutdown
-	m_main_deletion_queue.push_function([&]()
-		{
-			destroy_buffer(m_rectangle.index_buffer);
-			destroy_buffer(m_rectangle.vertex_buffer);
-		});
-
-	// textures
+		// textures
 
 	//3 default textures, white, grey, black. 1 pixel each
 	uint32_t white = glm::packUnorm4x8(glm::vec4(1, 1, 1, 1));
@@ -776,7 +652,7 @@ void VulkanRenderer::init_default_data()
 		destroy_image(m_error_checkerboard_image);
 		});
 
-	// material
+		// material
 
 	GltfMetallicRoughness::MaterialResources material_resources;
 	//default the material textures
@@ -803,23 +679,7 @@ void VulkanRenderer::init_default_data()
 
 	m_default_data = m_metal_rough_material.write_material(m_device, MaterialPassType::MainColor, material_resources, m_global_descriptor_allocator);
 
-	// meshes
-
-	for (auto& mesh : m_test_meshes)
-	{
-		std::shared_ptr<MeshNode> new_node = std::make_shared<MeshNode>();
-		new_node->mesh = mesh;
-
-		new_node->local_transform = glm::mat4{ 1.f };
-		new_node->world_transform = glm::mat4{ 1.f };
-
-		for (auto& surface : new_node->mesh->surfaces)
-		{
-			surface.material = std::make_shared<Material>(m_default_data);
-		}
-
-		m_predefined_meshes[mesh->name] = std::move(new_node);
-	}
+		// gizmo
 
 	std::vector<Vertex> gizmo_vertices;
 	std::vector<uint32_t> gizmo_indices;
@@ -842,6 +702,8 @@ void VulkanRenderer::init_default_data()
 	gizmo_node->world_transform = glm::mat4{ 1.f };
 
 	m_predefined_meshes["gizmo"] = std::move(gizmo_node);
+
+		// deletion queue
 
 	m_main_deletion_queue.push_function([=]()
 		{

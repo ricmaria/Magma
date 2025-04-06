@@ -5,16 +5,16 @@
 
 void GltfMetallicRoughness::build_pipelines(VkDevice device, VkDescriptorSetLayout gpu_scene_data_descriptor_layout, VkFormat draw_image_format, VkFormat depth_image_format)
 {
-	VkShaderModule mesh_frag_shader;
-	if (!vkutil::load_shader_module("../shaders/mesh.frag.spv", device, &mesh_frag_shader))
-	{
-		fmt::println("Error when building the triangle fragment shader module");
-	}
-
 	VkShaderModule mesh_vertex_shader;
 	if (!vkutil::load_shader_module("../shaders/mesh.vert.spv", device, &mesh_vertex_shader))
 	{
 		fmt::println("Error when building the triangle vertex shader module");
+	}
+
+	VkShaderModule mesh_frag_shader;
+	if (!vkutil::load_shader_module("../shaders/mesh.frag.spv", device, &mesh_frag_shader))
+	{
+		fmt::println("Error when building the triangle fragment shader module");
 	}
 
 	VkPushConstantRange matrix_range{};

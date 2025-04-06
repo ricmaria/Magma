@@ -65,14 +65,14 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 
 	fmt::print("Loading GLTF: {}", file_path);
 	
-	std::shared_ptr<GltfMesh> scene = std::shared_ptr<GltfMesh>(new GltfMesh);
+	std::shared_ptr<GltfMesh> gltf_mesh_pointer = std::shared_ptr<GltfMesh>(new GltfMesh);
 
-	scene->m_device = device;
-	scene->m_buffer_allocator = buffer_allocator;
-	scene->m_image_allocator = image_allocator;
-	scene->m_error_image = error_image;	
+	gltf_mesh_pointer->m_device = device;
+	gltf_mesh_pointer->m_buffer_allocator = buffer_allocator;
+	gltf_mesh_pointer->m_image_allocator = image_allocator;
+	gltf_mesh_pointer->m_error_image = error_image;	
 
-	GltfMesh& file = *scene.get();
+	GltfMesh& gltf_mesh = *gltf_mesh_pointer.get();
 
 	fastgltf::Parser parser{};
 
@@ -125,7 +125,7 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3 },
 		{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1 } };
 
-	file.m_descriptor_pool.init(device, static_cast<uint32_t>(gltf.materials.size()), sizes);
+	gltf_mesh.m_descriptor_pool.init(device, static_cast<uint32_t>(gltf.materials.size()), sizes);
 
 	// load samplers
 
@@ -143,7 +143,7 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 		VkSampler newSampler;
 		vkCreateSampler(device, &sampl, nullptr, &newSampler);
 
-		file.m_samplers.push_back(newSampler);
+		gltf_mesh.m_samplers.push_back(newSampler);
 	}
 
 	// temporal arrays for all the objects to use while creating the GLTF data
@@ -162,7 +162,7 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 		if (img.has_value())
 		{
 			images.push_back(*img);
-			file.m_images[image.name.c_str()] = *img;
+			gltf_mesh.m_images[image.name.c_str()] = *img;
 		}
 		else
 		{
@@ -176,18 +176,18 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 	// load materials
 
 // create buffer to hold the material data
-	file.m_material_data_buffer = buffer_allocator.create_buffer(sizeof(GltfMetallicRoughness::MaterialConstants) * gltf.materials.size(),
+	gltf_mesh.m_material_data_buffer = buffer_allocator.create_buffer(sizeof(GltfMetallicRoughness::MaterialConstants) * gltf.materials.size(),
 		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
 	int data_index = 0;
 
-	GltfMetallicRoughness::MaterialConstants* sceneMaterialConstants = (GltfMetallicRoughness::MaterialConstants*)file.m_material_data_buffer.info.pMappedData;
+	GltfMetallicRoughness::MaterialConstants* sceneMaterialConstants = (GltfMetallicRoughness::MaterialConstants*)gltf_mesh.m_material_data_buffer.info.pMappedData;
 
 	for (fastgltf::Material& material : gltf.materials)
 	{
 		std::shared_ptr<Material> new_material = std::make_shared<Material>();
 		materials.push_back(new_material);
-		file.m_materials[material.name.c_str()] = new_material;
+		gltf_mesh.m_materials[material.name.c_str()] = new_material;
 
 		GltfMetallicRoughness::MaterialConstants constants;
 		constants.color_factors.x = material.pbrData.baseColorFactor[0];
@@ -214,7 +214,7 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 		material_resources.metal_rough_sampler = default_sampler;
 
 		// set the uniform buffer for the material data
-		material_resources.data_buffer = file.m_material_data_buffer.buffer;
+		material_resources.data_buffer = gltf_mesh.m_material_data_buffer.buffer;
 		material_resources.data_buffer_offset = data_index * sizeof(GltfMetallicRoughness::MaterialConstants);
 		// grab textures from gltf file
 		if (material.pbrData.baseColorTexture.has_value())
@@ -223,10 +223,10 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 			size_t sampler = gltf.textures[material.pbrData.baseColorTexture.value().textureIndex].samplerIndex.value();
 
 			material_resources.color_image = images[img];
-			material_resources.color_sampler = file.m_samplers[sampler];
+			material_resources.color_sampler = gltf_mesh.m_samplers[sampler];
 		}
 		// build material
-		new_material->data = build_material(device, passType, material_resources, file.m_descriptor_pool);
+		new_material->data = build_material(device, passType, material_resources, gltf_mesh.m_descriptor_pool);
 
 		data_index++;
 	}
@@ -241,7 +241,7 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 	{
 		std::shared_ptr<MeshAsset> new_mesh = std::make_shared<MeshAsset>();
 		meshes.push_back(new_mesh);
-		file.m_meshes[mesh.name.c_str()] = new_mesh;
+		gltf_mesh.m_meshes[mesh.name.c_str()] = new_mesh;
 		new_mesh->name = mesh.name;
 
 		// clear the mesh arrays each mesh, we dont want to merge them by error
@@ -364,7 +364,7 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 		}
 
 		nodes.push_back(new_node);
-		file.m_nodes[node.name.c_str()];
+		gltf_mesh.m_nodes[node.name.c_str()];
 
 		std::visit(fastgltf::visitor
 			{
@@ -407,11 +407,11 @@ std::optional<std::shared_ptr<GltfMesh>> GltfMeshLoader::load_gltf_mesh()
 	{
 		if (node->parent.lock() == nullptr)
 		{
-			file.m_top_nodes.push_back(node);
+			gltf_mesh.m_top_nodes.push_back(node);
 			node->refresh_transform(glm::mat4{ 1.f });
 		}
 	}
-	return scene;
+	return gltf_mesh_pointer;
 }
 
 std::optional<std::vector<std::shared_ptr<MeshAsset>>> GltfMeshLoader::load_gltf_meshes(std::filesystem::path file_path, UploadMesh upload_mesh)
