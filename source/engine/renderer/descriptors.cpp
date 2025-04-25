@@ -209,7 +209,7 @@ VkDescriptorSet DescriptorAllocatorGrowable::allocate(VkDevice device, VkDescrip
 	return ds;
 }
 
-void DescriptorWriter::write_buffer(int binding, VkBuffer buffer, size_t size, size_t offset, VkDescriptorType type)
+void DescriptorWriter::add_buffer_write(int binding, VkBuffer buffer, size_t size, size_t offset, VkDescriptorType type)
 {
 	VkDescriptorBufferInfo& info = m_buffer_infos.emplace_back(VkDescriptorBufferInfo{
 		.buffer = buffer,
@@ -228,7 +228,7 @@ void DescriptorWriter::write_buffer(int binding, VkBuffer buffer, size_t size, s
 	m_writes.push_back(write);
 }
 
-void DescriptorWriter::write_image(int binding, VkImageView image, VkSampler sampler, VkImageLayout layout, VkDescriptorType type)
+void DescriptorWriter::add_image_write(int binding, VkImageView image, VkSampler sampler, VkImageLayout layout, VkDescriptorType type)
 {
 	VkDescriptorImageInfo& info = m_image_infos.emplace_back(VkDescriptorImageInfo{
 		.sampler = sampler,
@@ -254,7 +254,7 @@ void DescriptorWriter::clear()
 	m_buffer_infos.clear();
 }
 
-void DescriptorWriter::update_set(VkDevice device, VkDescriptorSet set)
+void DescriptorWriter::write_set(VkDevice device, VkDescriptorSet set)
 {
 	for (VkWriteDescriptorSet& write : m_writes)
 	{

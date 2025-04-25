@@ -88,15 +88,14 @@ MaterialInstance MetallicRoughnessMaterial::write_material(VkDevice device, Mate
 		material_instance.pipeline = &m_opaque_pipeline;
 	}
 
-	material_instance.material_set = descriptor_allocator.allocate(device, m_material_layout);
-
+	material_instance.descriptor_set = descriptor_allocator.allocate(device, m_material_layout);
 
 	m_writer.clear();
-	m_writer.write_buffer(0, resources.data_buffer, sizeof(MaterialConstants), resources.data_buffer_offset, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-	m_writer.write_image(1, resources.color_image.image_view, resources.color_sampler, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-	m_writer.write_image(2, resources.metal_rough_image.image_view, resources.metal_rough_sampler, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+	m_writer.add_buffer_write(0, resources.data_buffer, sizeof(MaterialConstants), resources.data_buffer_offset, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+	m_writer.add_image_write(1, resources.color_image.image_view, resources.color_sampler, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+	m_writer.add_image_write(2, resources.metal_rough_image.image_view, resources.metal_rough_sampler, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
 
-	m_writer.update_set(device, material_instance.material_set);
+	m_writer.write_set(device, material_instance.descriptor_set);
 
 	return material_instance;
 }

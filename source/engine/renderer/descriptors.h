@@ -59,11 +59,11 @@ private:
 class DescriptorWriter
 {
 public:
-	void write_image(int binding, VkImageView image, VkSampler sampler, VkImageLayout layout, VkDescriptorType type);
-	void write_buffer(int binding, VkBuffer buffer, size_t size, size_t offset, VkDescriptorType type);
+	void add_image_write(int binding, VkImageView image, VkSampler sampler, VkImageLayout layout, VkDescriptorType type);
+	void add_buffer_write(int binding, VkBuffer buffer, size_t size, size_t offset, VkDescriptorType type);
 
+	void write_set(VkDevice device, VkDescriptorSet set);
 	void clear();
-	void update_set(VkDevice device, VkDescriptorSet set);
 
 private:
 	std::deque<VkDescriptorImageInfo> m_image_infos;

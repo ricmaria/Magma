@@ -1216,11 +1216,11 @@ void VulkanRenderer::draw_main_render_context(VkCommandBuffer cmd)
 	*scene_uniform_data = m_scene_data;
 
 	//create a descriptor set that binds that buffer and update it
-	VkDescriptorSet global_descriptor = get_current_frame().frame_descriptors.allocate(m_device, m_gpu_scene_data_descriptor_layout);
+	VkDescriptorSet global_descriptor_set = get_current_frame().frame_descriptors.allocate(m_device, m_gpu_scene_data_descriptor_layout);
 
 	DescriptorWriter writer;
-	writer.write_buffer(0, gpu_scene_data_buffer.buffer, sizeof(GPUSceneData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-	writer.update_set(m_device, global_descriptor);
+	writer.add_buffer_write(0, gpu_scene_data_buffer.buffer, sizeof(GPUSceneData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+	writer.write_set(m_device, global_descriptor_set);
 
 	// begin rendering
 
@@ -1250,7 +1250,7 @@ void VulkanRenderer::draw_main_render_context(VkCommandBuffer cmd)
 				{
 					last_pipeline = r.material->pipeline;
 					vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, r.material->pipeline->pipeline);
-					vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, r.material->pipeline->layout, 0, 1, &global_descriptor, 0, nullptr);
+					vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, r.material->pipeline->layout, 0, 1, &global_descriptor_set, 0, nullptr);
 
 					VkViewport viewport = {};
 					viewport.x = 0;
@@ -1271,7 +1271,7 @@ void VulkanRenderer::draw_main_render_context(VkCommandBuffer cmd)
 					vkCmdSetScissor(cmd, 0, 1, &scissor);
 				}
 
-				vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, r.material->pipeline->layout, 1, 1, &r.material->material_set, 0, nullptr);
+				vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, r.material->pipeline->layout, 1, 1, &r.material->descriptor_set, 0, nullptr);
 			}
 
 			//rebind index buffer if needed
