@@ -27,12 +27,12 @@ void Renderer::set_camera_transform(const Transform& transform)
 	m_vulkan_renderer.set_camera_transform(transform);
 }
 
-Renderer::RenderObjectId Renderer::add_predefined_mesh_render_object(const std::string& mesh_name, glm::mat4 transform)
+Renderer::RenderObjectId Renderer::add_predefined_mesh_render_object(const std::string& mesh_name, const Transform& transform)
 {
 	return m_vulkan_renderer.add_render_object_predefined_mesh(mesh_name, transform);
 }
 
-Renderer::RenderObjectId Renderer::add_gltf_mesh_render_object(const std::string& gltf_file_path, glm::mat4 transform)
+Renderer::RenderObjectId Renderer::add_gltf_mesh_render_object(const std::string& gltf_file_path, const Transform& transform)
 {
 	return m_vulkan_renderer.add_render_object_gltf_mesh(gltf_file_path, transform);
 }
@@ -42,7 +42,7 @@ void Renderer::remove_render_object(RenderObjectId id)
 	m_vulkan_renderer.remove_render_object(id);
 }
 
-void Renderer::update_render_object(RenderObjectId id, const glm::mat4& transform)
+void Renderer::update_render_object(RenderObjectId id, const Transform& transform)
 {
 	m_vulkan_renderer.update_render_object(id, transform);
 }

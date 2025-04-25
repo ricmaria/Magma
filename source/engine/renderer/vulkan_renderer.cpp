@@ -54,12 +54,12 @@ void VulkanRenderer::init(uint32_t width, uint32_t height, SDL_Window* window)
 
 	init_imgui();
 
-	m_is_initialized = true;
+	m_initialized = true;
 }
 
 void VulkanRenderer::cleanup()
 {
-	if (m_is_initialized)
+	if (m_initialized)
 	{
 		//make sure the gpu has stopped doing its things
 		vkDeviceWaitIdle(m_device);
@@ -1397,14 +1397,14 @@ bool VulkanRenderer::is_visible(const GpuRenderObject& obj, const glm::mat4& vie
 	}
 }
 
-VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object_predefined_mesh(const std::string& mesh_name, const glm::mat4& transform)
+VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object_predefined_mesh(const std::string& mesh_name, const Transform& transform)
 {
 	assert(m_predefined_meshes.find(mesh_name) != m_predefined_meshes.end());
 
 	auto id = m_id_pool.acquire_id();
 
 	auto render_object = std::make_shared<RenderObject>();
-	render_object->transform = transform;
+	render_object->transform = transform.get_matrix();
 	render_object->renderable = m_predefined_meshes[mesh_name];
 
 	m_render_object_id_to_render_object[id] = render_object;
@@ -1412,7 +1412,7 @@ VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object_predefined_mesh
 	return id;
 }
 
-VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object_gltf_mesh(const std::string& gltf_file_path, const glm::mat4& transform)
+VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object_gltf_mesh(const std::string& gltf_file_path, const Transform& transform)
 {
 	auto id = m_id_pool.acquire_id();
 
@@ -1421,7 +1421,7 @@ VulkanRenderer::RenderObjectId VulkanRenderer::add_render_object_gltf_mesh(const
 	assert(gltf_mesh.has_value());
 
 	auto render_object = std::make_shared<RenderObject>();
-	render_object->transform = transform;
+	render_object->transform = transform.get_matrix();
 	render_object->renderable = gltf_mesh.value();
 
 	m_render_object_id_to_render_object[id] = render_object;
@@ -1439,12 +1439,12 @@ void VulkanRenderer::remove_render_object(RenderObjectId id)
 	}
 }
 
-void VulkanRenderer::update_render_object(RenderObjectId id, const glm::mat4& transform)
+void VulkanRenderer::update_render_object(RenderObjectId id, const Transform& transform)
 {
 	auto it = m_render_object_id_to_render_object.find(id);
 
 	if (it != m_render_object_id_to_render_object.end())
 	{
-		it->second->transform = transform;
+		it->second->transform = transform.get_matrix();
 	}
 }
