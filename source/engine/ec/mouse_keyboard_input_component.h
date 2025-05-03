@@ -34,9 +34,9 @@ namespace EC
 		virtual ~MouseKeyboardInputComponent() override {};
 
 	private:
-		const uint8_t* _sdl_keyboard_state_array = nullptr;
-		float _action_1 = 0.0f;
-		float _action_2 = 0.0f;
-		glm::vec2 _mouse_delta = { 0.0f,0.0f };
+		const uint8_t* m_sdl_keyboard_state_array = nullptr;
+		float m_action_1 = 0.0f;
+		float m_action_2 = 0.0f;
+		glm::vec2 m_mouse_delta = { 0.0f,0.0f };
 	};
 }

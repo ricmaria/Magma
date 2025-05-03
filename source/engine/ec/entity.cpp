@@ -4,7 +4,7 @@ using namespace EC;
 
 void Entity::update(float delta_time)
 {
-	for (auto& component : _components)
+	for (auto& component : m_components)
 	{
 		component->update(delta_time);
 	}
@@ -12,7 +12,7 @@ void Entity::update(float delta_time)
 
 std::unique_ptr<Component> Entity::remove_component(Component* component_arg)
 {
-	auto it = std::find_if(_components.begin(), _components.end(),
+	auto it = std::find_if(m_components.begin(), m_components.end(),
 		[&component_arg](std::unique_ptr<Component>& component_lambda)
 		{
 			return component_lambda.get() == component_arg;
@@ -23,14 +23,14 @@ std::unique_ptr<Component> Entity::remove_component(Component* component_arg)
 
 std::unique_ptr<Component> Entity::remove_component(const std::vector<std::unique_ptr<Component>>::iterator& it)
 {
-	if (it == _components.end())
+	if (it == m_components.end())
 	{
 		return nullptr;
 	}
 
 	Component* removed_component = (*it).get();
 
-	for (auto& other_component : _components)
+	for (auto& other_component : m_components)
 	{
 		Injector::eject_all(*removed_component);
 
@@ -48,7 +48,7 @@ std::unique_ptr<Component> Entity::remove_component(const std::vector<std::uniqu
 
 	std::unique_ptr<Component> component_unique = std::move(*it);
 
-	_components.erase(it);
+	m_components.erase(it);
 
 	return component_unique;
 	

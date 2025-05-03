@@ -6,20 +6,20 @@
 
 void SDLManager::init(uint32_t width, uint32_t height)
 {
-	_width = width;
-	_height = height;
+	m_width = width;
+	m_height = height;
 
 	// We initialize SDL and create a window with it. 
 	SDL_Init(SDL_INIT_VIDEO);
 
 	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
 
-	_window = SDL_CreateWindow(
+	m_window = SDL_CreateWindow(
 		"Magma Engine",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
-		_width,
-		_height,
+		m_width,
+		m_height,
 		window_flags
 	);
 }
@@ -51,11 +51,11 @@ void SDLManager::run(std::function<void(const SDL_Event*)> process_sdl_event, st
 			{
 				if (e.window.event == SDL_WINDOWEVENT_MINIMIZED)
 				{
-					_windows_visible = false;
+					m_windows_visible = false;
 				}
 				if (e.window.event == SDL_WINDOWEVENT_RESTORED)
 				{
-					_windows_visible = true;
+					m_windows_visible = true;
 				}
 			}
 
@@ -68,12 +68,12 @@ void SDLManager::run(std::function<void(const SDL_Event*)> process_sdl_event, st
 
 void SDLManager::cleanup()
 {
-	SDL_DestroyWindow(_window);
+	SDL_DestroyWindow(m_window);
 }
 
 bool SDLManager::is_window_visible() const
 {
-	return _windows_visible;
+	return m_windows_visible;
 }
 
 void SDLManager::log(const char* text)

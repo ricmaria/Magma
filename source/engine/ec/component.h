@@ -26,7 +26,7 @@ namespace EC
 	protected:
 		const std::vector<Dependency>& get_dependencies() const override
 		{
-			static Dependency logger = Dependency::make(&Component::_logger);
+			static Dependency logger = Dependency::make(&Component::m_logger);
 			static auto dependencies = append_dependencies(Injectee::get_dependencies(), { logger });
 
 			return dependencies;
@@ -42,6 +42,6 @@ namespace EC
 
 		virtual void on_sibling_component_removed(Component* sibling) {};
 
-		Logger* _logger;
+		Logger* m_logger;
 	};
 };

@@ -13,7 +13,7 @@ namespace EC
 	public:
 		inline void init(Injector* injector)
 		{
-			_injector = injector;
+			m_injector = injector;
 		}
 
 		Entity* create_entity();
@@ -21,8 +21,8 @@ namespace EC
 		void update(float delta_time);
 
 	private:
-		std::vector<std::unique_ptr<Entity>> _entities;
+		std::vector<std::unique_ptr<Entity>> m_entities;
 
-		Injector* _injector;
+		Injector* m_injector;
 	};
 }

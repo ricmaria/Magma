@@ -4,16 +4,16 @@ using namespace EC;
 
 Entity* EntityManager::create_entity()
 {
-	Entity* entity = new Entity(_injector);
+	Entity* entity = new Entity(m_injector);
 
-	_entities.push_back(std::unique_ptr<Entity>(entity));
+	m_entities.push_back(std::unique_ptr<Entity>(entity));
 
-	return _entities.back().get();
+	return m_entities.back().get();
 }
 
 void EntityManager::update(float delta_time)
 {
-	for (auto& entity : _entities)
+	for (auto& entity : m_entities)
 	{
 		entity->update(delta_time);
 	}

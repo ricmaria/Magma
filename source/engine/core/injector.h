@@ -15,9 +15,9 @@ public:
 		{
 			Reflectable::TypeId type_id = dependency.type_id;
 
-			auto it = _type_id_to_injected.find(type_id);
+			auto it = m_type_id_to_injected.find(type_id);
 
-			if (it != _type_id_to_injected.end())
+			if (it != m_type_id_to_injected.end())
 			{
 				void* injected = it->second;
 
@@ -70,9 +70,9 @@ public:
 		{
 			Reflectable::TypeId type_id = dependency.type_id;
 
-			auto it = _type_id_to_injected.find(type_id);
+			auto it = m_type_id_to_injected.find(type_id);
 
-			if (it != _type_id_to_injected.end())
+			if (it != m_type_id_to_injected.end())
 			{
 				void* injected = it->second;
 
@@ -135,7 +135,7 @@ protected:
 		Reflectable* injected;
 	};
 
-	std::unordered_map<Reflectable::TypeId, void*> _type_id_to_injected;
+	std::unordered_map<Reflectable::TypeId, void*> m_type_id_to_injected;
 };
 
 class InjectorRegister : public Injector
@@ -147,9 +147,9 @@ public:
 		
 		for (auto& type_id : injected->get_types())
 		{
-			if (type_id != reflectable_type_id && !_type_id_to_injected.contains(type_id))
+			if (type_id != reflectable_type_id && !m_type_id_to_injected.contains(type_id))
 			{
-				_type_id_to_injected[type_id] = injected;
+				m_type_id_to_injected[type_id] = injected;
 			}
 		}
 	}
@@ -162,7 +162,7 @@ public:
 
 		if (injected_type_id != reflectable_type_id)
 		{
-			_type_id_to_injected[injected_type_id] = injected;
+			m_type_id_to_injected[injected_type_id] = injected;
 		}
 	}
 
@@ -170,11 +170,11 @@ public:
 	{
 		for (auto& type_id : injected->get_types())
 		{
-			auto it = _type_id_to_injected.find(type_id);
+			auto it = m_type_id_to_injected.find(type_id);
 
-			if (it != _type_id_to_injected.end())
+			if (it != m_type_id_to_injected.end())
 			{
-				_type_id_to_injected.erase(it);
+				m_type_id_to_injected.erase(it);
 			}
 		}
 	}
@@ -184,17 +184,17 @@ public:
 	{
 		static Reflectable::TypeId injected_type_id = Reflectable::extract_type<TInjected>();
 
-		auto it = _type_id_to_injected.find(injected_type_id);
+		auto it = m_type_id_to_injected.find(injected_type_id);
 
-		if (it != _type_id_to_injected.end())
+		if (it != m_type_id_to_injected.end())
 		{
-			_type_id_to_injected.erase(it);
+			m_type_id_to_injected.erase(it);
 		}
 	}
 
 	void unregister_injected(void* injected)
 	{
-		std::erase_if(_type_id_to_injected, [injected](const auto& pair)
+		std::erase_if(m_type_id_to_injected, [injected](const auto& pair)
 			{ return pair.second == injected; });
 	}
 };

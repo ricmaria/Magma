@@ -10,13 +10,13 @@ public:
 	template<typename TFunction>
 	Delegate(TFunction function)
 	{
-		_function = function;
+		m_function = function;
 	}
 
 	template<typename TObject, typename TMemberFunction>
 	Delegate(TObject* object, TMemberFunction member_function)
 	{
-		_function = [object, member_function](TParams&&... params)
+		m_function = [object, member_function](TParams&&... params)
 			{
 				return (object->*member_function)(std::forward<TParams>(params)...);
 			};
@@ -24,9 +24,9 @@ public:
 
 	TReturn operator()(TParams&&... params) const
 	{
-		return _function(std::forward<TParams>(params)...);
+		return m_function(std::forward<TParams>(params)...);
 	}
 
 private:
-	std::function<TReturn(TParams...)> _function;
+	std::function<TReturn(TParams...)> m_function;
 };
