@@ -36,6 +36,9 @@ public:
 
 	inline void set_camera_transform(const Transform& transform) { m_camera_transform = transform; }
 
+	inline void set_directional_light_direction(const glm::vec3& direction) { m_directional_light_direction = direction; }
+	inline void set_directional_light_color(const glm::vec4& color) { m_directional_light_color = color; }
+
 	RenderObjectId add_render_object_predefined_mesh(const std::string& mesh_name, const Transform& transform);
 	RenderObjectId add_render_object_gltf_mesh(const std::string& gltf_file_path, const Transform& transform);
 
@@ -245,4 +248,7 @@ private:
 	Transform m_camera_transform;
 
 	std::unordered_map<RenderObjectId, std::shared_ptr<RenderObject>> m_render_object_id_to_render_object;
+
+	glm::vec3 m_directional_light_direction = { 0.0f, 1.0f, 0.0f };
+	glm::vec4 m_directional_light_color = glm::vec4{ 1.0f };
 };

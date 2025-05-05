@@ -27,6 +27,16 @@ void Renderer::set_camera_transform(const Transform& transform)
 	m_vulkan_renderer.set_camera_transform(transform);
 }
 
+void Renderer::set_directional_light_direction(const glm::vec3& direction)
+{
+	m_vulkan_renderer.set_directional_light_direction(direction);
+}
+
+void Renderer::set_directional_light_color(const glm::vec4& color)
+{
+	m_vulkan_renderer.set_directional_light_color(color);
+}
+
 Renderer::RenderObjectId Renderer::add_predefined_mesh_render_object(const std::string& mesh_name, const Transform& transform)
 {
 	return m_vulkan_renderer.add_render_object_predefined_mesh(mesh_name, transform);

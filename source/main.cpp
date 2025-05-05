@@ -7,6 +7,7 @@
 #include <ec/render/camera_component.h>
 #include <ec/render/gltf_mesh_render_component.h>
 #include <ec/render/predefined_mesh_render_component.h>
+#include <ec/render/directional_light_component.h>
 #include <ec/first_person_controller_component.h>
 
 #include <core/delegate.h>
@@ -36,6 +37,9 @@ int main(int argc, char* argv[])
 	auto gltf_structure_transform_component = gltf_structure_entity->add_component<EC::TransformComponent>();
 	auto gltf_structure_mesh_component = gltf_structure_entity->add_component<EC::GltfMeshRenderComponent>();
 	gltf_structure_mesh_component->set_gltf_file_path("..\\assets\\structure.glb");
+
+	EC::Entity* light_entity = entity_manager->create_entity();
+	auto directional_light_component = light_entity->add_component<EC::DirectionaLightRenderComponent>();
 
 	EC::Entity* gizmo_entity = entity_manager->create_entity();
 	auto gizmo_transform_component = gizmo_entity->add_component<EC::TransformComponent>();

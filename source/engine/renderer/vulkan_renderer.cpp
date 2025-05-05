@@ -1055,8 +1055,8 @@ void VulkanRenderer::add_render_objects_to_context()
 
 	//some default lighting parameters
 	m_scene_data.ambient_color = glm::vec4(.1f);
-	m_scene_data.sunlight_color = glm::vec4(1.f);
-	m_scene_data.sunlight_direction = glm::vec4(0, 1, 0.5, 1.f);
+	m_scene_data.sunlight_color = m_directional_light_color;
+	m_scene_data.sunlight_direction = glm::vec4(m_directional_light_direction, 1.f);
 
 	for (auto& render_object : m_render_object_id_to_render_object)
 	{
