@@ -4,9 +4,10 @@
 
 #include <ec/mouse_keyboard_input_component.h>
 #include <ec/transform_component.h>
-#include <ec/camera_component.h>
+#include <ec/render/camera_component.h>
+#include <ec/render/gltf_mesh_render_component.h>
+#include <ec/render/predefined_mesh_render_component.h>
 #include <ec/first_person_controller_component.h>
-#include <ec/mesh_render_component.h>
 
 #include <core/delegate.h>
 

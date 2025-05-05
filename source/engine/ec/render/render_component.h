@@ -1,12 +1,10 @@
 #pragma once
 
-#include "component.h"
+#include "ec/component.h"
 #include "renderer/renderer.h"
 
 namespace EC
 {
-	class TransformComponent;
-
 	class RenderComponent : public Component
 	{
 	public:

@@ -17,9 +17,15 @@ file(GLOB_RECURSE SRC_RENDERER
 )
 
 set(EC_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ec/")
-file(GLOB_RECURSE SRC_EC
+file(GLOB SRC_EC
     "${EC_SOURCE_DIR}/*.cpp"
     "${EC_SOURCE_DIR}/*.h"
+)
+
+set(EC_RENDER_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ec/render/")
+file(GLOB SRC_EC_RENDER
+    "${EC_RENDER_SOURCE_DIR}/*.cpp"
+    "${EC_RENDER_SOURCE_DIR}/*.h"
 )
 
 add_library(MagmaEngine
@@ -27,12 +33,14 @@ add_library(MagmaEngine
  ${SRC_CORE}
  ${SRC_RENDERER}
  ${SRC_EC}
+ ${SRC_EC_RENDER}
  )
 
 source_group("Source Files" FILES ${SRC_ENGINE})
 source_group("Source Files/core" FILES ${SRC_CORE})
 source_group("Source Files/renderer" FILES ${SRC_RENDERER})
 source_group("Source Files/ec" FILES ${SRC_EC})
+source_group("Source Files/ec/render" FILES ${SRC_EC_RENDER})
 
 target_compile_definitions(MagmaEngine PUBLIC GLM_FORCE_DEPTH_ZERO_TO_ONE NOMINMAX)
 

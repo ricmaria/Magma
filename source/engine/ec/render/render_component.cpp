@@ -1,6 +1,6 @@
 #include "render_component.h"
 
-#include "transform_component.h"
+#include "ec/transform_component.h"
 #include "renderer/renderer.h"
 
 using namespace EC;
