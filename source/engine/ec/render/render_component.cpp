@@ -9,7 +9,7 @@ void EC::RenderComponent::on_sibling_component_added(Component* sibling)
 {
 	ParentType::on_sibling_component_added(sibling);
 
-	if (can_add_to_renderer())
+	if (!is_on_renderer() && can_be_on_renderer())
 	{
 		add_to_renderer();
 	}
@@ -17,9 +17,12 @@ void EC::RenderComponent::on_sibling_component_added(Component* sibling)
 
 void EC::RenderComponent::on_sibling_component_removed(Component* sibling)
 {
-	remove_from_renderer();
-
 	ParentType::on_sibling_component_removed(sibling);
+
+	if (is_on_renderer() && !can_be_on_renderer())
+	{
+		remove_from_renderer();
+	}
 }
 
 void RenderComponent::on_being_removed()
@@ -29,19 +32,20 @@ void RenderComponent::on_being_removed()
 	ParentType::on_being_removed();
 }
 
-bool EC::RenderComponent::can_add_to_renderer()
+bool RenderComponent::can_be_on_renderer()
 {
 	return m_renderer != nullptr;
 }
 
-void EC::RenderComponent::remove_from_renderer()
+void RenderComponent::reset_on_render()
 {
-	if (m_render_object_id == Renderer::invalid_render_object_id)
+	if (is_on_renderer())
 	{
-		return;
+		remove_from_renderer();
 	}
 
-	m_renderer->remove_render_object(m_render_object_id);
-
-	m_render_object_id = Renderer::invalid_render_object_id;
+	if (can_be_on_renderer())
+	{
+		add_to_renderer();
+	}
 }

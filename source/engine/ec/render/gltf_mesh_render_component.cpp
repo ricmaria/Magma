@@ -9,16 +9,12 @@ void EC::GltfMeshRenderComponent::set_gltf_file_path(const std::string& gltf_fil
 
 	m_gltf_file_path = gltf_file_path;
 
-	if (can_add_to_renderer())
-	{
-		remove_from_renderer();
-		add_to_renderer();
-	}
+	reset_on_render();
 }
 
-bool EC::GltfMeshRenderComponent::can_add_to_renderer()
+bool EC::GltfMeshRenderComponent::can_be_on_renderer()
 {
-	return !m_gltf_file_path.empty() && ParentType::can_add_to_renderer();
+	return !m_gltf_file_path.empty() && ParentType::can_be_on_renderer();
 }
 
 void EC::GltfMeshRenderComponent::add_to_renderer()

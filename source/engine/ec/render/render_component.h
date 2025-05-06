@@ -29,14 +29,16 @@ namespace EC
 			return dependencies;
 		}
 
-		virtual bool can_add_to_renderer();
+		virtual bool is_on_renderer() = 0;
 
-		virtual void add_to_renderer() = 0;
+		virtual bool can_be_on_renderer();
 
-		void remove_from_renderer();
+		virtual void add_to_renderer() {};
+
+		virtual void remove_from_renderer() {};
+
+		void reset_on_render();
 
 		Renderer* m_renderer = nullptr;
-
-		Renderer::RenderObjectId m_render_object_id = Renderer::invalid_render_object_id;
 	};
 }

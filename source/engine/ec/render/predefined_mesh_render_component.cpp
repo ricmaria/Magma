@@ -9,16 +9,12 @@ void EC::PredefinedMeshRenderComponent::set_mesh_name(const std::string& mesh_na
 
 	m_mesh_name = mesh_name;
 
-	if (can_add_to_renderer())
-	{
-		remove_from_renderer();
-		add_to_renderer();
-	}
+	reset_on_render();
 }
 
-bool EC::PredefinedMeshRenderComponent::can_add_to_renderer()
+bool EC::PredefinedMeshRenderComponent::can_be_on_renderer()
 {
-	return !m_mesh_name.empty() && ParentType::can_add_to_renderer();
+	return !m_mesh_name.empty() && ParentType::can_be_on_renderer();
 }
 
 void EC::PredefinedMeshRenderComponent::add_to_renderer()

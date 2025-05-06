@@ -20,6 +20,7 @@ namespace EC
 		void update(float delta_time) override;
 
 	protected:
+		bool is_on_renderer() override { return true; };
 		void add_to_renderer() override;
 
 		glm::vec3 m_direction = { 0.0f, 1.0f, 0.5f };
